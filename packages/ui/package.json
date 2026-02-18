@@ -18,6 +18,7 @@
     "@tiptap/starter-kit": "*",
     "grist-plugin-api": "*",
     "react": "*",
+    "react-dom": "*",
     "tiptap-markdown": "*"
   }
 }
