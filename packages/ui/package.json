@@ -1,0 +1,19 @@
+{
+  "name": "@grist-widgets/ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@gouvfr-lasuite/ui-kit": "*",
+    "@openfun/cunningham-react": "*",
+    "@tiptap/extension-placeholder": "*",
+    "@tiptap/react": "*",
+    "@tiptap/starter-kit": "*",
+    "grist-plugin-api": "*",
+    "react": "*",
+    "tiptap-markdown": "*"
+  }
+}

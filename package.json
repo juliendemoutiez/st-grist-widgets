@@ -1,0 +1,9 @@
+{
+  "name": "grist-widgets",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev:crm": "pnpm --filter crm dev",
+    "build:crm": "pnpm --filter crm build"
+  }
+}

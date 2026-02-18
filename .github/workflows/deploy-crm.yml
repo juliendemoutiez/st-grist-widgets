@@ -1,0 +1,37 @@
+name: Deploy CRM widget
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/crm/**'
+      - 'packages/ui/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install
+
+      - run: pnpm --filter crm build
+        env:
+          VITE_BASE_URL: /${{ github.event.repository.name }}/crm/
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps/crm/dist
+          destination_dir: crm
