@@ -13,7 +13,7 @@ const PROJET_FORM: FormConfig = {
   fields: [
     { colId: 'Pour_qui', icon: 'group', label: 'Pour qui' },
     { colId: 'Statut', icon: 'flag', label: 'Statut' },
-    { colId: 'Priorite', icon: 'priority_high', label: 'Priorité' },
+    { colId: 'Priorite', icon: 'priority_high', label: '🤝 Priorité' },
     { colId: 'Effectifs', icon: 'people', label: 'Effectifs' },
     { colId: 'Outils_utilises', icon: 'build', label: 'Outils utilisés' },
     {
