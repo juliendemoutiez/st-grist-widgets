@@ -6,6 +6,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "devDependencies": {
+    "@types/react": "*"
+  },
   "peerDependencies": {
     "@gouvfr-lasuite/ui-kit": "*",
     "@openfun/cunningham-react": "*",

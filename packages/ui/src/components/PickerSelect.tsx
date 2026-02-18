@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface PickerOption {
@@ -34,7 +34,7 @@ interface MultiProps extends CommonProps {
 type PickerSelectProps = SingleProps | MultiProps;
 
 /** Build inline style for a color chip from a PickerOption. */
-function chipStyle(opt: PickerOption): React.CSSProperties {
+function chipStyle(opt: PickerOption): CSSProperties {
   if (opt.fillColor || opt.textColor) {
     return {
       backgroundColor: opt.fillColor || '#f0f0f0',
@@ -58,7 +58,7 @@ export function PickerSelect(props: PickerSelectProps) {
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({ position: 'fixed', visibility: 'hidden' });
+  const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({ position: 'fixed', visibility: 'hidden' });
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -129,17 +129,6 @@ export function PickerSelect(props: PickerSelectProps) {
         const singleProps = props as SingleProps;
         singleProps.onChange(value);
         setOpen(false);
-      }
-    },
-    [isMulti, props],
-  );
-
-  const _removeChip = useCallback(
-    (value: string, e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (isMulti) {
-        const multiProps = props as MultiProps;
-        multiProps.onChange(multiProps.value.filter((v) => v !== value));
       }
     },
     [isMulti, props],

@@ -61,7 +61,7 @@ export function MarkdownEditor({ icon, label, value, onChange, onBlur, readOnly 
     editable: !readOnly,
     onUpdate: ({ editor: ed }) => {
       userEdited.current = true;
-      const md = ed.storage.markdown.getMarkdown() as string;
+      const md = (ed.storage as unknown as { markdown: { getMarkdown: () => string } }).markdown.getMarkdown();
       onChange(md);
     },
   });

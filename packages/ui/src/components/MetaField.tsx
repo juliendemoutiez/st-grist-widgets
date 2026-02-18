@@ -64,7 +64,7 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
     if (!targetTable) return;
     try {
       const data = await fetchTable(targetTable);
-      const items = data.id.map((id, i) => ({
+      const items = (data.id as number[]).map((id: number, i: number) => ({
         value: String(id),
         label: String((data[labelCol] as string[])?.[i] ?? ''),
       }));
@@ -198,7 +198,7 @@ function applyTransform(val: string, transform?: 'uppercase' | 'capitalize'): st
   return val.replace(/(^|[\s-])(\S)/g, (_, sep, c) => sep + c.toUpperCase());
 }
 
-export function MetaField({ colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, avatar, transform, refLabelCol }: MetaFieldProps) {
+export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, avatar, transform, refLabelCol }: MetaFieldProps) {
   // Strip timezone suffix from DateTime types (e.g. "DateTime:Europe/Paris" → "DateTime")
   const rawType = columnMeta?.type ?? 'Text';
   const type = rawType.startsWith('DateTime') ? 'DateTime' : rawType;
