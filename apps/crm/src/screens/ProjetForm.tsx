@@ -11,7 +11,7 @@ const PROJET_FORM: FormConfig = {
   newRecordLabel: 'Nouveau projet',
   emptyMessage: 'Cliquez sur un projet pour afficher les détails',
   fields: [
-    { colId: 'Pour_qui', icon: 'group', label: 'Pour qui' },
+    { colId: 'Pour_qui_', icon: 'group', label: 'Pour qui' },
     // { colId: 'Statut', icon: 'flag', label: 'Statut' },
     { colId: 'Priorite', icon: 'priority_high', label: 'Priorité' },
     { colId: 'Lien_CR', icon: 'link', label: 'Lien CR' },

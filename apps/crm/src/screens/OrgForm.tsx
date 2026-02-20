@@ -26,7 +26,7 @@ const ORG_FORM: FormConfig = {
       addLabel: 'Ajouter un contact',
       refAddScreen: 'ContactForm',
       refEditScreen: 'ContactForm',
-      refLabelCol: 'Nom_complet',
+      refLabelCol: 'Nom_Complet',
     },
     { colId: 'Cree_par', icon: 'account_circle', label: 'Créé par', readOnly: true, avatar: true },
     { colId: 'Derniere_mise_a_jour_par', icon: 'account_circle', label: 'Dernière mise à jour par', readOnly: true, avatar: true },
