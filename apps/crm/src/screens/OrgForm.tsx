@@ -2,7 +2,7 @@ import { RecordForm } from '@grist-widgets/ui';
 import type { FormConfig } from '@grist-widgets/ui';
 
 const ORG_FORM: FormConfig = {
-  table: 'ORGANISATIONS',
+  table: 'Organisations',
   titleColId: 'Nom',
   titleDefault: 'Sans titre',
   titlePlaceholder: "Nom de l'organisation",

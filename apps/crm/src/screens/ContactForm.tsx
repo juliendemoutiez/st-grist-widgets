@@ -2,7 +2,7 @@ import { RecordForm } from '@grist-widgets/ui';
 import type { FormConfig } from '@grist-widgets/ui';
 
 const CONTACT_FORM: FormConfig = {
-  table: 'CONTACTS',
+  table: 'Contacts',
   titleColId: 'Nom_complet',
   titleDefault: 'Nouveau contact',
   titlePlaceholder: '',

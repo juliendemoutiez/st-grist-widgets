@@ -190,6 +190,31 @@ function decodeChoiceList(value: unknown): string[] {
   return arr.map(String);
 }
 
+/**
+ * Parse a Grist hyperlink value.
+ * Grist format: "Label https://url" (text then space then URL), or just "https://url".
+ * Returns null if the value is empty/null.
+ */
+function parseHyperlink(value: unknown): { url: string; label: string } | null {
+  if (!value || typeof value !== 'string' || !value.trim()) return null;
+  const str = value.trim();
+  const lastSpace = str.lastIndexOf(' ');
+  if (lastSpace !== -1) {
+    const potentialUrl = str.slice(lastSpace + 1);
+    if (/^https?:\/\/\S/.test(potentialUrl)) {
+      return { url: potentialUrl, label: str.slice(0, lastSpace) };
+    }
+  }
+  const url = /^https?:\/\//.test(str) ? str : `https://${str}`;
+  return { url, label: str };
+}
+
+/** Return a short display label for a hyperlink: use the explicit label if set, otherwise the hostname. */
+function getHyperlinkDisplay(parsed: { url: string; label: string }): string {
+  if (parsed.label !== parsed.url) return parsed.label;
+  try { return new URL(parsed.url).hostname; } catch { return parsed.url; }
+}
+
 /** Apply a text transform: 'uppercase' → all caps, 'capitalize' → first letter of each word. */
 function applyTransform(val: string, transform?: 'uppercase' | 'capitalize'): string {
   if (!transform) return val;
@@ -205,6 +230,7 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
   const refTarget = parseRefTarget(type);
   const refListTarget = parseRefListTarget(type);
   const refOptions = useRefOptions(refTarget ?? refListTarget, refReloadTrigger, refLabelCol);
+  const [hlEditing, setHlEditing] = useState(false);
 
   if (type === 'Choice') {
     const options = buildChoiceOptions(columnMeta!);
@@ -355,6 +381,57 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
             const v = e.target.value;
             onChange(v ? fromDateTimeLocal(v) : null);
           }}
+        />
+      </MetaRow>
+    );
+  }
+
+  // HyperLink: Text column styled as hyperlink
+  const isHyperlink = columnMeta?.widgetOptions?.widget === 'HyperLink';
+  if (isHyperlink) {
+    const parsed = parseHyperlink(value);
+    const displayText = parsed ? getHyperlinkDisplay(parsed) : '';
+
+    if (readOnly) {
+      return (
+        <MetaRow icon={icon} label={label}>
+          {parsed
+            ? <a href={parsed.url} target="_blank" rel="noopener noreferrer" className="meta-row__hl-chip">{displayText}</a>
+            : <span className="meta-row__value-static">{'\u2014'}</span>
+          }
+        </MetaRow>
+      );
+    }
+
+    const strValue = value != null ? String(value) : '';
+
+    // Chip view: show pill + edit button
+    if (parsed && !hlEditing) {
+      return (
+        <MetaRow icon={icon} label={label}>
+          <div className="meta-row__link-wrap">
+            <a href={parsed.url} target="_blank" rel="noopener noreferrer" className="meta-row__hl-chip">{displayText}</a>
+            <button type="button" className="meta-row__hl-edit" onClick={() => setHlEditing(true)} title="Modifier">
+              <span className="material-icons">edit</span>
+            </button>
+          </div>
+        </MetaRow>
+      );
+    }
+
+    // Edit view: text input (also shown when no value yet)
+    return (
+      <MetaRow icon={icon} label={label}>
+        <input
+          type="text"
+          className="meta-row__input"
+          value={strValue}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus={hlEditing}
+          placeholder={label}
+          onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLElement).blur(); }}
+          onBlur={() => { setHlEditing(false); onBlur?.(); }}
+          onChange={(e) => { setHlEditing(true); onChange(e.target.value); }}
         />
       </MetaRow>
     );

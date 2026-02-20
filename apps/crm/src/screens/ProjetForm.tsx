@@ -2,7 +2,7 @@ import { RecordForm, Timeline } from '@grist-widgets/ui';
 import type { FormConfig, TimelineConfig } from '@grist-widgets/ui';
 
 const PROJET_FORM: FormConfig = {
-  table: 'PROJETS',
+  table: 'Projets',
   titleColId: 'Nom',
   titleDefault: 'Sans titre',
   titlePlaceholder: 'Titre du projet',
@@ -12,10 +12,16 @@ const PROJET_FORM: FormConfig = {
   emptyMessage: 'Cliquez sur un projet pour afficher les détails',
   fields: [
     { colId: 'Pour_qui', icon: 'group', label: 'Pour qui' },
-    { colId: 'Statut', icon: 'flag', label: 'Statut' },
-    { colId: 'Priorite', icon: 'priority_high', label: '🤝 Priorité' },
-    { colId: 'Effectifs', icon: 'people', label: '🌱 Effectifs' },
-    { colId: 'Outils_utilises', icon: 'build', label: 'Outils utilisés' },
+    // { colId: 'Statut', icon: 'flag', label: 'Statut' },
+    { colId: 'Priorite', icon: 'priority_high', label: 'Priorité' },
+    { colId: 'Lien_CR', icon: 'link', label: 'Lien CR' },
+    { colId: 'Effectifs', icon: 'people', label: 'Effectifs' },
+    { colId: 'Solutions_actuelles', icon: 'inventory_2', label: 'Solutions actuelles' },
+    { colId: 'Interet_pour_La_Suite', icon: 'favorite', label: 'Intérêt pour La Suite' },
+    // { colId: 'Projet_de_migration', icon: 'build', label: 'Projet de migration' },
+    { colId: 'Sentiment_envers_LaSuite', icon: 'sentiment_satisfied', label: 'Sentiment envers La Suite' },
+    { colId: 'Echeance_contrat', icon: 'calendar_month', label: 'Echéance contrat' },
+
     {
       colId: 'Organisation',
       icon: 'business',
@@ -32,7 +38,7 @@ const PROJET_FORM: FormConfig = {
 };
 
 const INTERACTIONS_TIMELINE: TimelineConfig = {
-  table: 'INTERACTIONS',
+  table: 'Interactions',
   filterCol: 'Projets',
   refType: 'RefList',
   dateCol: 'Date',

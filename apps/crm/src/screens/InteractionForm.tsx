@@ -2,7 +2,7 @@ import { RecordForm } from '@grist-widgets/ui';
 import type { FormConfig } from '@grist-widgets/ui';
 
 const INTERACTION_FORM: FormConfig = {
-  table: 'INTERACTIONS',
+  table: 'Interactions',
   titleColId: 'Type',
   titleDefault: 'Nouvelle interaction',
   titlePlaceholder: '',
@@ -30,10 +30,9 @@ const INTERACTION_FORM: FormConfig = {
       readOnly: true,
       refLabelCol: 'Nom_complet',
     },
+    { colId: 'Date_de_prochaine_interaction', icon: 'calendar_month', label: 'Date de prochaine interaction' },
     { colId: 'Cree_par', icon: 'account_circle', label: 'Créé par', readOnly: true, avatar: true },
-    { colId: 'Derniere_mise_a_jour_par', icon: 'account_circle', label: 'Dernière mise à jour par', readOnly: true, avatar: true },
     { colId: 'Cree_le', icon: 'calendar_today', label: 'Créé le', readOnly: true },
-    { colId: 'Derniere_mise_a_jour', icon: 'update', label: 'Dernière mise à jour le', readOnly: true },
     { colId: 'Prochaine_etape', icon: 'notes', label: 'Prochaine étape', markdown: true },
   ],
 };
