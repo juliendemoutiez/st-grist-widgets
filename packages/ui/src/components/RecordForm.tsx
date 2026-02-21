@@ -180,9 +180,17 @@ export function RecordForm({ config, mode, children }: RecordFormProps) {
 
   // --- Saving ---
 
+  // When a titleFormula is defined, derive the displayed title from field values
+  useEffect(() => {
+    if (config.titleFormula) {
+      setTitle(config.titleFormula(fields));
+    }
+  }, [fields, config.titleFormula]);
+
   // Re-fetch the title from Grist (for computed/formula title columns)
   const refreshTitle = useCallback(async (rowId: number) => {
     if (!config.titleReadOnly) return;
+    if (config.titleFormula) return; // title is derived from field state, not from Grist
     try {
       const table = await fetchTable(config.table);
       const rowIdx = table.id.indexOf(rowId);

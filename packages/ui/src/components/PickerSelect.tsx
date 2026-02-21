@@ -181,13 +181,6 @@ export function PickerSelect(props: PickerSelectProps) {
     if (!selected) {
       return <span className="picker-select__placeholder">{placeholder}</span>;
     }
-    if (hasColor(selected)) {
-      return (
-        <span className="picker-select__color-chip" style={chipStyle(selected)}>
-          {selected.label}
-        </span>
-      );
-    }
     if (props.relation) {
       return (
         <span className="picker-select__relation-chip">
@@ -200,6 +193,13 @@ export function PickerSelect(props: PickerSelectProps) {
               }}
             >link</span>
           )}
+          {selected.label}
+        </span>
+      );
+    }
+    if (hasColor(selected)) {
+      return (
+        <span className="picker-select__color-chip" style={chipStyle(selected)}>
           {selected.label}
         </span>
       );

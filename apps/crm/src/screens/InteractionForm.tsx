@@ -1,12 +1,26 @@
 import { RecordForm } from '@grist-widgets/ui';
 import type { FormConfig } from '@grist-widgets/ui';
 
+function interactionTitle(fields: Record<string, unknown>): string {
+  const type = fields['Type'];
+  if (!type) return '';
+  const date = fields['Date'];
+  if (typeof date === 'number' && date > 0) {
+    const formatted = new Date(date * 1000).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+    });
+    return `${type} (${formatted})`;
+  }
+  return `${type} (Non datée)`;
+}
+
 const INTERACTION_FORM: FormConfig = {
   table: 'Interactions',
   titleColId: 'Type',
   titleDefault: 'Nouvelle interaction',
   titlePlaceholder: '',
   titleReadOnly: true,
+  titleFormula: interactionTitle,
   headerDateColId: 'Cree_le',
   headerDatePrefix: 'Créé',
   fields: [

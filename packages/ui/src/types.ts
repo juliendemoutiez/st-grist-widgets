@@ -66,6 +66,12 @@ export interface FormConfig {
   titlePlaceholder: string;
   /** When true, the title is displayed but not editable (e.g. for computed columns). */
   titleReadOnly?: boolean;
+  /**
+   * Optional function to compute the displayed title from the current field values.
+   * When provided, overrides titleColId for display purposes.
+   * Return an empty string to show no title.
+   */
+  titleFormula?: (fields: Record<string, unknown>) => string;
   /** Column whose Grist timestamp is shown as a relative date in the header */
   headerDateColId?: string;
   /** Prefix for the relative date, e.g. 'Créé' */
