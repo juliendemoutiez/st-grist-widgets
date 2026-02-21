@@ -12,7 +12,7 @@ const CONTACT_FORM: FormConfig = {
   fields: [
     { colId: 'Nom', icon: 'person', label: 'Nom', transform: 'uppercase' },
     { colId: 'Prenom', icon: 'badge', label: 'Prénom', transform: 'capitalize' },
-    { colId: 'Organisation', icon: 'business', label: 'Organisation', refLabelCol: 'Nom' },
+    { colId: 'Organisation', icon: 'business', label: 'Organisation', refLabelCol: 'Nom', refEditScreen: 'OrgForm' },
     { colId: 'Cree_par', icon: 'account_circle', label: 'Créé par', readOnly: true, avatar: true },
     { colId: 'Derniere_mise_a_jour_par', icon: 'account_circle', label: 'Dernière mise à jour par', readOnly: true, avatar: true },
     { colId: 'Cree_le', icon: 'calendar_today', label: 'Créé le', readOnly: true },
