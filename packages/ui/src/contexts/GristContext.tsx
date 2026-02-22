@@ -31,10 +31,18 @@ export function useGrist() {
   return ctx;
 }
 
+const TABLE_CACHE_TTL_MS = 30_000;
+
+interface CacheEntry {
+  data: FetchedTable;
+  fetchedAt: number;
+}
+
 export function GristProvider({ children }: { children: ReactNode }) {
   const [record, setRecord] = useState<RowRecord | null>(null);
   const [isReady, setIsReady] = useState(false);
   const initRef = useRef(false);
+  const tableCache = useRef(new Map<string, CacheEntry>());
 
   useEffect(() => {
     if (initRef.current) return;
@@ -59,11 +67,19 @@ export function GristProvider({ children }: { children: ReactNode }) {
     if (!grist || !record) return;
     const table = await grist.getTable();
     await table.update({ id: record.id, fields });
+    // Invalidate cache for the linked table (tableId unknown here, clear all)
+    tableCache.current.clear();
   }, [record]);
 
   const fetchTable = useCallback(async (tableId: string) => {
     if (!grist) throw new Error('Grist API not available');
-    return grist.docApi.fetchTable(tableId);
+    const cached = tableCache.current.get(tableId);
+    if (cached && Date.now() - cached.fetchedAt < TABLE_CACHE_TTL_MS) {
+      return cached.data;
+    }
+    const data = await grist.docApi.fetchTable(tableId);
+    tableCache.current.set(tableId, { data, fetchedAt: Date.now() });
+    return data;
   }, []);
 
   const createRecord = useCallback(async (tableId: string, fields: Record<string, unknown>) => {
@@ -71,6 +87,7 @@ export function GristProvider({ children }: { children: ReactNode }) {
     const result = await grist.docApi.applyUserActions([
       ['AddRecord', tableId, null, fields],
     ]);
+    tableCache.current.delete(tableId);
     return (result as { retValues: number[] }).retValues[0];
   }, []);
 
@@ -78,6 +95,7 @@ export function GristProvider({ children }: { children: ReactNode }) {
     if (!grist) throw new Error('Grist API not available');
     const table = await grist.getTable(tableId);
     await table.update({ id, fields });
+    tableCache.current.delete(tableId);
   }, []);
 
   const setCursorPos = useCallback(async (rowId: number) => {
