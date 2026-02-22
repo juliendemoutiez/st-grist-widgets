@@ -1,8 +1,15 @@
 import { RecordForm } from '@grist-widgets/ui';
 import type { FormConfig } from '@grist-widgets/ui';
 
+function decodeType(value: unknown): string {
+  if (Array.isArray(value) && value[0] === 'L') {
+    return value.slice(1).join(', ');
+  }
+  return String(value ?? '');
+}
+
 function interactionTitle(fields: Record<string, unknown>): string {
-  const type = fields['Type'];
+  const type = decodeType(fields['Type']);
   if (!type) return '';
   const date = fields['Date'];
   if (typeof date === 'number' && date > 0) {
@@ -42,6 +49,7 @@ const INTERACTION_FORM: FormConfig = {
       icon: 'group',
       label: 'Contacts internes',
       readOnly: true,
+      refEditScreen: 'ContactForm',
       refLabelCol: 'Nom_Complet',
     },
     { colId: 'Date_de_prochaine_interaction', icon: 'calendar_month', label: 'Date de prochaine interaction' },
