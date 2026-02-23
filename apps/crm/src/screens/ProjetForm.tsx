@@ -12,13 +12,13 @@ const PROJET_FORM: FormConfig = {
   emptyMessage: 'Cliquez sur un projet pour afficher les détails',
   fields: [
     { colId: 'Pour_qui_', icon: 'group', label: 'Pour qui' },
-    // { colId: 'Statut', icon: 'flag', label: 'Statut' },
+    { colId: 'Statut', icon: 'flag', label: 'Statut' },
     { colId: 'Priorite', icon: 'priority_high', label: 'Priorité' },
     { colId: 'Lien_CR', icon: 'link', label: 'Lien CR' },
     { colId: 'Effectifs', icon: 'people', label: 'Effectifs' },
     { colId: 'Solutions_actuelles', icon: 'inventory_2', label: 'Solutions actuelles' },
     { colId: 'Interet_pour_La_Suite', icon: 'favorite', label: 'Intérêt pour La Suite' },
-    // { colId: 'Projet_de_migration', icon: 'build', label: 'Projet de migration' },
+    { colId: 'Besoin', icon: 'build', label: 'Besoin' },
     { colId: 'Sentiment_envers_LaSuite', icon: 'sentiment_satisfied', label: 'Sentiment envers La Suite' },
     { colId: 'Echeance_contrat', icon: 'calendar_month', label: 'Echéance contrat' },
 

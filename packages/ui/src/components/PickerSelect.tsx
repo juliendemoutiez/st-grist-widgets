@@ -204,7 +204,7 @@ export function PickerSelect(props: PickerSelectProps) {
         </span>
       );
     }
-    return <span className="picker-select__text">{selected.label}</span>;
+    return <span className="picker-select__chip">{selected.label}</span>;
   };
 
   const isSelected = (value: string) => {
@@ -272,7 +272,7 @@ export function PickerSelect(props: PickerSelectProps) {
                       {opt.label}
                     </span>
                   ) : (
-                    opt.label
+                    <span className="picker-select__chip">{opt.label}</span>
                   )}
                 </li>
               ))

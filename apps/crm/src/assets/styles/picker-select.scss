@@ -54,8 +54,8 @@
   border-radius: 0.25rem;
   flex-shrink: 1;
   min-width: 0;
-  background-color: var(--c--theme--colors--primary-100, #e3f2fd);
-  color: var(--c--theme--colors--primary-500, #1976d2);
+  background-color: #f0f0f0;
+  color: #555;
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
@@ -72,14 +72,14 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: var(--c--theme--colors--primary-500, #1976d2);
+  color: #555;
 
   .material-icons {
     font-size: 14px;
   }
 
   &:hover {
-    color: var(--c--theme--colors--primary-700, #1565c0);
+    color: #333;
   }
 }
 
