@@ -59,7 +59,19 @@ function buildChoiceOptions(meta: ColumnMeta): PickerOption[] {
 function useRefOptions(targetTable: string | null, reloadTrigger?: number, labelCol = 'Nom') {
   const { fetchTable } = useGrist();
   const [options, setOptions] = useState<PickerOption[]>([]);
-  const [loading, setLoading] = useState(!!targetTable);
+  // Track which targetTable options have actually been loaded for.
+  // This lets us derive `loading` synchronously during render, so the skeleton
+  // is shown even when targetTable transitions from null → non-null mid-lifecycle
+  // (e.g. when columnMeta loads asynchronously after the initial render).
+  const loadedForRef = useRef<string | null>(null);
+  // Explicit reloading flag for when reloadTrigger fires (loadedForRef won't help
+  // there since the table hasn't changed, only its data has).
+  const [reloading, setReloading] = useState(false);
+
+  // loading = true when:
+  // 1. targetTable is set but we haven't loaded options for it yet (derived, synchronous)
+  // 2. an explicit reload is in progress due to reloadTrigger
+  const loading = reloading || (targetTable !== null && loadedForRef.current !== targetTable);
 
   const reload = useCallback(async () => {
     if (!targetTable) return;
@@ -69,11 +81,13 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
         value: String(id),
         label: String((data[labelCol] as string[])?.[i] ?? ''),
       }));
+      loadedForRef.current = targetTable;
       setOptions(items);
     } catch (err) {
       console.warn(`[MetaField] Could not fetch ${targetTable}:`, err);
+      loadedForRef.current = targetTable; // mark done even on error
     } finally {
-      setLoading(false);
+      setReloading(false);
     }
   }, [fetchTable, targetTable, labelCol]);
 
@@ -91,6 +105,7 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
   useEffect(() => {
     if (reloadTrigger !== prevTrigger.current) {
       prevTrigger.current = reloadTrigger;
+      setReloading(true);
       reload();
     }
   }, [reloadTrigger, reload]);
