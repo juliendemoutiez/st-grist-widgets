@@ -55,10 +55,11 @@ function buildChoiceOptions(meta: ColumnMeta): PickerOption[] {
   }));
 }
 
-/** Hook to fetch rows from a Ref target table. Returns options as { value: id, label }. */
+/** Hook to fetch rows from a Ref target table. Returns options and a loading flag. */
 function useRefOptions(targetTable: string | null, reloadTrigger?: number, labelCol = 'Nom') {
   const { fetchTable } = useGrist();
   const [options, setOptions] = useState<PickerOption[]>([]);
+  const [loading, setLoading] = useState(!!targetTable);
 
   const reload = useCallback(async () => {
     if (!targetTable) return;
@@ -71,6 +72,8 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
       setOptions(items);
     } catch (err) {
       console.warn(`[MetaField] Could not fetch ${targetTable}:`, err);
+    } finally {
+      setLoading(false);
     }
   }, [fetchTable, targetTable, labelCol]);
 
@@ -92,7 +95,7 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
     }
   }, [reloadTrigger, reload]);
 
-  return options;
+  return { options, loading };
 }
 
 /** Extract the target table name from a Ref type string, e.g. "Ref:Organisations" -> "Organisations" */
@@ -229,7 +232,7 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
   const type = rawType.startsWith('DateTime') ? 'DateTime' : rawType;
   const refTarget = parseRefTarget(type);
   const refListTarget = parseRefListTarget(type);
-  const refOptions = useRefOptions(refTarget ?? refListTarget, refReloadTrigger, refLabelCol);
+  const { options: refOptions, loading: refLoading } = useRefOptions(refTarget ?? refListTarget, refReloadTrigger, refLabelCol);
   const [hlEditing, setHlEditing] = useState(false);
 
   if (type === 'Choice') {
@@ -264,6 +267,25 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
 
   if (refTarget) {
     const strValue = value != null && value !== 0 ? String(value) : undefined;
+    if (refLoading && strValue) {
+      return <MetaRow icon={icon} label={label}><span className="meta-row__skeleton" /></MetaRow>;
+    }
+    if (readOnly) {
+      const opt = refOptions.find(o => o.value === strValue);
+      const chipLabel = opt?.label ?? '\u2014';
+      return (
+        <MetaRow icon={icon} label={label}>
+          {strValue ? (
+            <span className="picker-select__relation-chip">
+              {onClickSelected && (
+                <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(strValue, opt?.label ?? '')}>link</span>
+              )}
+              {chipLabel}
+            </span>
+          ) : <span className="meta-row__value-static">{'\u2014'}</span>}
+        </MetaRow>
+      );
+    }
     return (
       <MetaRow icon={icon} label={label}>
         <PickerSelect
@@ -285,6 +307,33 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
 
   if (refListTarget) {
     const arrValue = decodeRefList(value).map(String);
+    if (refLoading && arrValue.length > 0) {
+      return (
+        <MetaRow icon={icon} label={label}>
+          {arrValue.map((_, i) => <span key={i} className="meta-row__skeleton" />)}
+        </MetaRow>
+      );
+    }
+    if (readOnly) {
+      return (
+        <MetaRow icon={icon} label={label}>
+          {arrValue.length === 0
+            ? <span className="meta-row__value-static">{'\u2014'}</span>
+            : arrValue.map((v) => {
+                const opt = refOptions.find(o => o.value === v);
+                return (
+                  <span key={v} className="picker-select__relation-chip">
+                    {onClickSelected && (
+                      <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(v, opt?.label ?? '')}>link</span>
+                    )}
+                    {opt?.label ?? '\u2014'}
+                  </span>
+                );
+              })
+          }
+        </MetaRow>
+      );
+    }
     return (
       <MetaRow icon={icon} label={label}>
         <PickerSelect

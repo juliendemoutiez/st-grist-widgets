@@ -226,6 +226,25 @@
   }
 }
 
+@keyframes meta-skeleton-shimmer {
+  0%   { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+
+.meta-row__skeleton {
+  display: inline-block;
+  width: 120px;
+  height: 22px;
+  border-radius: 0.25rem;
+  background: linear-gradient(90deg, #ececec 25%, #f5f5f5 50%, #ececec 75%);
+  background-size: 400px 100%;
+  animation: meta-skeleton-shimmer 1.2s ease-in-out infinite;
+
+  & + & {
+    margin-left: 0.25rem;
+  }
+}
+
 .picker-select__relation-link {
   cursor: pointer;
   border-radius: 0.125rem;
