@@ -48,7 +48,6 @@ const INTERACTION_FORM: FormConfig = {
       colId: 'Contacts_internes',
       icon: 'group',
       label: 'Contacts internes',
-      readOnly: true,
       refEditScreen: 'ContactForm',
       refLabelCol: 'Nom_Complet',
     },
