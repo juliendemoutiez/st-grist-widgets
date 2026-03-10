@@ -10,6 +10,14 @@ export default defineConfig({
       '@grist-widgets/ui': path.resolve(__dirname, '../../packages/ui/src'),
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        crm: path.resolve(__dirname, 'index.html'),
+        kanban: path.resolve(__dirname, 'kanban.html'),
+      },
+    },
+  },
   optimizeDeps: {
     include: ['@tiptap/react/menus'],
   },

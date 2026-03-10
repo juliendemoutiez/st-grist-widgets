@@ -13,6 +13,8 @@ interface GristContextValue {
   isReady: boolean;
   /** Update fields on the currently selected record. */
   updateCurrentRecord: (fields: Record<string, unknown>) => Promise<void>;
+  /** Update a record in the widget's linked table. Triggers cross-widget notifications. */
+  updateLinkedRecord: (id: number, fields: Record<string, unknown>) => Promise<void>;
   /** Fetch all rows from a table (column-oriented). */
   fetchTable: (tableId: string) => Promise<FetchedTable>;
   /** Create a new record in a table, returns the new row id. */
@@ -38,7 +40,7 @@ interface CacheEntry {
   fetchedAt: number;
 }
 
-export function GristProvider({ children }: { children: ReactNode }) {
+export function GristProvider({ children, allowSelectBy }: { children: ReactNode; allowSelectBy?: boolean }) {
   const [record, setRecord] = useState<RowRecord | null>(null);
   const [isReady, setIsReady] = useState(false);
   const initRef = useRef(false);
@@ -55,9 +57,10 @@ export function GristProvider({ children }: { children: ReactNode }) {
     }
 
     console.log('Calling grist.ready()');
-    grist.ready({ requiredAccess: 'full' });
+    grist.ready({ requiredAccess: 'full', allowSelectBy });
     grist.onRecord((data) => {
       console.log('grist.onRecord fired:', JSON.stringify(data));
+      tableCache.current.clear();
       setRecord(data);
       setIsReady(true);
     });
@@ -67,9 +70,15 @@ export function GristProvider({ children }: { children: ReactNode }) {
     if (!grist || !record) return;
     const table = await grist.getTable();
     await table.update({ id: record.id, fields });
-    // Invalidate cache for the linked table (tableId unknown here, clear all)
     tableCache.current.clear();
   }, [record]);
+
+  const updateLinkedRecord = useCallback(async (id: number, fields: Record<string, unknown>) => {
+    if (!grist) throw new Error('Grist API not available');
+    const table = await grist.getTable();
+    await table.update({ id, fields });
+    tableCache.current.clear();
+  }, []);
 
   const fetchTable = useCallback(async (tableId: string) => {
     if (!grist) throw new Error('Grist API not available');
@@ -104,7 +113,7 @@ export function GristProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <GristContext.Provider value={{ record, isReady, updateCurrentRecord, fetchTable, createRecord, updateRecord, setCursorPos }}>
+    <GristContext.Provider value={{ record, isReady, updateCurrentRecord, updateLinkedRecord, fetchTable, createRecord, updateRecord, setCursorPos }}>
       {children}
     </GristContext.Provider>
   );
