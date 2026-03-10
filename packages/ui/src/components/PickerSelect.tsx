@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
+import { UserAvatar } from '@gouvfr-lasuite/ui-kit';
 
 export interface PickerOption {
   value: string;
@@ -17,6 +18,7 @@ interface CommonProps {
   onAdd?: () => void;
   relation?: boolean;
   onClickSelected?: (value: string) => void;
+  avatar?: boolean;
 }
 
 interface SingleProps extends CommonProps {
@@ -204,7 +206,12 @@ export function PickerSelect(props: PickerSelectProps) {
         </span>
       );
     }
-    return <span className="picker-select__chip">{selected.label}</span>;
+    return (
+      <span className="picker-select__chip">
+        {props.avatar && <UserAvatar fullName={selected.label} size="xsmall" />}
+        {selected.label}
+      </span>
+    );
   };
 
   const isSelected = (value: string) => {
@@ -272,7 +279,10 @@ export function PickerSelect(props: PickerSelectProps) {
                       {opt.label}
                     </span>
                   ) : (
-                    <span className="picker-select__chip">{opt.label}</span>
+                    <span className="picker-select__chip">
+                      {props.avatar && <UserAvatar fullName={opt.label} size="xsmall" />}
+                      {opt.label}
+                    </span>
                   )}
                 </li>
               ))

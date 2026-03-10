@@ -260,6 +260,7 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
           value={strValue}
           onChange={(v) => { onChange(v ?? ''); onBlur?.(); }}
           placeholder="Choisir..."
+          avatar={avatar}
         />
       </MetaRow>
     );

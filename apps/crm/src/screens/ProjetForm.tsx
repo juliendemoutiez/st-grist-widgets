@@ -22,6 +22,7 @@ const PROJET_FORM: FormConfig = {
     { colId: 'Sentiment_envers_LaSuite', icon: 'sentiment_satisfied', label: 'Sentiment envers La Suite' },
     { colId: 'Echeance_contrat', icon: 'calendar_month', label: 'Echéance contrat' },
 
+    { colId: 'Lead', icon: 'person', label: 'Lead', avatar: true },
     {
       colId: 'Organisation',
       icon: 'business',

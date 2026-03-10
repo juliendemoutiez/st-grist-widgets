@@ -24,7 +24,7 @@ export function KanbanCard({ record, isSelected, prochaineDate, isOverdue, onCli
   const pourQui = record['Pour_qui_'] ? String(record['Pour_qui_']) : null;
   const effectifs = record['Effectifs'] != null ? String(record['Effectifs']) : null;
   const dateStr = prochaineDate ? formatDate(prochaineDate) : null;
-  const majPar = record['Derniere_mise_a_jour_par'] ? String(record['Derniere_mise_a_jour_par']) : null;
+  const lead = record['Lead'] ? String(record['Lead']) : null;
 
   return (
     <div
@@ -39,7 +39,7 @@ export function KanbanCard({ record, isSelected, prochaineDate, isOverdue, onCli
     >
       <div className="kanban-card__title">{nom}</div>
       {pourQui && <div className="kanban-card__subtitle">{pourQui}</div>}
-      {(effectifs || dateStr || majPar) && (
+      {(effectifs || dateStr || lead) && (
         <div className="kanban-card__footer">
           {effectifs && (
             <span className="kanban-card__badge">
@@ -53,9 +53,9 @@ export function KanbanCard({ record, isSelected, prochaineDate, isOverdue, onCli
               {dateStr}
             </span>
           )}
-          {majPar && (
+          {lead && (
             <span className="kanban-card__user">
-              <UserAvatar fullName={majPar} size="xsmall" />
+              <UserAvatar fullName={lead} size="xsmall" />
             </span>
           )}
         </div>
