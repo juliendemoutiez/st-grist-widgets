@@ -1,10 +1,10 @@
-name: Deploy CRM widget
+name: Deploy widgets
 
 on:
   push:
     branches: [main]
     paths:
-      - 'apps/crm/**'
+      - 'apps/widgets/**'
       - 'packages/ui/**'
 
 jobs:
@@ -26,12 +26,12 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm --filter crm build
+      - run: pnpm --filter widgets build
         env:
-          VITE_BASE_URL: /${{ github.event.repository.name }}/crm/
+          VITE_BASE_URL: /${{ github.event.repository.name }}/
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./apps/crm/dist
-          destination_dir: crm
+          publish_dir: ./apps/widgets/dist
+          destination_dir: .
