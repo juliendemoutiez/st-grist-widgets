@@ -6,6 +6,8 @@ on:
     paths:
       - 'apps/widgets/**'
       - 'packages/ui/**'
+      - '.github/workflows/deploy-crm.yml'
+  workflow_dispatch:
 
 jobs:
   deploy:
