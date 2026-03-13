@@ -10,8 +10,8 @@ const STATUSES = [
   '1. RDV découverte',
   '2. Focus produit',
   '3. Expérimentation lancée',
-  '4. Suivi expé',
-  '5. Bilan expé',
+  '4. Suivi bizdev',
+  '5. Bilan expérimentation',
   '6. Perdu / En pause',
 ] as const;
 
