@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { UserAvatar } from '@gouvfr-lasuite/ui-kit';
+import './picker-select.scss';
 
 export interface PickerOption {
   value: string;
@@ -19,6 +20,8 @@ interface CommonProps {
   relation?: boolean;
   onClickSelected?: (value: string) => void;
   avatar?: boolean;
+  defaultOpen?: boolean;
+  onClose?: () => void;
 }
 
 interface SingleProps extends CommonProps {
@@ -55,7 +58,7 @@ function hasColor(opt: PickerOption): boolean {
 }
 
 export function PickerSelect(props: PickerSelectProps) {
-  const { options, placeholder = 'Choisir...' } = props;
+  const { options, placeholder = 'Choisir...', defaultOpen, onClose } = props;
   const isMulti = props.mode === 'multi';
 
   const [open, setOpen] = useState(false);
@@ -70,40 +73,6 @@ export function PickerSelect(props: PickerSelectProps) {
     o.label.toLowerCase().includes(search.toLowerCase()),
   );
 
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    function handleClick(e: MouseEvent) {
-      const target = e.target as Node;
-      if (
-        containerRef.current && !containerRef.current.contains(target) &&
-        dropdownRef.current && !dropdownRef.current.contains(target)
-      ) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open]);
-
-  // Close on Escape
-  useEffect(() => {
-    if (!open) return;
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  }, [open]);
-
-  // Auto-focus search on open
-  useEffect(() => {
-    if (open) {
-      setSearch('');
-      requestAnimationFrame(() => searchRef.current?.focus());
-    }
-  }, [open]);
-
   const openDropdown = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
@@ -116,6 +85,51 @@ export function PickerSelect(props: PickerSelectProps) {
     }
     setOpen(true);
   }, []);
+
+  const closeDropdown = useCallback(() => {
+    setOpen(false);
+    onClose?.();
+  }, [onClose]);
+
+  // Open on mount if defaultOpen
+  useEffect(() => {
+    if (defaultOpen) openDropdown();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      const target = e.target as Node;
+      if (
+        containerRef.current && !containerRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
+        closeDropdown();
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open, closeDropdown]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') closeDropdown();
+    }
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [open, closeDropdown]);
+
+  // Auto-focus search on open
+  useEffect(() => {
+    if (open) {
+      setSearch('');
+      requestAnimationFrame(() => searchRef.current?.focus());
+    }
+  }, [open]);
 
   const handleSelect = useCallback(
     (value: string) => {
@@ -130,7 +144,7 @@ export function PickerSelect(props: PickerSelectProps) {
       } else {
         const singleProps = props as SingleProps;
         singleProps.onChange(value);
-        setOpen(false);
+        closeDropdown();
       }
     },
     [isMulti, props],
@@ -227,7 +241,7 @@ export function PickerSelect(props: PickerSelectProps) {
         ref={triggerRef}
         type="button"
         className="picker-select__trigger"
-        onClick={() => open ? setOpen(false) : openDropdown()}
+        onClick={() => open ? closeDropdown() : openDropdown()}
       >
         {renderTriggerContent()}
       </button>
@@ -249,7 +263,7 @@ export function PickerSelect(props: PickerSelectProps) {
             {!isMulti && (props as SingleProps).value != null && (
               <li
                 className="picker-select__option picker-select__option--clear"
-                onClick={() => { (props as SingleProps).onChange(undefined); setOpen(false); }}
+                onClick={() => { (props as SingleProps).onChange(undefined); closeDropdown(); }}
               >
                 <span className="material-icons">close</span>
                 Effacer
@@ -292,7 +306,7 @@ export function PickerSelect(props: PickerSelectProps) {
             <button
               type="button"
               className="picker-select__add"
-              onClick={() => { props.onAdd!(); setOpen(false); }}
+              onClick={() => { props.onAdd!(); closeDropdown(); }}
             >
               <span className="material-icons">add</span>
               {props.addLabel ?? 'Ajouter'}

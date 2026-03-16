@@ -24,6 +24,8 @@ export interface FieldDef {
   refLabelCol?: string;
   /** Render as a full-width markdown editor at the bottom of the form */
   markdown?: boolean;
+  /** Show a mailto: link icon next to the field value */
+  mailto?: boolean;
 }
 
 /** Declarative configuration for a generic timeline section. */

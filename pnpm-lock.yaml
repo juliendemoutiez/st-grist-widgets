@@ -8,17 +8,17 @@ importers:
 
   .: {}
 
-  apps/crm:
+  apps/widgets:
     dependencies:
+      '@gouvfr-lasuite/cunningham-react':
+        specifier: ^4.2.0
+        version: 4.2.0(@types/node@24.10.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@gouvfr-lasuite/ui-kit':
-        specifier: ^0.18.7
-        version: 0.18.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+        specifier: ^0.19.8
+        version: 0.19.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@grist-widgets/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@openfun/cunningham-react':
-        specifier: ^4.0.0
-        version: 4.0.0(@types/node@24.10.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@tiptap/extension-placeholder':
         specifier: ^3.19.0
         version: 3.20.0(@tiptap/extensions@3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0))
@@ -83,12 +83,12 @@ importers:
 
   packages/ui:
     dependencies:
+      '@gouvfr-lasuite/cunningham-react':
+        specifier: '*'
+        version: 4.2.0(@types/node@24.10.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@gouvfr-lasuite/ui-kit':
         specifier: '*'
         version: 0.18.7(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
-      '@openfun/cunningham-react':
-        specifier: '*'
-        version: 4.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@tiptap/extension-placeholder':
         specifier: '*'
         version: 3.20.0(@tiptap/extensions@3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0))
@@ -476,6 +476,13 @@ packages:
       react: ^19.1.2
       react-dom: ^19.1.2
 
+  '@gouvfr-lasuite/cunningham-react@4.2.0':
+    resolution: {integrity: sha512-97eTA+v/ySsl6d5NCn6D2mVoNqrJnHWG+PWCY1L/Fz8MEx18sPwqUsqdaIuSj0C+iug0SCJ6Ufx57MURHCf0oA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^19.1.2
+      react-dom: ^19.1.2
+
   '@gouvfr-lasuite/cunningham-tokens@3.1.0':
     resolution: {integrity: sha512-7HP7E1vjxv3FbFn21XuEqbjQPHP5xucWU0D8+Oj02nIeKLL+0eArTL2GB+c2rPFBt0tAzaLI6A3WlsimOjHN4A==}
     engines: {node: '>=18.0.0'}
@@ -492,6 +499,12 @@ packages:
 
   '@gouvfr-lasuite/ui-kit@0.18.7':
     resolution: {integrity: sha512-1Bw1FSol9+mxztiaPEyfwVf9/1Vns7OJVEzvwLTlChbo6cS8FjuP/ZYG57RMvschsN4kfMzC03YmxcVdS0L9Nw==}
+    peerDependencies:
+      react: ^19.1.2
+      react-dom: ^19.1.2
+
+  '@gouvfr-lasuite/ui-kit@0.19.10':
+    resolution: {integrity: sha512-Fn3dLks9O2Lr3iFJVlwptZDmluOBIzAGAUiqA2Wp2/7dQLZu0RaCqdNYc/prvQP9PsuNeHbG0TmrNrjQtQNnbQ==}
     peerDependencies:
       react: ^19.1.2
       react-dom: ^19.1.2
@@ -545,18 +558,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
-  '@openfun/cunningham-react@4.0.0':
-    resolution: {integrity: sha512-2JgIRDl2UE/PMcOrjjfxbhFRwEwF7JFAaPoN/Xjq+sOYHP6WasRxFRrkwhnuZ5ZU7lOpzaAFyPtkawoBF6GsEQ==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      react: 19.1.0
-      react-dom: 19.1.0
-
-  '@openfun/cunningham-tokens@3.0.0':
-    resolution: {integrity: sha512-YMLLL7CaQA1+kuSVxf3UgXNjdyeX6Dj2Kdlz/9+lX2ePm51rPxZsEGXWeUVafNLFH+T/zpsajiEzgJ9mBEJd5w==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
 
   '@parcel/watcher-android-arm64@2.5.6':
     resolution: {integrity: sha512-YQxSS34tPF/6ZG7r/Ih9xy+kP/WwediEUsqmtf0cuCV5TPPKw/PQHRhueUo6JdeFJaqV3pyjm0GdYjZotbRt/A==}
@@ -3318,6 +3319,66 @@ snapshots:
       - '@types/node'
       - typescript
 
+  '@gouvfr-lasuite/cunningham-react@4.2.0(@types/node@22.10.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
+    dependencies:
+      '@fontsource-variable/roboto-flex': 5.2.5
+      '@fontsource/material-icons-outlined': 5.2.5
+      '@gouvfr-lasuite/cunningham-tokens': 3.1.0(@types/node@22.10.7)(typescript@5.9.3)
+      '@internationalized/date': 3.8.0
+      '@react-aria/calendar': 3.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-aria/datepicker': 3.14.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-aria/i18n': 3.12.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-stately/calendar': 3.8.0(react@19.2.4)
+      '@react-stately/datepicker': 3.14.0(react@19.2.4)
+      '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@types/react-modal': 3.16.3
+      chromatic: 11.28.2
+      classnames: 2.5.1
+      downshift: 9.0.9(react@19.2.4)
+      react: 19.2.4
+      react-aria: 3.39.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-aria-components: 1.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-dom: 19.2.4(react@19.2.4)
+      react-modal: 3.16.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-stately: 3.37.0(react@19.2.4)
+    transitivePeerDependencies:
+      - '@chromatic-com/cypress'
+      - '@chromatic-com/playwright'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - typescript
+
+  '@gouvfr-lasuite/cunningham-react@4.2.0(@types/node@24.10.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
+    dependencies:
+      '@fontsource-variable/roboto-flex': 5.2.5
+      '@fontsource/material-icons-outlined': 5.2.5
+      '@gouvfr-lasuite/cunningham-tokens': 3.1.0(@types/node@24.10.13)(typescript@5.9.3)
+      '@internationalized/date': 3.8.0
+      '@react-aria/calendar': 3.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-aria/datepicker': 3.14.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-aria/i18n': 3.12.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@react-stately/calendar': 3.8.0(react@19.2.4)
+      '@react-stately/datepicker': 3.14.0(react@19.2.4)
+      '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@types/react-modal': 3.16.3
+      chromatic: 11.28.2
+      classnames: 2.5.1
+      downshift: 9.0.9(react@19.2.4)
+      react: 19.2.4
+      react-aria: 3.39.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-aria-components: 1.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-dom: 19.2.4(react@19.2.4)
+      react-modal: 3.16.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-stately: 3.37.0(react@19.2.4)
+    transitivePeerDependencies:
+      - '@chromatic-com/cypress'
+      - '@chromatic-com/playwright'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - typescript
+
   '@gouvfr-lasuite/cunningham-tokens@3.1.0(@types/node@22.10.7)(typescript@5.9.3)':
     dependencies:
       chalk: 4.1.2
@@ -3325,6 +3386,19 @@ snapshots:
       deepmerge: 4.3.1
       figlet: 1.8.1
       ts-node: 10.9.2(@types/node@22.10.7)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/node'
+      - typescript
+
+  '@gouvfr-lasuite/cunningham-tokens@3.1.0(@types/node@24.10.13)(typescript@5.9.3)':
+    dependencies:
+      chalk: 4.1.2
+      commander: 13.1.0
+      deepmerge: 4.3.1
+      figlet: 1.8.1
+      ts-node: 10.9.2(@types/node@24.10.13)(typescript@5.9.3)
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -3346,6 +3420,34 @@ snapshots:
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@fontsource/material-icons': 5.2.5
       '@gouvfr-lasuite/cunningham-react': 4.1.0(@types/node@22.10.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@gouvfr-lasuite/cunningham-tokens': 3.1.0(@types/node@22.10.7)(typescript@5.9.3)
+      '@gouvfr-lasuite/integration': 1.0.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@types/node': 22.10.7
+      clsx: 2.1.1
+      cmdk: 1.0.4(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-arborist: 3.4.3(@types/node@22.10.7)(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-aria-components: 1.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-dom: 19.2.4(react@19.2.4)
+      react-resizable-panels: 2.1.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-stately: 3.37.0(react@19.2.4)
+    transitivePeerDependencies:
+      - '@chromatic-com/cypress'
+      - '@chromatic-com/playwright'
+      - '@swc/core'
+      - '@swc/wasm'
+      - '@types/hoist-non-react-statics'
+      - '@types/react'
+      - '@types/react-dom'
+      - typescript
+
+  '@gouvfr-lasuite/ui-kit@0.19.10(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
+    dependencies:
+      '@dnd-kit/core': 6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@dnd-kit/modifiers': 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+      '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+      '@fontsource/material-icons': 5.2.5
+      '@gouvfr-lasuite/cunningham-react': 4.2.0(@types/node@22.10.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@gouvfr-lasuite/cunningham-tokens': 3.1.0(@types/node@22.10.7)(typescript@5.9.3)
       '@gouvfr-lasuite/integration': 1.0.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@types/node': 22.10.7
@@ -3422,92 +3524,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@openfun/cunningham-react@4.0.0(@types/node@24.10.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
-    dependencies:
-      '@fontsource-variable/roboto-flex': 5.2.5
-      '@fontsource/material-icons-outlined': 5.2.5
-      '@internationalized/date': 3.8.0
-      '@openfun/cunningham-tokens': 3.0.0(@types/node@24.10.13)(typescript@5.9.3)
-      '@react-aria/calendar': 3.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-aria/datepicker': 3.14.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-aria/i18n': 3.12.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-stately/calendar': 3.8.0(react@19.2.4)
-      '@react-stately/datepicker': 3.14.0(react@19.2.4)
-      '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@types/react-modal': 3.16.3
-      chromatic: 11.28.2
-      classnames: 2.5.1
-      downshift: 9.0.9(react@19.2.4)
-      react: 19.2.4
-      react-aria: 3.39.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-aria-components: 1.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-dom: 19.2.4(react@19.2.4)
-      react-modal: 3.16.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-stately: 3.37.0(react@19.2.4)
-    transitivePeerDependencies:
-      - '@chromatic-com/cypress'
-      - '@chromatic-com/playwright'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - typescript
-
-  '@openfun/cunningham-react@4.0.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
-    dependencies:
-      '@fontsource-variable/roboto-flex': 5.2.5
-      '@fontsource/material-icons-outlined': 5.2.5
-      '@internationalized/date': 3.8.0
-      '@openfun/cunningham-tokens': 3.0.0(typescript@5.9.3)
-      '@react-aria/calendar': 3.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-aria/datepicker': 3.14.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-aria/i18n': 3.12.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@react-stately/calendar': 3.8.0(react@19.2.4)
-      '@react-stately/datepicker': 3.14.0(react@19.2.4)
-      '@tanstack/react-table': 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@types/react-modal': 3.16.3
-      chromatic: 11.28.2
-      classnames: 2.5.1
-      downshift: 9.0.9(react@19.2.4)
-      react: 19.2.4
-      react-aria: 3.39.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-aria-components: 1.8.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-dom: 19.2.4(react@19.2.4)
-      react-modal: 3.16.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react-stately: 3.37.0(react@19.2.4)
-    transitivePeerDependencies:
-      - '@chromatic-com/cypress'
-      - '@chromatic-com/playwright'
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - typescript
-
-  '@openfun/cunningham-tokens@3.0.0(@types/node@24.10.13)(typescript@5.9.3)':
-    dependencies:
-      chalk: 4.1.2
-      commander: 13.1.0
-      deepmerge: 4.3.1
-      figlet: 1.8.1
-      ts-node: 10.9.2(@types/node@24.10.13)(typescript@5.9.3)
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - typescript
-
-  '@openfun/cunningham-tokens@3.0.0(typescript@5.9.3)':
-    dependencies:
-      chalk: 4.1.2
-      commander: 13.1.0
-      deepmerge: 4.3.1
-      figlet: 1.8.1
-      ts-node: 10.9.2(typescript@5.9.3)
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - typescript
 
   '@parcel/watcher-android-arm64@2.5.6':
     optional: true
@@ -6362,23 +6378,6 @@ snapshots:
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
       '@types/node': 24.10.13
-      acorn: 8.15.0
-      acorn-walk: 8.3.4
-      arg: 4.1.3
-      create-require: 1.1.1
-      diff: 4.0.4
-      make-error: 1.3.6
-      typescript: 5.9.3
-      v8-compile-cache-lib: 3.0.1
-      yn: 3.1.1
-
-  ts-node@10.9.2(typescript@5.9.3):
-    dependencies:
-      '@cspotcode/source-map-support': 0.8.1
-      '@tsconfig/node10': 1.0.12
-      '@tsconfig/node12': 1.0.11
-      '@tsconfig/node14': 1.0.3
-      '@tsconfig/node16': 1.0.4
       acorn: 8.15.0
       acorn-walk: 8.3.4
       arg: 4.1.3

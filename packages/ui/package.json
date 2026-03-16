@@ -12,7 +12,7 @@
   },
   "peerDependencies": {
     "@gouvfr-lasuite/ui-kit": "*",
-    "@openfun/cunningham-react": "*",
+    "@gouvfr-lasuite/cunningham-react": "*",
     "@tiptap/extension-placeholder": "*",
     "@tiptap/react": "*",
     "@tiptap/starter-kit": "*",

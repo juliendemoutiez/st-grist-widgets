@@ -11,6 +11,8 @@ interface GristContextValue {
   record: RowRecord | null;
   /** Whether grist.ready() has been called and first record received. */
   isReady: boolean;
+  /** Increments whenever Grist notifies of a data change — use as a useEffect dependency to re-fetch. */
+  dataVersion: number;
   /** Update fields on the currently selected record. */
   updateCurrentRecord: (fields: Record<string, unknown>) => Promise<void>;
   /** Update a record in the widget's linked table. Triggers cross-widget notifications. */
@@ -21,6 +23,8 @@ interface GristContextValue {
   createRecord: (tableId: string, fields: Record<string, unknown>) => Promise<number>;
   /** Update a record in any table. */
   updateRecord: (tableId: string, id: number, fields: Record<string, unknown>) => Promise<void>;
+  /** Delete a record from a table. */
+  deleteRecord: (tableId: string, id: number) => Promise<void>;
   /** Move the Grist cursor to a specific row. */
   setCursorPos: (rowId: number) => Promise<void>;
 }
@@ -43,6 +47,7 @@ interface CacheEntry {
 export function GristProvider({ children, allowSelectBy }: { children: ReactNode; allowSelectBy?: boolean }) {
   const [record, setRecord] = useState<RowRecord | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [dataVersion, setDataVersion] = useState(0);
   const initRef = useRef(false);
   const tableCache = useRef(new Map<string, CacheEntry>());
 
@@ -63,6 +68,10 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
       tableCache.current.clear();
       setRecord(data);
       setIsReady(true);
+    });
+    grist.onRecords(() => {
+      tableCache.current.clear();
+      setDataVersion((v) => v + 1);
     });
   }, []);
 
@@ -107,13 +116,19 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     tableCache.current.delete(tableId);
   }, []);
 
+  const deleteRecord = useCallback(async (tableId: string, id: number) => {
+    if (!grist) throw new Error('Grist API not available');
+    await grist.docApi.applyUserActions([['RemoveRecord', tableId, id]]);
+    tableCache.current.delete(tableId);
+  }, []);
+
   const setCursorPos = useCallback(async (rowId: number) => {
     if (!grist) throw new Error('Grist API not available');
     await grist.setCursorPos({ rowId });
   }, []);
 
   return (
-    <GristContext.Provider value={{ record, isReady, updateCurrentRecord, updateLinkedRecord, fetchTable, createRecord, updateRecord, setCursorPos }}>
+    <GristContext.Provider value={{ record, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos }}>
       {children}
     </GristContext.Provider>
   );
