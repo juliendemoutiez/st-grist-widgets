@@ -1,4 +1,4 @@
-import { RecordForm } from '@grist-widgets/ui';
+import { RecordForm } from '../../../widgets/nested-form/RecordForm';
 import type { FormConfig } from '@grist-widgets/ui';
 
 function decodeType(value: unknown): string {

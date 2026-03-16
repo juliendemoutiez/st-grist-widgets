@@ -2,14 +2,12 @@
 @use "@gouvfr-lasuite/ui-kit/style";
 @use "./cunningham-tokens.css";
 @use "./cunningham-tokens.scss" as *;
-@use "./screens.scss";
-@use "./picker-select.scss";
 
 html, body {
   height: 100%;
   margin: 0;
   overflow: auto;
-  background-color: #F6F8F9;
+  background-color: var(--c--contextuals--background--surface--tertiary);
 }
 
 div#root {

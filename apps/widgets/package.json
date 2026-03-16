@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@grist-widgets/ui": "workspace:*",
-    "@gouvfr-lasuite/ui-kit": "^0.18.7",
-    "@openfun/cunningham-react": "^4.0.0",
+    "@gouvfr-lasuite/cunningham-react": "^4.2.0",
+    "@gouvfr-lasuite/ui-kit": "^0.19.8",
     "@tiptap/extension-placeholder": "^3.19.0",
     "@tiptap/react": "^3.19.0",
     "@tiptap/starter-kit": "^3.19.0",

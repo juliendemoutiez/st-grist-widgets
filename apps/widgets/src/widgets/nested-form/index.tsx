@@ -1,3 +1,4 @@
+import './nested-form.scss';
 import { NavigationProvider, useNavigation } from '@grist-widgets/ui';
 
 type ScreenMap = Record<string, React.ComponentType>;

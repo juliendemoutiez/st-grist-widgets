@@ -1,4 +1,5 @@
-import { RecordForm, Timeline } from '@grist-widgets/ui';
+import { RecordForm } from '../../../widgets/nested-form/RecordForm';
+import { Timeline } from '../../../widgets/nested-form/Timeline';
 import type { FormConfig, TimelineConfig } from '@grist-widgets/ui';
 
 const PROJET_FORM: FormConfig = {

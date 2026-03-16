@@ -18,8 +18,6 @@ export function KanbanBoard({ statuses }: KanbanBoardProps) {
   const dragRef = useRef<{ id: number; fromStatus: string } | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
 
-  console.log('records', records);
-
   const columns = statuses.map((status) => ({
     status,
     cards: records.filter((r) => r['Statut'] === status),

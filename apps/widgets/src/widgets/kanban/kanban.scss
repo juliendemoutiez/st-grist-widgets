@@ -42,15 +42,15 @@ div#root .c__app {
   flex-direction: column;
   width: 280px;
   flex-shrink: 0;
-  background: #EAECF0;
+  background: var(--c--contextuals--background--semantic--neutral--tertiary);
   border-radius: 10px;
   padding: 0 8px 8px;
   box-sizing: border-box;
   transition: background-color 0.15s, box-shadow 0.15s;
 
   &--drag-over {
-    background: #DDE2F5;
-    box-shadow: inset 0 0 0 2px var(--c--theme--colors--primary-500, #6969DF);
+    background: var(--c--contextuals--background--semantic--brand--secondary);
+    box-shadow: inset 0 0 0 2px var(--c--contextuals--content--semantic--brand--tertiary);
   }
 }
 
@@ -69,22 +69,13 @@ div#root .c__app {
   height: 9px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: #9CA3AF;
-
-  &[data-status="Pas de contact"]     { background: #9CA3AF; }
-  &[data-status="Contacté"]           { background: #60A5FA; }
-  &[data-status="Autonomie"]          { background: #A78BFA; }
-  &[data-status="Bloqué"]             { background: #EF4444; }
-  &[data-status="Cadrage en cours"]   { background: #F59E0B; }
-  &[data-status="Déploiement engagé"] { background: #FB923C; }
-  &[data-status="Adopté"]             { background: #10B981; }
-  &[data-status="Abandonné"]          { background: #6B7280; }
+  background: var(--c--contextuals--content--semantic--disabled--primary);
 }
 
 .kanban-column__title {
   font-size: 12px;
   font-weight: 700;
-  color: #374151;
+  color: var(--c--contextuals--content--semantic--neutral--primary);
   flex: 1;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -92,8 +83,8 @@ div#root .c__app {
 
 .kanban-column__count {
   font-size: 11px;
-  color: #6B7280;
-  background: #D1D5DB;
+  color: var(--c--contextuals--content--semantic--neutral--tertiary);
+  background: var(--c--contextuals--background--semantic--neutral--secondary-hover);
   border-radius: 10px;
   padding: 1px 7px;
   font-weight: 600;
@@ -112,8 +103,8 @@ div#root .c__app {
 /* ── Card ────────────────────────────────────────────── */
 
 .kanban-card {
-  background: #fff;
-  border: 1px solid #E5E7EB;
+  background: var(--c--contextuals--background--surface--primary);
+  border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
   border-radius: 7px;
   padding: 10px 11px;
   cursor: pointer;
@@ -122,16 +113,16 @@ div#root .c__app {
 
   &:hover {
     box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-    border-color: #CBD5E1;
+    border-color: var(--c--contextuals--background--semantic--neutral--secondary-hover);
   }
 
   &--selected {
-    border-color: var(--c--theme--colors--primary-500, #6969DF);
-    box-shadow: 0 0 0 1px var(--c--theme--colors--primary-500, #6969DF);
+    border-color: var(--c--contextuals--content--semantic--brand--tertiary);
+    box-shadow: 0 0 0 1px var(--c--contextuals--content--semantic--brand--tertiary);
 
     &:hover {
-      border-color: var(--c--theme--colors--primary-500, #6969DF);
-      box-shadow: 0 0 0 1px var(--c--theme--colors--primary-500, #6969DF);
+      border-color: var(--c--contextuals--content--semantic--brand--tertiary);
+      box-shadow: 0 0 0 1px var(--c--contextuals--content--semantic--brand--tertiary);
     }
   }
 
@@ -144,13 +135,13 @@ div#root .c__app {
 .kanban-card__title {
   font-size: 13px;
   font-weight: 500;
-  color: #111827;
+  color: var(--c--contextuals--content--semantic--neutral--primary);
   line-height: 1.4;
 }
 
 .kanban-card__subtitle {
   font-size: 12px;
-  color: #6B7280;
+  color: var(--c--contextuals--content--semantic--neutral--tertiary);
   margin-top: 4px;
   line-height: 1.3;
 }
@@ -170,8 +161,8 @@ div#root .c__app {
   font-weight: 600;
   padding: 2px 8px 2px 6px;
   border-radius: 4px;
-  background: #EEF1FA;
-  color: var(--c--theme--colors--primary-500, #6969DF);
+  background: var(--c--contextuals--background--semantic--brand--tertiary);
+  color: var(--c--contextuals--content--semantic--brand--tertiary);
 
   .material-icons {
     font-size: 13px;
@@ -191,15 +182,15 @@ div#root .c__app {
   gap: 3px;
   font-size: 11px;
   font-weight: 500;
-  color: #6B7280;
+  color: var(--c--contextuals--content--semantic--neutral--tertiary);
 
   .material-icons {
     font-size: 13px;
   }
 
   &--overdue {
-    background: #FEE2E2;
-    color: #DC2626;
+    background: var(--c--contextuals--background--semantic--error--tertiary);
+    color: var(--c--contextuals--content--semantic--error--tertiary);
     padding: 2px 6px;
     border-radius: 4px;
     font-weight: 600;
