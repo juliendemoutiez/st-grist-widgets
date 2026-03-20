@@ -153,6 +153,7 @@ export function NoteWidget({
   const [title, setTitle] = useState('');
   const [emoji, setEmoji] = useState('');
   const [settings, setSettings] = useState<PageSettings>({ ...DEFAULT_SETTINGS });
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const editor = useCreateBlockNote();
   const gristValueRef = useRef<string>('');
@@ -293,7 +294,12 @@ export function NoteWidget({
     gristValueRef.current = incoming;
     suppressSaveRef.current = true;
 
-    const blocks = editor.tryParseMarkdownToBlocks(incoming);
+    let blocks;
+    try {
+      blocks = JSON.parse(incoming);
+    } catch {
+      blocks = editor.tryParseMarkdownToBlocks(incoming);
+    }
     editor.replaceBlocks(editor.document, blocks);
     suppressSaveRef.current = false;
   }, [record, columnId, editor]);
@@ -301,11 +307,11 @@ export function NoteWidget({
   const handleChange = useCallback(() => {
     if (suppressSaveRef.current) return;
 
-    const markdown = editor.blocksToMarkdownLossy(editor.document);
-    if (markdown === gristValueRef.current) return;
+    const json = JSON.stringify(editor.document);
+    if (json === gristValueRef.current) return;
 
-    gristValueRef.current = markdown;
-    updateCurrentRecord({ [columnId]: markdown });
+    gristValueRef.current = json;
+    updateCurrentRecord({ [columnId]: json });
   }, [editor, columnId, updateCurrentRecord]);
 
   const handleNewPage = useCallback(async () => {
@@ -337,20 +343,29 @@ export function NoteWidget({
 
   return (
     <div className="note-app">
-      <aside className="note-sidebar">
-        <div className="note-sidebar__header">
-          <span className="note-sidebar__heading">Pages</span>
-          <button
-            type="button"
-            className="note-sidebar__new-btn"
-            title="Nouvelle page"
-            onClick={handleNewPage}
-          >
-            <span className="material-icons">add</span>
-          </button>
-        </div>
+      {sidebarOpen ? (
+        <aside className="note-sidebar">
+          <div className="note-sidebar__header">
+            <span className="note-sidebar__heading">Pages</span>
+            <button
+              type="button"
+              className="note-sidebar__new-btn"
+              title="Nouvelle page"
+              onClick={handleNewPage}
+            >
+              <span className="material-icons">add</span>
+            </button>
+            <button
+              type="button"
+              className="note-sidebar__new-btn"
+              title="Fermer le panneau"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className="material-icons">chevron_left</span>
+            </button>
+          </div>
 
-        <ul className="note-sidebar__list">
+          <ul className="note-sidebar__list">
           {sortedPages.map((p) => {
             const isOver = dragState?.overId === p.id && dragState.draggedId !== p.id;
             const liClass = [
@@ -388,8 +403,18 @@ export function NoteWidget({
               </li>
             );
           })}
-        </ul>
-      </aside>
+          </ul>
+        </aside>
+      ) : (
+        <button
+          type="button"
+          className="note-sidebar-toggle"
+          title="Ouvrir le panneau"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <span className="material-icons">menu</span>
+        </button>
+      )}
 
       <main className="note-main">
         {!record ? (
