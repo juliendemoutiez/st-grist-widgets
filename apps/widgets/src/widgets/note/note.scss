@@ -485,4 +485,13 @@ div#root {
     z-index: 20;
     width: 100%;
   }
+
+  .note-widget--reduced .note-widget__header,
+  .note-widget--reduced .bn-editor,
+  .note-widget--full .note-widget__header,
+  .note-widget--full .bn-editor {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

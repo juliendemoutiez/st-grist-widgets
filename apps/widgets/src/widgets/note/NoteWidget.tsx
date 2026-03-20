@@ -284,13 +284,17 @@ export function NoteWidget({
 
   const handleDragEnd = useCallback(() => setDragState(null), []);
 
-  // Load editor content when the selected record changes
+  // Load editor content only when switching to a different record.
+  // We must NOT reload on every record update for the same ID, because
+  // onRecord fires back after our own writes with slightly stale data,
+  // which would overwrite what the user just typed and jump the cursor.
+  const loadedRecordIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!record) return;
+    if (record.id === loadedRecordIdRef.current) return;
+    loadedRecordIdRef.current = record.id;
 
     const incoming = String(record[columnId] ?? '');
-    if (incoming === gristValueRef.current) return;
-
     gristValueRef.current = incoming;
     suppressSaveRef.current = true;
 
