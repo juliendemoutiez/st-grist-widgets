@@ -9,6 +9,8 @@ const grist = (window as unknown as { grist?: typeof import('grist-plugin-api').
 interface GristContextValue {
   /** The currently selected row in the widget's linked table. */
   record: RowRecord | null;
+  /** All rows visible in the widget's linked table. */
+  allRecords: RowRecord[];
   /** Whether grist.ready() has been called and first record received. */
   isReady: boolean;
   /** Increments whenever Grist notifies of a data change — use as a useEffect dependency to re-fetch. */
@@ -17,6 +19,8 @@ interface GristContextValue {
   updateCurrentRecord: (fields: Record<string, unknown>) => Promise<void>;
   /** Update a record in the widget's linked table. Triggers cross-widget notifications. */
   updateLinkedRecord: (id: number, fields: Record<string, unknown>) => Promise<void>;
+  /** Create a new record in the widget's linked table, returns the new row id. */
+  createLinkedRecord: (fields: Record<string, unknown>) => Promise<number>;
   /** Fetch all rows from a table (column-oriented). */
   fetchTable: (tableId: string) => Promise<FetchedTable>;
   /** Create a new record in a table, returns the new row id. */
@@ -27,6 +31,12 @@ interface GristContextValue {
   deleteRecord: (tableId: string, id: number) => Promise<void>;
   /** Move the Grist cursor to a specific row. */
   setCursorPos: (rowId: number) => Promise<void>;
+  /**
+   * Fetch ALL rows with ALL columns from the widget's linked table,
+   * regardless of column visibility in the Grist section.
+   * Use this when onRecord/allRecords may be missing hidden columns.
+   */
+  fetchCurrentTable: () => Promise<RowRecord[]>;
 }
 
 const GristContext = createContext<GristContextValue | null>(null);
@@ -46,6 +56,7 @@ interface CacheEntry {
 
 export function GristProvider({ children, allowSelectBy }: { children: ReactNode; allowSelectBy?: boolean }) {
   const [record, setRecord] = useState<RowRecord | null>(null);
+  const [allRecords, setAllRecords] = useState<RowRecord[]>([]);
   const [isReady, setIsReady] = useState(false);
   const [dataVersion, setDataVersion] = useState(0);
   const initRef = useRef(false);
@@ -69,8 +80,9 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
       setRecord(data);
       setIsReady(true);
     });
-    grist.onRecords(() => {
+    grist.onRecords((records) => {
       tableCache.current.clear();
+      setAllRecords(records ?? []);
       setDataVersion((v) => v + 1);
     });
   }, []);
@@ -81,6 +93,14 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     await table.update({ id: record.id, fields });
     tableCache.current.clear();
   }, [record]);
+
+  const createLinkedRecord = useCallback(async (fields: Record<string, unknown>) => {
+    if (!grist) throw new Error('Grist API not available');
+    const table = await grist.getTable();
+    const id = await table.create({ fields });
+    tableCache.current.clear();
+    return id;
+  }, []);
 
   const updateLinkedRecord = useCallback(async (id: number, fields: Record<string, unknown>) => {
     if (!grist) throw new Error('Grist API not available');
@@ -127,8 +147,23 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     await grist.setCursorPos({ rowId });
   }, []);
 
+  const fetchCurrentTable = useCallback(async (): Promise<RowRecord[]> => {
+    if (!grist) throw new Error('Grist API not available');
+    const table = await grist.getTable();
+    const tableId = await table.getTableId();
+    const fetched = await grist.docApi.fetchTable(tableId);
+    const ids = fetched.id as number[];
+    return ids.map((id, i) => {
+      const row: RowRecord = { id };
+      for (const [col, values] of Object.entries(fetched)) {
+        if (col !== 'id') row[col] = (values as unknown[])[i];
+      }
+      return row;
+    });
+  }, []);
+
   return (
-    <GristContext.Provider value={{ record, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos }}>
+    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos, fetchCurrentTable }}>
       {children}
     </GristContext.Provider>
   );

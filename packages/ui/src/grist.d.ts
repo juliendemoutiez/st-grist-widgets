@@ -28,6 +28,7 @@ declare module 'grist-plugin-api' {
   }
 
   export interface TableOperations {
+    getTableId(): Promise<string>;
     create(records: { fields: Record<string, unknown> }): Promise<number>;
     update(record: { id: number; fields: Record<string, unknown> }): Promise<void>;
     destroy(rowId: number): Promise<void>;

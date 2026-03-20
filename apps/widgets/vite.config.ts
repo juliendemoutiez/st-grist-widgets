@@ -17,6 +17,7 @@ export default defineConfig({
         'dinum-activation-pipeline': path.resolve(__dirname, 'dinum-activation-pipeline.html'),
         'dinum-retention-pipeline': path.resolve(__dirname, 'dinum-retention-pipeline.html'),
         'default-interaction': path.resolve(__dirname, 'default-interaction.html'),
+        'note': path.resolve(__dirname, 'note.html'),
       },
     },
   },
