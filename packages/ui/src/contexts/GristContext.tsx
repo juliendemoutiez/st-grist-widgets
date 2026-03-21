@@ -21,6 +21,8 @@ interface GristContextValue {
   updateLinkedRecord: (id: number, fields: Record<string, unknown>) => Promise<void>;
   /** Create a new record in the widget's linked table, returns the new row id. */
   createLinkedRecord: (fields: Record<string, unknown>) => Promise<number>;
+  /** Delete a record from the widget's linked table. */
+  deleteLinkedRecord: (id: number) => Promise<void>;
   /** Fetch all rows from a table (column-oriented). */
   fetchTable: (tableId: string) => Promise<FetchedTable>;
   /** Create a new record in a table, returns the new row id. */
@@ -102,6 +104,13 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     return id;
   }, []);
 
+  const deleteLinkedRecord = useCallback(async (id: number) => {
+    if (!grist) throw new Error('Grist API not available');
+    const table = await grist.getTable();
+    await table.destroy(id);
+    tableCache.current.clear();
+  }, []);
+
   const updateLinkedRecord = useCallback(async (id: number, fields: Record<string, unknown>) => {
     if (!grist) throw new Error('Grist API not available');
     const table = await grist.getTable();
@@ -163,7 +172,7 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
   }, []);
 
   return (
-    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos, fetchCurrentTable }}>
+    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos, fetchCurrentTable }}>
       {children}
     </GristContext.Provider>
   );

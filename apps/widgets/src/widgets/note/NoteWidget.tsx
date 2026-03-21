@@ -2,11 +2,103 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import './note.scss';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCreateBlockNote } from '@blocknote/react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCreateBlockNote,
+  FormattingToolbar,
+  FormattingToolbarController,
+  BlockTypeSelect,
+  BasicTextStyleButton,
+  ColorStyleButton,
+  NestBlockButton,
+  UnnestBlockButton,
+  CreateLinkButton,
+  createReactBlockSpec,
+  SuggestionMenuController,
+  getDefaultReactSlashMenuItems,
+} from '@blocknote/react';
+import { BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core';
 import { BlockNoteView } from '@blocknote/mantine';
 import type { RowRecord } from 'grist-plugin-api';
 import { useGrist } from '@grist-widgets/ui';
+
+// ── Page-ref block ────────────────────────────────────────────────────────────
+
+interface NoteContextValue {
+  pages: RowRecord[];
+  emojiColumnId: string;
+  titleColumnId: string;
+  onNavigate: (pageId: number) => void;
+}
+
+const NoteContext = React.createContext<NoteContextValue | null>(null);
+
+const PageRefBlock = createReactBlockSpec(
+  {
+    type: 'pageRef' as const,
+    propSchema: { pageId: { default: '' } },
+    content: 'none',
+  },
+  {
+    render: ({ block }) => {
+      const ctx = useContext(NoteContext);
+      const pageId = Number(block.props.pageId);
+      const page = ctx?.pages.find((p) => p.id === pageId) ?? null;
+      const emoji = String(page?.[ctx?.emojiColumnId ?? 'Emoji'] ?? '📄');
+      const title = page
+        ? String(page[ctx?.titleColumnId ?? 'Title'] || 'Sans titre')
+        : 'Page introuvable';
+
+      return (
+        <div
+          className={`page-ref-block${!page ? ' page-ref-block--missing' : ''}`}
+          onClick={() => page && ctx?.onNavigate(pageId)}
+          contentEditable={false}
+        >
+          <span className="page-ref-block__emoji">{emoji}</span>
+          <span className="page-ref-block__title">{title}</span>
+          <span className="material-icons page-ref-block__icon">chevron_right</span>
+        </div>
+      );
+    },
+  },
+);
+
+const noteSchema = BlockNoteSchema.create({
+  blockSpecs: { ...defaultBlockSpecs, pageRef: PageRefBlock() },
+});
+
+const MAX_IMAGE_DIMENSION = 1200;
+
+function resizeImageToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onload = () => {
+      if (!file.type.startsWith('image/')) {
+        resolve(reader.result as string);
+        return;
+      }
+      const img = new Image();
+      img.onerror = () => reject(new Error('Failed to decode image'));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+          const ratio = Math.min(MAX_IMAGE_DIMENSION / width, MAX_IMAGE_DIMENSION / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 const EMOJIS = [
   '📄', '📝', '📌', '📎', '🔖', '💡', '🎯', '✅', '⭐', '🔥',
@@ -77,9 +169,11 @@ function EmojiPicker({ current, onSelect }: { current: string; onSelect: (e: str
 function PageOptionsMenu({
   settings,
   onUpdate,
+  onDelete,
 }: {
   settings: PageSettings;
   onUpdate: (patch: Partial<PageSettings>) => void;
+  onDelete: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -93,7 +187,7 @@ function PageOptionsMenu({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
 
-  const width = settings.width ?? 'reduced';
+  const isFullWidth = settings.width === 'full';
 
   return (
     <div className="page-options" ref={ref}>
@@ -107,29 +201,44 @@ function PageOptionsMenu({
       </button>
       {open && (
         <div className="page-options__dropdown">
-          <span className="page-options__label">Largeur</span>
-          <div className="page-options__choices">
-            <button
-              type="button"
-              className={`page-options__choice${width === 'reduced' ? ' page-options__choice--active' : ''}`}
-              onClick={() => onUpdate({ width: 'reduced' })}
-            >
-              <span className="material-icons">vertical_align_center</span>
-              Réduite
-            </button>
-            <button
-              type="button"
-              className={`page-options__choice${width === 'full' ? ' page-options__choice--active' : ''}`}
-              onClick={() => onUpdate({ width: 'full' })}
-            >
-              <span className="material-icons">width_full</span>
-              Pleine
-            </button>
+          <div className="page-options__toggle-row">
+            <span className="page-options__toggle-label">Pleine largeur</span>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={isFullWidth}
+                onChange={(e) => onUpdate({ width: e.target.checked ? 'full' : 'reduced' })}
+              />
+              <span className="toggle__slider" />
+            </label>
           </div>
+          <div className="page-options__divider" />
+          <button
+            type="button"
+            className="page-options__choice page-options__choice--danger"
+            onClick={() => { onDelete(); setOpen(false); }}
+          >
+            <span className="material-icons">delete</span>
+            Supprimer la page
+          </button>
         </div>
       )}
     </div>
   );
+}
+
+function isRootPage(page: RowRecord, parentCol: string): boolean {
+  const v = page[parentCol];
+  return !v || v === 0;
+}
+
+function sortByPosition(pages: RowRecord[], posCol: string): RowRecord[] {
+  return [...pages].sort((a, b) => {
+    const posA = Number(a[posCol]) || 0;
+    const posB = Number(b[posCol]) || 0;
+    if (posA !== posB) return posA - posB;
+    return a.id - b.id;
+  });
 }
 
 export function NoteWidget({
@@ -138,24 +247,31 @@ export function NoteWidget({
   emojiColumnId = 'Emoji',
   settingsColumnId = 'Settings',
   positionColumnId = 'Position',
+  parentColumnId = 'Parent',
+  deletedColumnId = 'Deleted',
 }: {
   columnId?: string;
   titleColumnId?: string;
   emojiColumnId?: string;
   settingsColumnId?: string;
   positionColumnId?: string;
+  parentColumnId?: string;
+  deletedColumnId?: string;
 }) {
   const { record, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, setCursorPos, fetchCurrentTable } = useGrist();
 
-  // Full pages list fetched via docApi.fetchTable (all columns, regardless of section visibility)
   const [pages, setPages] = useState<RowRecord[]>([]);
 
   const [title, setTitle] = useState('');
   const [emoji, setEmoji] = useState('');
   const [settings, setSettings] = useState<PageSettings>({ ...DEFAULT_SETTINGS });
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
 
-  const editor = useCreateBlockNote();
+  const editor = useCreateBlockNote({
+    schema: noteSchema,
+    uploadFile: resizeImageToDataUrl,
+  });
   const gristValueRef = useRef<string>('');
   const suppressSaveRef = useRef(false);
 
@@ -163,26 +279,39 @@ export function NoteWidget({
   useEffect(() => {
     if (!isReady) return;
     fetchCurrentTable()
-      .then(setPages)
+      .then((rows) => setPages(rows.filter((r) => !r[deletedColumnId])))
       .catch(console.error);
-  }, [isReady, dataVersion, fetchCurrentTable]);
+  }, [isReady, dataVersion, fetchCurrentTable, deletedColumnId]);
 
-  const sortedPages = useMemo(() =>
-    [...pages].sort((a, b) => {
-      const posA = Number(a[positionColumnId]) || 0;
-      const posB = Number(b[positionColumnId]) || 0;
-      if (posA !== posB) return posA - posB;
-      return a.id - b.id;
-    }),
-    [pages, positionColumnId],
-  );
+  // Build tree: roots + children grouped by parent
+  const { roots, childrenMap } = useMemo(() => {
+    const rootPages: RowRecord[] = [];
+    const map = new Map<number, RowRecord[]>();
 
-  // Derive the current page from the full pages list so emoji is always populated
+    for (const p of pages) {
+      if (isRootPage(p, parentColumnId)) {
+        rootPages.push(p);
+      } else {
+        const pid = Number(p[parentColumnId]);
+        const list = map.get(pid) ?? [];
+        list.push(p);
+        map.set(pid, list);
+      }
+    }
+
+    const sortedRoots = sortByPosition(rootPages, positionColumnId);
+    for (const [pid, children] of map) {
+      map.set(pid, sortByPosition(children, positionColumnId));
+    }
+
+    return { roots: sortedRoots, childrenMap: map };
+  }, [pages, parentColumnId, positionColumnId]);
+
   const currentPage = pages.find((p) => p.id === record?.id) ?? null;
+  const parentPage = currentPage && !isRootPage(currentPage, parentColumnId)
+    ? pages.find((p) => p.id === Number(currentPage[parentColumnId])) ?? null
+    : null;
 
-  // Sync title, emoji and settings from Grist only when switching to a different page.
-  // Using record id as the trigger prevents a race condition: fetchCurrentTable()
-  // can return stale data before writes are committed, which would reset local state.
   const syncedPageIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!currentPage) return;
@@ -221,6 +350,11 @@ export function NoteWidget({
     [emojiColumnId, updateCurrentRecord],
   );
 
+  const handleDeletePage = useCallback(async () => {
+    if (!record) return;
+    await updateCurrentRecord({ [deletedColumnId]: true });
+  }, [record, deletedColumnId, updateCurrentRecord]);
+
   const handleSettingsUpdate = useCallback(
     (patch: Partial<PageSettings>) => {
       setSettings((prev) => {
@@ -232,11 +366,20 @@ export function NoteWidget({
     [settingsColumnId, updateCurrentRecord],
   );
 
-  // ── Drag-and-drop reordering ──────────────────────────────────────
+  const toggleCollapse = useCallback((pageId: number) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(pageId)) next.delete(pageId);
+      else next.add(pageId);
+      return next;
+    });
+  }, []);
+
+  // ── Drag-and-drop reordering + reparenting ──────────────────────────
   const [dragState, setDragState] = useState<{
     draggedId: number;
     overId: number | null;
-    placement: 'before' | 'after';
+    placement: 'before' | 'after' | 'onto';
   } | null>(null);
 
   const handleDragStart = useCallback((e: React.DragEvent, pageId: number) => {
@@ -245,11 +388,22 @@ export function NoteWidget({
     setDragState({ draggedId: pageId, overId: null, placement: 'before' });
   }, []);
 
-  const handleDragOver = useCallback((e: React.DragEvent, pageId: number) => {
+  const handleDragOver = useCallback((e: React.DragEvent, pageId: number, isChild: boolean) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     const rect = e.currentTarget.getBoundingClientRect();
-    const placement: 'before' | 'after' = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+    const y = e.clientY - rect.top;
+    const h = rect.height;
+
+    let placement: 'before' | 'after' | 'onto';
+    if (!isChild && y > h * 0.25 && y < h * 0.75) {
+      placement = 'onto';
+    } else if (y < h / 2) {
+      placement = 'before';
+    } else {
+      placement = 'after';
+    }
+
     setDragState((prev) => prev ? { ...prev, overId: pageId, placement } : null);
   }, []);
 
@@ -260,7 +414,45 @@ export function NoteWidget({
       return;
     }
 
-    const without = sortedPages.filter((p) => p.id !== dragState.draggedId);
+    const dragged = pages.find((p) => p.id === dragState.draggedId);
+    const over = pages.find((p) => p.id === dragState.overId);
+    if (!dragged || !over) { setDragState(null); return; }
+
+    // ── Reparent: drop "onto" a root page ───────────────────────────
+    if (dragState.placement === 'onto') {
+      if (!isRootPage(over, parentColumnId)) { setDragState(null); return; }
+      const draggedHasChildren = (childrenMap.get(dragged.id) ?? []).length > 0;
+      if (draggedHasChildren) { setDragState(null); return; }
+
+      const newSiblings = childrenMap.get(over.id) ?? [];
+      const maxPos = newSiblings.length > 0
+        ? Math.max(...newSiblings.map((p) => Number(p[positionColumnId]) || 0))
+        : 0;
+
+      setPages((prev) =>
+        prev.map((p) => (p.id === dragged.id
+          ? { ...p, [parentColumnId]: over.id, [positionColumnId]: maxPos + 1 }
+          : p)),
+      );
+      updateLinkedRecord(dragged.id, { [parentColumnId]: over.id, [positionColumnId]: maxPos + 1 });
+      setCollapsed((prev) => { const next = new Set(prev); next.delete(over.id); return next; });
+      setDragState(null);
+      return;
+    }
+
+    // ── Reorder / reparent via before|after placement ───────────────
+    // The new parent is determined by where we're dropping, not where we came from.
+    const newParent = isRootPage(over, parentColumnId) ? 0 : Number(over[parentColumnId]);
+
+    // A page that has children cannot be made into a subpage.
+    const draggedHasChildren = (childrenMap.get(dragged.id) ?? []).length > 0;
+    if (draggedHasChildren && newParent !== 0) { setDragState(null); return; }
+
+    const siblings = newParent === 0
+      ? roots
+      : (childrenMap.get(newParent) ?? []);
+
+    const without = siblings.filter((p) => p.id !== dragState.draggedId);
     const overIdx = without.findIndex((p) => p.id === dragState.overId);
     const targetIdx = dragState.placement === 'before' ? overIdx : overIdx + 1;
 
@@ -276,18 +468,17 @@ export function NoteWidget({
     }
 
     setPages((prev) =>
-      prev.map((p) => (p.id === dragState.draggedId ? { ...p, [positionColumnId]: newPos } : p)),
+      prev.map((p) => (p.id === dragState.draggedId
+        ? { ...p, [parentColumnId]: newParent, [positionColumnId]: newPos }
+        : p)),
     );
-    updateLinkedRecord(dragState.draggedId, { [positionColumnId]: newPos });
+    updateLinkedRecord(dragState.draggedId, { [parentColumnId]: newParent, [positionColumnId]: newPos });
     setDragState(null);
-  }, [dragState, sortedPages, positionColumnId, updateLinkedRecord]);
+  }, [dragState, pages, roots, childrenMap, parentColumnId, positionColumnId, updateLinkedRecord]);
 
   const handleDragEnd = useCallback(() => setDragState(null), []);
 
-  // Load editor content only when switching to a different record.
-  // We must NOT reload on every record update for the same ID, because
-  // onRecord fires back after our own writes with slightly stale data,
-  // which would overwrite what the user just typed and jump the cursor.
+  // Load editor content only when switching to a different record
   const loadedRecordIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (!record) return;
@@ -318,9 +509,13 @@ export function NoteWidget({
     updateCurrentRecord({ [columnId]: json });
   }, [editor, columnId, updateCurrentRecord]);
 
+  const handleNavigate = useCallback((pageId: number) => {
+    setCursorPos(pageId);
+  }, [setCursorPos]);
+
   const handleNewPage = useCallback(async () => {
-    const maxPos = sortedPages.length > 0
-      ? Math.max(...sortedPages.map((p) => Number(p[positionColumnId]) || 0))
+    const maxPos = roots.length > 0
+      ? Math.max(...roots.map((p) => Number(p[positionColumnId]) || 0))
       : 0;
     const id = await createLinkedRecord({
       [titleColumnId]: '',
@@ -328,9 +523,32 @@ export function NoteWidget({
       [emojiColumnId]: DEFAULT_EMOJI,
       [settingsColumnId]: JSON.stringify(DEFAULT_SETTINGS),
       [positionColumnId]: maxPos + 1,
+      [parentColumnId]: 0,
     });
     await setCursorPos(id);
-  }, [createLinkedRecord, setCursorPos, titleColumnId, columnId, emojiColumnId, settingsColumnId, positionColumnId, sortedPages]);
+  }, [createLinkedRecord, setCursorPos, titleColumnId, columnId, emojiColumnId, settingsColumnId, positionColumnId, parentColumnId, roots]);
+
+  const handleNewSubpage = useCallback(async (parentId: number) => {
+    const siblings = childrenMap.get(parentId) ?? [];
+    const maxPos = siblings.length > 0
+      ? Math.max(...siblings.map((p) => Number(p[positionColumnId]) || 0))
+      : 0;
+    const id = await createLinkedRecord({
+      [titleColumnId]: '',
+      [columnId]: '',
+      [emojiColumnId]: DEFAULT_EMOJI,
+      [settingsColumnId]: JSON.stringify(DEFAULT_SETTINGS),
+      [positionColumnId]: maxPos + 1,
+      [parentColumnId]: parentId,
+    });
+    setCollapsed((prev) => { const next = new Set(prev); next.delete(parentId); return next; });
+    await setCursorPos(id);
+  }, [createLinkedRecord, setCursorPos, titleColumnId, columnId, emojiColumnId, settingsColumnId, positionColumnId, parentColumnId, childrenMap]);
+
+  const noteContextValue = useMemo<NoteContextValue>(
+    () => ({ pages, emojiColumnId, titleColumnId, onNavigate: handleNavigate }),
+    [pages, emojiColumnId, titleColumnId, handleNavigate],
+  );
 
   if (!isReady) {
     return (
@@ -345,7 +563,71 @@ export function NoteWidget({
 
   const widthClass = settings.width === 'full' ? 'note-widget--full' : 'note-widget--reduced';
 
+  const renderPageItem = (p: RowRecord, isChild: boolean) => {
+    const isOver = dragState?.overId === p.id && dragState.draggedId !== p.id;
+    const children = childrenMap.get(p.id) ?? [];
+    const hasChildren = children.length > 0;
+    const isCollapsed = collapsed.has(p.id);
+
+    const liClass = [
+      'note-sidebar__li',
+      isChild ? 'note-sidebar__li--child' : '',
+      dragState?.draggedId === p.id ? 'note-sidebar__li--dragging' : '',
+      isOver && dragState?.placement === 'before' ? 'note-sidebar__li--drop-before' : '',
+      isOver && dragState?.placement === 'after' ? 'note-sidebar__li--drop-after' : '',
+      isOver && dragState?.placement === 'onto' ? 'note-sidebar__li--drop-onto' : '',
+    ].filter(Boolean).join(' ');
+
+    return (
+      <li
+        key={p.id}
+        className={liClass}
+        draggable
+        onDragStart={(e) => handleDragStart(e, p.id)}
+        onDragOver={(e) => handleDragOver(e, p.id, isChild)}
+        onDrop={handleDrop}
+        onDragEnd={handleDragEnd}
+      >
+        <button
+          type="button"
+          className={`note-sidebar__emoji-btn${hasChildren && !isChild ? ' note-sidebar__emoji-btn--collapsible' : ''}`}
+          onClick={hasChildren && !isChild ? () => toggleCollapse(p.id) : undefined}
+          tabIndex={hasChildren && !isChild ? 0 : -1}
+        >
+          <span className="note-sidebar__emoji-char">
+            {String(p[emojiColumnId] || DEFAULT_EMOJI)}
+          </span>
+          {hasChildren && !isChild && (
+            <span className="material-icons note-sidebar__emoji-caret">
+              {isCollapsed ? 'chevron_right' : 'expand_more'}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          className={`note-sidebar__item${p.id === record?.id ? ' note-sidebar__item--active' : ''}`}
+          onClick={() => setCursorPos(p.id)}
+        >
+          <span className="note-sidebar__item-label">
+            {String(p[titleColumnId] || 'Sans titre')}
+          </span>
+        </button>
+        {!isChild && (
+          <button
+            type="button"
+            className="note-sidebar__add-sub-btn"
+            title="Ajouter une sous-page"
+            onClick={(e) => { e.stopPropagation(); handleNewSubpage(p.id); }}
+          >
+            <span className="material-icons">add</span>
+          </button>
+        )}
+      </li>
+    );
+  };
+
   return (
+    <NoteContext.Provider value={noteContextValue}>
     <div className="note-app">
       {sidebarOpen ? (
         <aside className="note-sidebar">
@@ -370,43 +652,16 @@ export function NoteWidget({
           </div>
 
           <ul className="note-sidebar__list">
-          {sortedPages.map((p) => {
-            const isOver = dragState?.overId === p.id && dragState.draggedId !== p.id;
-            const liClass = [
-              'note-sidebar__li',
-              dragState?.draggedId === p.id ? 'note-sidebar__li--dragging' : '',
-              isOver && dragState?.placement === 'before' ? 'note-sidebar__li--drop-before' : '',
-              isOver && dragState?.placement === 'after' ? 'note-sidebar__li--drop-after' : '',
-            ].filter(Boolean).join(' ');
-
-            return (
-              <li
-                key={p.id}
-                className={liClass}
-                draggable
-                onDragStart={(e) => handleDragStart(e, p.id)}
-                onDragOver={(e) => handleDragOver(e, p.id)}
-                onDrop={handleDrop}
-                onDragEnd={handleDragEnd}
-              >
-                <span className="note-sidebar__drag-handle">
-                  <span className="material-icons">drag_indicator</span>
-                </span>
-                <button
-                  type="button"
-                  className={`note-sidebar__item${p.id === record?.id ? ' note-sidebar__item--active' : ''}`}
-                  onClick={() => setCursorPos(p.id)}
-                >
-                  <span className="note-sidebar__item-emoji">
-                    {String(p[emojiColumnId] || DEFAULT_EMOJI)}
-                  </span>
-                  <span className="note-sidebar__item-label">
-                    {String(p[titleColumnId] || 'Sans titre')}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
+            {roots.map((p) => {
+              const children = childrenMap.get(p.id) ?? [];
+              const isCollapsed = collapsed.has(p.id);
+              return (
+                <React.Fragment key={p.id}>
+                  {renderPageItem(p, false)}
+                  {!isCollapsed && children.map((c) => renderPageItem(c, true))}
+                </React.Fragment>
+              );
+            })}
           </ul>
         </aside>
       ) : (
@@ -429,9 +684,20 @@ export function NoteWidget({
         ) : (
           <div className={`note-widget ${widthClass}`}>
             <div className="note-widget__toolbar">
-              <PageOptionsMenu settings={settings} onUpdate={handleSettingsUpdate} />
+              <PageOptionsMenu settings={settings} onUpdate={handleSettingsUpdate} onDelete={handleDeletePage} />
             </div>
             <div className="note-widget__header">
+              {parentPage && (
+                <button
+                  type="button"
+                  className="note-widget__breadcrumb"
+                  onClick={() => setCursorPos(parentPage.id)}
+                >
+                  <span className="material-icons">chevron_left</span>
+                  <span>{String(parentPage[emojiColumnId] || DEFAULT_EMOJI)}</span>
+                  <span>{String(parentPage[titleColumnId] || 'Sans titre')}</span>
+                </button>
+              )}
               <EmojiPicker current={emoji} onSelect={handleEmojiSelect} />
               <input
                 className="note-widget__title"
@@ -442,10 +708,56 @@ export function NoteWidget({
                 placeholder="Sans titre"
               />
             </div>
-            <BlockNoteView editor={editor} onChange={handleChange} editable={true} />
+            <BlockNoteView editor={editor} onChange={handleChange} editable={true} formattingToolbar={false} slashMenu={false}>
+              <SuggestionMenuController
+                triggerCharacter="/"
+                getItems={async (query) => {
+                  const defaultItems = getDefaultReactSlashMenuItems(editor);
+                  const pageItems = pages
+                    .filter((p) => p.id !== record?.id)
+                    .map((p) => ({
+                      title: String(p[titleColumnId] || 'Sans titre'),
+                      aliases: [String(p[titleColumnId] || '').toLowerCase(), 'page', 'sous-page'],
+                      group: 'Pages',
+                      icon: <span style={{ fontSize: '14px', lineHeight: 1 }}>{String(p[emojiColumnId] || DEFAULT_EMOJI)}</span>,
+                      onItemClick: () => {
+                        editor.insertBlocks(
+                          [{ type: 'pageRef', props: { pageId: String(p.id) } }],
+                          editor.getTextCursorPosition().block,
+                          'after',
+                        );
+                      },
+                    }));
+                  const all = [...defaultItems, ...pageItems];
+                  if (!query) return all;
+                  const q = query.toLowerCase();
+                  return all.filter((item) =>
+                    item.title.toLowerCase().includes(q) ||
+                    item.aliases?.some((a) => a.toLowerCase().includes(q)),
+                  );
+                }}
+              />
+              <FormattingToolbarController
+                formattingToolbar={() => (
+                  <FormattingToolbar>
+                    <BlockTypeSelect key="blockTypeSelect" />
+                    <BasicTextStyleButton basicTextStyle="bold" key="boldStyleButton" />
+                    <BasicTextStyleButton basicTextStyle="italic" key="italicStyleButton" />
+                    <BasicTextStyleButton basicTextStyle="underline" key="underlineStyleButton" />
+                    <BasicTextStyleButton basicTextStyle="strike" key="strikeStyleButton" />
+                    <BasicTextStyleButton basicTextStyle="code" key="codeStyleButton" />
+                    <ColorStyleButton key="colorStyleButton" />
+                    <NestBlockButton key="nestBlockButton" />
+                    <UnnestBlockButton key="unnestBlockButton" />
+                    <CreateLinkButton key="createLinkButton" />
+                  </FormattingToolbar>
+                )}
+              />
+            </BlockNoteView>
           </div>
         )}
       </main>
     </div>
+    </NoteContext.Provider>
   );
 }

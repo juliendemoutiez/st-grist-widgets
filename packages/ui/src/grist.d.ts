@@ -34,11 +34,17 @@ declare module 'grist-plugin-api' {
     destroy(rowId: number): Promise<void>;
   }
 
+  export interface AccessTokenResult {
+    token: string;
+    baseUrl: string;
+  }
+
   export interface DocApi {
     getDocName(): Promise<string>;
     listTables(): Promise<string[]>;
     fetchTable(tableId: string): Promise<FetchedTable>;
     applyUserActions(actions: unknown[][]): Promise<unknown>;
+    getAccessToken(options: { readOnly?: boolean }): Promise<AccessTokenResult>;
   }
 
   const grist: {
