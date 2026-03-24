@@ -13,7 +13,7 @@ const STATUSES = [
   '4. Suivi bizdev',
   '5. Bilan expérimentation',
   '6. Autonomie',
-  '6. Perdu / En pause',
+  '7. Perdu / En pause',
 ] as const;
 
 createRoot(document.getElementById('root')!).render(

@@ -7,12 +7,12 @@ import { GristProvider } from '@grist-widgets/ui';
 import { KanbanWidget } from '../../widgets/kanban';
 
 const STATUSES = [
-  '7. Suivi objections',
-  '8. Engagement déploiement',
-  '9. Suivi déploiement',
-  '10. Arrêts licences',
-  '11. Elargissement LaSuite',
-  '12. En pause',
+  '8. Suivi objections',
+  '9. Engagement déploiement',
+  '10. Suivi déploiement',
+  '11. Arrêts licences',
+  '12. Elargissement LaSuite',
+  '13. En pause',
 ] as const;
 
 createRoot(document.getElementById('root')!).render(
