@@ -2,6 +2,8 @@ import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 import './note.scss';
 
+import { withMultiColumn, getMultiColumnSlashMenuItems, multiColumnDropCursor, locales as multiColumnLocales } from '@blocknote/xl-multi-column';
+
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   useCreateBlockNote,
@@ -16,8 +18,10 @@ import {
   createReactBlockSpec,
   SuggestionMenuController,
   getDefaultReactSlashMenuItems,
+  SideMenuController,
 } from '@blocknote/react';
 import { BlockNoteSchema, defaultBlockSpecs } from '@blocknote/core';
+import { en as enDictionary } from '@blocknote/core/locales';
 import { BlockNoteView } from '@blocknote/mantine';
 import type { RowRecord } from 'grist-plugin-api';
 import { useGrist } from '@grist-widgets/ui';
@@ -64,9 +68,200 @@ const PageRefBlock = createReactBlockSpec(
   },
 );
 
-const noteSchema = BlockNoteSchema.create({
-  blockSpecs: { ...defaultBlockSpecs, pageRef: PageRefBlock() },
-});
+// ── Todo-item block ────────────────────────────────────────────────────────
+
+const PROJECT_COLORS = ['blue', 'violet', 'green', 'orange', 'red', 'teal'] as const;
+type ProjectColor = (typeof PROJECT_COLORS)[number];
+
+function hashColor(text: string): ProjectColor {
+  let h = 0x811c9dc5; // FNV-1a offset basis
+  for (let i = 0; i < text.length; i++) {
+    h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0; // FNV prime
+  }
+  return PROJECT_COLORS[h % PROJECT_COLORS.length];
+}
+
+function ProjectBadge({
+  block,
+  editor,
+}: {
+  block: { id: string; props: { checked: boolean; project: string } };
+  editor: ReturnType<typeof useCreateBlockNote>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+
+  const commit = (value: string) => {
+    editor.updateBlock(block as Parameters<typeof editor.updateBlock>[0], {
+      props: { project: value.trim() },
+    });
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    setDraft(block.props.project);
+    setTimeout(() => inputRef.current?.select(), 0);
+    const handle = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) commit(draftRef.current);
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [open]);
+
+  const project = block.props.project.trim();
+  const color = project ? (block.props.checked ? 'grey' : hashColor(project)) : null;
+
+  return (
+    <div className="todo-badge-wrap" ref={ref}>
+      <button
+        type="button"
+        className={`todo-badge${color ? ` todo-badge--${color}` : ' todo-badge--empty'}`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {project ? (
+          <span>{project}</span>
+        ) : (
+          <>
+            <span className="material-icons">add</span>
+            <span>Projet</span>
+          </>
+        )}
+      </button>
+      {open && (
+        <div className="todo-badge-picker">
+          <input
+            ref={inputRef}
+            className="todo-badge-picker__input"
+            value={draft}
+            placeholder="Nom du projet…"
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commit(draft); }
+              if (e.key === 'Escape') { setOpen(false); }
+            }}
+          />
+          <div className="todo-badge-picker__actions">
+            {project && (
+              <button
+                type="button"
+                className="todo-badge-picker__clear"
+                onClick={() => commit('')}
+              >
+                <span className="material-icons">close</span>
+                Retirer
+              </button>
+            )}
+            <button
+              type="button"
+              className="todo-badge-picker__confirm"
+              onClick={() => commit(draft)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TodoItemBlock = createReactBlockSpec(
+  {
+    type: 'todoItem' as const,
+    propSchema: {
+      checked: { default: false },
+      project: { default: '' },
+    },
+    content: 'inline',
+  },
+  {
+    render: ({ block, editor, contentRef }) => {
+      const isEmpty = (block.content as unknown[]).length === 0;
+      return (
+        <div className={`todo-item${block.props.checked ? ' todo-item--checked' : ''}`}>
+          <button
+            type="button"
+            className="todo-item__checkbox"
+            contentEditable={false}
+            onClick={() =>
+              editor.updateBlock(block, { props: { checked: !block.props.checked } })
+            }
+          >
+            <span className="material-icons">
+              {block.props.checked ? 'check_box' : 'check_box_outline_blank'}
+            </span>
+          </button>
+          <div contentEditable={false}>
+            <ProjectBadge block={block} editor={editor} />
+          </div>
+          <div className={`todo-item__text-wrap${isEmpty ? ' todo-item__text-wrap--empty' : ''}`}>
+            <div className="todo-item__text" ref={contentRef} />
+          </div>
+        </div>
+      );
+    },
+  },
+);
+
+// ── Status-badge block ─────────────────────────────────────────────────────
+
+const STATUS_OPTIONS = [
+  { label: 'Todo',        color: 'grey'   },
+  { label: 'In Progress', color: 'blue'   },
+  { label: 'Review',      color: 'orange' },
+  { label: 'Done',        color: 'green'  },
+  { label: 'Blocked',     color: 'red'    },
+] as const;
+
+type StatusColor = (typeof STATUS_OPTIONS)[number]['color'];
+
+const StatusBadgeBlock = createReactBlockSpec(
+  {
+    type: 'statusBadge' as const,
+    propSchema: {
+      label: { default: 'Todo' },
+      color: { default: 'grey' as StatusColor },
+    },
+    content: 'none',
+  },
+  {
+    render: ({ block, editor }) => {
+      const { label, color } = block.props;
+
+      const handleClick = () => {
+        const idx = STATUS_OPTIONS.findIndex((s) => s.label === label);
+        const next = STATUS_OPTIONS[(idx + 1) % STATUS_OPTIONS.length];
+        editor.updateBlock(block, { props: { label: next.label, color: next.color } });
+      };
+
+      return (
+        <span
+          className={`status-badge status-badge--${color}`}
+          onClick={handleClick}
+          contentEditable={false}
+          title="Cliquer pour changer le statut"
+        >
+          {label}
+        </span>
+      );
+    },
+  },
+);
+
+const noteSchema = withMultiColumn(BlockNoteSchema.create({
+  blockSpecs: {
+    ...defaultBlockSpecs,
+    pageRef: PageRefBlock(),
+    statusBadge: StatusBadgeBlock(),
+    todoItem: TodoItemBlock(),
+  },
+}));
 
 const MAX_IMAGE_DIMENSION = 1200;
 
@@ -104,7 +299,7 @@ const EMOJIS = [
   '📄', '📝', '📌', '📎', '🔖', '💡', '🎯', '✅', '⭐', '🔥',
   '💼', '📊', '📈', '🗓️', '🔍', '🧠', '💬', '🤝', '🎉', '🚀',
   '🌟', '❤️', '🔴', '🟡', '🟢', '🔵', '⚡', '🛠️', '🎨', '📚',
-  '🏠', '🌍', '👤', '👥', '🔒', '📧', '📞', '🖥️', '📱', '🎵',
+  '🏠', '🌍', '👤', '👥', '🔒', '📧', '📞', '🖥️', '😋', '🎵', '🥬'
 ];
 
 const DEFAULT_EMOJI = '📄';
@@ -271,9 +466,36 @@ export function NoteWidget({
   const editor = useCreateBlockNote({
     schema: noteSchema,
     uploadFile: resizeImageToDataUrl,
+    dropCursor: multiColumnDropCursor,
+    dictionary: { ...enDictionary, multi_column: multiColumnLocales.en } as any,
   });
   const gristValueRef = useRef<string>('');
   const suppressSaveRef = useRef(false);
+
+  // Enter on a todoItem → insert a new todoItem below
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.shiftKey) return;
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+      if (!editor.isFocused) return;
+      let pos;
+      try { pos = editor.getTextCursorPosition(); } catch { return; }
+      if (!pos || pos.block.type !== 'todoItem') return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const newId = Math.random().toString(36).slice(2);
+      try {
+        editor.insertBlocks(
+          [{ id: newId, type: 'todoItem', props: { checked: false, project: '' } }],
+          pos.block,
+          'after',
+        );
+        editor.setTextCursorPosition(newId, 'start');
+      } catch { /* no-op */ }
+    };
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [editor]);
 
   // Re-fetch all pages (with all columns) whenever data changes
   useEffect(() => {
@@ -495,8 +717,11 @@ export function NoteWidget({
     } catch {
       blocks = editor.tryParseMarkdownToBlocks(incoming);
     }
-    editor.replaceBlocks(editor.document, blocks);
-    suppressSaveRef.current = false;
+    try {
+      editor.replaceBlocks(editor.document, blocks);
+    } finally {
+      suppressSaveRef.current = false;
+    }
   }, [record, columnId, editor]);
 
   const handleChange = useCallback(() => {
@@ -708,7 +933,8 @@ export function NoteWidget({
                 placeholder="Sans titre"
               />
             </div>
-            <BlockNoteView editor={editor} onChange={handleChange} editable={true} formattingToolbar={false} slashMenu={false}>
+            <BlockNoteView editor={editor} onChange={handleChange} editable={true} formattingToolbar={false} slashMenu={false} sideMenu={false}>
+              <SideMenuController floatingUIOptions={{ useFloatingOptions: { placement: 'left' } }} />
               <SuggestionMenuController
                 triggerCharacter="/"
                 getItems={async (query) => {
@@ -728,7 +954,34 @@ export function NoteWidget({
                         );
                       },
                     }));
-                  const all = [...defaultItems, ...pageItems];
+                  const todoItem = {
+                    title: 'To Do',
+                    aliases: ['todo', 'task', 'tâche', 'checklist'],
+                    group: 'Blocs',
+                    icon: <span className="material-icons" style={{ fontSize: '16px' }}>check_box_outline_blank</span>,
+                    onItemClick: () => {
+                      editor.insertBlocks(
+                        [{ type: 'todoItem', props: { checked: false, project: '' } }],
+                        editor.getTextCursorPosition().block,
+                        'after',
+                      );
+                    },
+                  };
+                  const statusItem = {
+                    title: 'Status Badge',
+                    aliases: ['status', 'badge', 'statut', 'tag'],
+                    group: 'Blocs',
+                    icon: <span style={{ fontSize: '12px', lineHeight: 1, fontWeight: 600 }}>●</span>,
+                    onItemClick: () => {
+                      editor.insertBlocks(
+                        [{ type: 'statusBadge', props: { label: 'Todo', color: 'grey' } }],
+                        editor.getTextCursorPosition().block,
+                        'after',
+                      );
+                    },
+                  };
+                  const columnItems = getMultiColumnSlashMenuItems(editor);
+                  const all = [...defaultItems, ...columnItems, todoItem, statusItem, ...pageItems];
                   if (!query) return all;
                   const q = query.toLowerCase();
                   return all.filter((item) =>

@@ -11,9 +11,10 @@
     "build-theme": "cunningham -g css,scss,ts -o src/assets/styles"
   },
   "dependencies": {
-    "@blocknote/core": "^0.47.1",
-    "@blocknote/mantine": "^0.47.1",
-    "@blocknote/react": "^0.47.1",
+    "@blocknote/core": "^0.47.2",
+    "@blocknote/mantine": "^0.47.2",
+    "@blocknote/react": "^0.47.2",
+    "@blocknote/xl-multi-column": "^0.47.2",
     "@gouvfr-lasuite/cunningham-react": "^4.2.0",
     "@gouvfr-lasuite/ui-kit": "^0.19.8",
     "@grist-widgets/ui": "workspace:*",
