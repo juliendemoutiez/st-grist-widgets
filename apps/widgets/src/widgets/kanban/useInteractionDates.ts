@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { RowRecord } from 'grist-plugin-api';
 
 const grist = (window as unknown as { grist?: typeof import('grist-plugin-api').default }).grist;
 
@@ -8,7 +9,7 @@ export interface InteractionInfo {
 }
 
 /** Maps projectId → InteractionInfo from the latest interaction. */
-export function useInteractionDates(): Map<number, InteractionInfo> {
+export function useInteractionDates(records: RowRecord[]): Map<number, InteractionInfo> {
   const [map, setMap] = useState<Map<number, InteractionInfo>>(new Map());
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export function useInteractionDates(): Map<number, InteractionInfo> {
     }).catch((err) => {
       console.warn('[useInteractionDates] Failed:', err);
     });
-  }, []);
+  }, [records]);
 
   return map;
 }

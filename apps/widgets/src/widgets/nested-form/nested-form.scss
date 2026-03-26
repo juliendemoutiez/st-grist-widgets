@@ -549,6 +549,13 @@
   color: var(--c--contextuals--content--semantic--neutral--primary);
 }
 
+.timeline__types {
+  display: flex;
+  gap: 0.25rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .timeline__type {
   font-size: 12px;
   padding: 0.125rem 0.5rem;

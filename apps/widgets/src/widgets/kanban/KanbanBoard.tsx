@@ -12,7 +12,7 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ statuses }: KanbanBoardProps) {
   const records = useRecords();
-  const interactionDates = useInteractionDates();
+  const interactionDates = useInteractionDates(records);
   const statusColors = useStatusColors();
   const { record: selectedRecord, updateLinkedRecord, setCursorPos } = useGrist();
   const dragRef = useRef<{ id: number; fromStatus: string } | null>(null);
