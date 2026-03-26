@@ -12,6 +12,8 @@ const CONTACT_FORM: FormConfig = {
   fields: [
     { colId: 'Nom', icon: 'person', label: 'Nom', transform: 'uppercase' },
     { colId: 'Prenom', icon: 'badge', label: 'Prénom', transform: 'capitalize' },
+    { colId: 'Email', icon: 'email', label: 'Email' },
+    { colId: 'Fonction', icon: 'work', label: 'Fonction' },
     { colId: 'Organisation', icon: 'business', label: 'Organisation', refLabelCol: 'Nom', refEditScreen: 'OrgForm' },
     { colId: 'Cree_par', icon: 'account_circle', label: 'Créé par', readOnly: true, avatar: true },
     { colId: 'Derniere_mise_a_jour_par', icon: 'account_circle', label: 'Dernière mise à jour par', readOnly: true, avatar: true },
