@@ -32,7 +32,7 @@ const INTERACTION_FORM: FormConfig = {
   headerDatePrefix: 'Créé',
   fields: [
     { colId: 'Date', icon: 'event', label: 'Date' },
-    { colId: 'Projets', icon: 'folder', label: 'Projets', readOnly: true, refLabelCol: 'Nom' },
+    { colId: 'Projets', icon: 'folder', label: 'Projet', readOnly: true, refLabelCol: 'Nom' },
     { colId: 'Type', icon: 'label', label: 'Type', readOnly: true },
     { colId: 'Produits', icon: 'inventory_2', label: 'Produits', readOnly: true },
     {
