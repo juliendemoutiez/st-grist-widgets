@@ -331,6 +331,7 @@ html, body {
     align-items: baseline;
     gap: 4px;
     min-width: 0;
+    padding-right: 32px;
   }
 
   &__name {
@@ -361,7 +362,7 @@ html, body {
     display: flex;
     align-items: flex-start;
     gap: 0.5rem;
-    margin-top: 2px;
+    margin-top: 5px;
     min-height: 18px;
   }
 
@@ -496,11 +497,13 @@ html, body {
   }
 
   &__side {
+    position: absolute;
+    top: 0.75rem;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 4px;
-    flex-shrink: 0;
   }
 
   &__actions {
