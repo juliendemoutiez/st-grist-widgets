@@ -267,7 +267,6 @@ export function TodoWidget() {
   const [projetColorMap, setProjetColorMap] = useState<Map<string, ProjetColor>>(new Map());
   const [etiquettesChoices, setEtiquettesChoices] = useState<string[]>([]);
   const [etiquettesColorMap, setEtiquettesColorMap] = useState<Map<string, ProjetColor>>(new Map());
-  const [prioriteColorMap, setPrioriteColorMap] = useState<Map<string, ProjetColor>>(new Map());
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
   const [newTask, setNewTask] = useState('');
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ type: 'section', key: "Aujourd'hui" });
@@ -370,7 +369,6 @@ export function TodoWidget() {
         } catch {}
       }
       setEtiquettesColorMap(buildColorMap(ETIQUETTES_COL));
-      setPrioriteColorMap(buildColorMap(PRIORITE_COL));
     }).catch(() => {});
   }, [fetchTable, dataVersion]);
 
