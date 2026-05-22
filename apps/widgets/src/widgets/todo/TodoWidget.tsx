@@ -57,6 +57,7 @@ function SortButton({ sortMode, onSort }: { sortMode: 'manual' | 'priority' | 'n
         title={`Tri : ${current.label}`}
       >
         <span className="material-icons">swap_vert</span>
+        {sortMode !== 'manual' && <span className="todo-widget__sort-label">{current.label}</span>}
       </button>
       {open && (
         <div className="todo-widget__sort-menu">
@@ -260,7 +261,7 @@ function dueStatus(d: Date): DueStatus {
 // ─── Main widget ──────────────────────────────────────────────────────────────
 
 export function TodoWidget() {
-  const { dataVersion, updateLinkedRecord, createLinkedRecord, setCursorPos, setSelectedRows, fetchTable, fetchCurrentTable } = useGrist();
+  const { dataVersion, allRecords, updateLinkedRecord, createLinkedRecord, setCursorPos, setSelectedRows, fetchTable, fetchCurrentTable } = useGrist();
   const [records, setRecords] = useState<RowRecord[]>([]);
   const [projetChoices, setProjetChoices] = useState<string[]>([]);
   const [projetColorMap, setProjetColorMap] = useState<Map<string, ProjetColor>>(new Map());
@@ -274,6 +275,8 @@ export function TodoWidget() {
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dropIndicatorId, setDropIndicatorId] = useState<number | 'end' | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const pendingSelectId = useRef<number | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
   const [showNewRow, setShowNewRow] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showDone, setShowDone] = useState(() => {
@@ -315,8 +318,21 @@ export function TodoWidget() {
   const headerMenuWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchCurrentTable().then((rows) => setRecords(rows.filter((r) => !r[SUPPRIME_COL]))).catch(() => {});
+    fetchCurrentTable().then((rows) => {
+      setRecords(rows.filter((r) => !r[SUPPRIME_COL]));
+    }).catch(() => {});
   }, [dataVersion, fetchCurrentTable]);
+
+  useEffect(() => {
+    if (pendingSelectId.current === null) return;
+    const id = pendingSelectId.current;
+    if (allRecords.some((r) => r.id === id)) {
+      pendingSelectId.current = null;
+      setSelectedId(id);
+      void setCursorPos(id);
+      void setSelectedRows([id]);
+    }
+  }, [allRecords, setCursorPos, setSelectedRows]);
 
   useEffect(() => {
     fetchTable('_grist_Tables_column').then((table) => {
@@ -437,8 +453,10 @@ export function TodoWidget() {
     const maxOrder = filteredRecords.reduce((max, r) => Math.max(max, (r[ORDRE_COL] as number) || 0), 0);
     const fields: Record<string, unknown> = { [NAME_COL]: trimmed, [ORDRE_COL]: maxOrder + 10 };
     if (activeFilter.type === 'section') fields[LISTE_COL] = activeFilter.key;
-    else fields[PROJET_COL] = activeFilter.id;
-    await createLinkedRecord(fields);
+    else if (activeFilter.type === 'project') { fields[PROJET_COL] = activeFilter.id; fields[LISTE_COL] = 'Boîte de réception'; }
+    else if (activeFilter.type === 'tag') { fields[LISTE_COL] = 'Boîte de réception'; fields[ETIQUETTES_COL] = ['L', activeFilter.id]; }
+    const id = await createLinkedRecord(fields);
+    if (id) pendingSelectId.current = id;
   };
 
   const handleNewTaskKeyDown = (e: React.KeyboardEvent) => {
@@ -538,11 +556,8 @@ export function TodoWidget() {
         const subtasksDone = subtasks.filter((t) => t.done).length;
         const tags = decodeChoiceList(record[ETIQUETTES_COL]);
         const priority = record[PRIORITE_COL] ? String(record[PRIORITE_COL]) : null;
-        const priorityGristColor = priority ? prioriteColorMap.get(priority) : null;
         const PRIORITY_DEFAULTS: Record<string, string> = { P1: '#ef4444', P2: '#f97316', P3: '#3b82f6' };
-        const priorityColor = priorityGristColor
-          ? (priorityGristColor.text && priorityGristColor.text !== '#000000' && priorityGristColor.text !== '#000' ? priorityGristColor.text : priorityGristColor.fill)
-          : (priority ? (PRIORITY_DEFAULTS[priority] ?? null) : null);
+        const priorityColor = priority ? (PRIORITY_DEFAULTS[priority] ?? null) : null;
 
         return (
           <li
@@ -606,33 +621,42 @@ export function TodoWidget() {
                 />
               </div>
               <div className="todo-widget__meta">
-                {dueDate && (
-                  <div className={`todo-widget__due${isDone ? ' todo-widget__due--done' : status ? ` todo-widget__due--${status}` : ''}`}>
-                    <span className="material-icons">calendar_today</span>
-                    {formatDate(dueDate)}
-                  </div>
-                )}
-                {tags.length > 0 && (
-                  <div className="todo-widget__tags">
-                    <span className="material-icons">sell</span>
-                    <span className="todo-widget__tags-text">
-                      {tags.map((tag, i) => (
-                        <React.Fragment key={tag}>
-                          <span
-                            className="todo-widget__tag-link"
-                            onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'tag', id: tag, label: tag }); }}
-                          >{tag}</span>
-                          {i < tags.length - 1 && ', '}
-                        </React.Fragment>
-                      ))}
-                    </span>
-                  </div>
-                )}
-                {subtasks.length > 0 && (
-                  <div className={`todo-widget__subtasks-badge${subtasksDone === subtasks.length ? ' todo-widget__subtasks-badge--done' : ''}`}>
-                    <span className="material-icons">checklist</span>
-                    <span>{subtasksDone}/{subtasks.length}</span>
-                  </div>
+                <div className="todo-widget__meta-left">
+                  {dueDate && (
+                    <div className={`todo-widget__due${isDone ? ' todo-widget__due--done' : status ? ` todo-widget__due--${status}` : ''}`}>
+                      <span className="material-icons">calendar_today</span>
+                      {formatDate(dueDate)}
+                    </div>
+                  )}
+                  {tags.length > 0 && (
+                    <div className="todo-widget__tags">
+                      <span className="material-icons">sell</span>
+                      <span className="todo-widget__tags-text">
+                        {tags.map((tag, i) => (
+                          <React.Fragment key={tag}>
+                            <span
+                              className="todo-widget__tag-link"
+                              onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'tag', id: tag, label: tag }); }}
+                            >{tag}</span>
+                            {i < tags.length - 1 && ', '}
+                          </React.Fragment>
+                        ))}
+                      </span>
+                    </div>
+                  )}
+                  {subtasks.length > 0 && (
+                    <div className={`todo-widget__subtasks-badge${subtasksDone === subtasks.length ? ' todo-widget__subtasks-badge--done' : ''}`}>
+                      <span className="material-icons">checklist</span>
+                      <span>{subtasksDone}/{subtasks.length}</span>
+                    </div>
+                  )}
+                </div>
+                {activeFilter.type !== 'project' && projetName && (
+                  <span
+                    className="todo-widget__projet-chip"
+                    style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
+                    onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); }}
+                  >{projetName}</span>
                 )}
               </div>
             </div>
@@ -655,14 +679,6 @@ export function TodoWidget() {
                   )}
                 </div>
               </div>
-              {activeFilter.type !== 'project' && (
-                <span
-                  className={`todo-widget__projet-chip${!projetName ? ' todo-widget__projet-chip--hidden' : ''}`}
-                  style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
-                  onClick={projetName ? (e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); } : undefined}
-                >                  {projetName || ' '}
-                </span>
-              )}
             </div>
           </li>
         );
@@ -698,7 +714,8 @@ export function TodoWidget() {
 
   return (
     <div className="todo-widget__root">
-      <nav className="todo-widget__nav">
+      {navOpen && <div className="todo-widget__nav-overlay" onClick={() => setNavOpen(false)} />}
+      <nav className={`todo-widget__nav${navOpen ? ' todo-widget__nav--open' : ''}`}>
         {SECTIONS.map((section) => (
           <button
             key={section.key}
@@ -707,7 +724,7 @@ export function TodoWidget() {
               isSectionActive(section.key) ? 'todo-widget__nav-item--active' : '',
               isDragOverSection(section.key) ? 'todo-widget__nav-item--drag-over' : '',
             ].filter(Boolean).join(' ')}
-            onClick={() => setActiveFilter({ type: 'section', key: section.key })}
+            onClick={() => { setActiveFilter({ type: 'section', key: section.key }); setNavOpen(false); }}
             onDragOver={(e) => { e.preventDefault(); if (draggingId === null) return; setDragTarget({ type: 'section', key: section.key }); setDropIndicatorId(null); }}
             onDragLeave={() => setDragTarget(null)}
             onDrop={(e) => { e.preventDefault(); handleDrop({ type: 'section', key: section.key }); }}
@@ -730,7 +747,7 @@ export function TodoWidget() {
                     isProjectActive(name) ? 'todo-widget__nav-item--active' : '',
                     isDragOverProject(name) ? 'todo-widget__nav-item--drag-over' : '',
                   ].filter(Boolean).join(' ')}
-                  onClick={() => setActiveFilter({ type: 'project', id: name, label: name })}
+                  onClick={() => { setActiveFilter({ type: 'project', id: name, label: name }); setNavOpen(false); }}
                   onDragOver={(e) => { e.preventDefault(); if (draggingId === null) return; setDragTarget({ type: 'project', id: name }); setDropIndicatorId(null); }}
                   onDragLeave={() => setDragTarget(null)}
                   onDrop={(e) => { e.preventDefault(); handleDrop({ type: 'project', id: name }); }}
@@ -758,7 +775,7 @@ export function TodoWidget() {
                     'todo-widget__nav-item',
                     isTagActive(tag) ? 'todo-widget__nav-item--active' : '',
                   ].filter(Boolean).join(' ')}
-                  onClick={() => setActiveFilter({ type: 'tag', id: tag, label: tag })}
+                  onClick={() => { setActiveFilter({ type: 'tag', id: tag, label: tag }); setNavOpen(false); }}
                 >
                   <span
                     className="material-icons todo-widget__nav-tag-icon"
@@ -774,6 +791,9 @@ export function TodoWidget() {
 
       <div className="todo-widget__main" onClick={() => { setSelectedId(null); setSelectedRows([]); }}>
         <div className="todo-widget__header">
+          <button className="todo-widget__nav-toggle" onClick={(e) => { e.stopPropagation(); setNavOpen((v) => !v); }} aria-label="Menu">
+            <span className="material-icons">menu</span>
+          </button>
           <h1 className="todo-widget__title">
             {activeFilter.type === 'section' ? (
               <span className="material-icons todo-widget__title-icon">

@@ -105,9 +105,9 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
   const createLinkedRecord = useCallback(async (fields: Record<string, unknown>) => {
     if (!grist) throw new Error('Grist API not available');
     const table = await grist.getTable();
-    const id = await table.create({ fields });
+    const result = await table.create({ fields });
     tableCache.current.clear();
-    return id;
+    return typeof result === 'object' && result !== null ? (result as { id: number }).id : result as number;
   }, []);
 
   const deleteLinkedRecord = useCallback(async (id: number) => {
