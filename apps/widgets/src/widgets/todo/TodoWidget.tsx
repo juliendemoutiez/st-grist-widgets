@@ -12,7 +12,7 @@ interface HeaderMenuProps {
   label: string;
 }
 
-function HeaderMenu({ showDone, onToggleDone, onClose, label }: HeaderMenuProps) {
+function HeaderMenu({ showDone, onToggleDone, label }: HeaderMenuProps) {
   return (
     <div className="todo-widget__header-menu">
       <div className="todo-widget__header-menu-item" onMouseDown={(e) => { e.preventDefault(); onToggleDone(); }}>
@@ -260,7 +260,7 @@ function dueStatus(d: Date): DueStatus {
 // ─── Main widget ──────────────────────────────────────────────────────────────
 
 export function TodoWidget() {
-  const { dataVersion, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord, setCursorPos, setSelectedRows, fetchTable, fetchCurrentTable } = useGrist();
+  const { dataVersion, updateLinkedRecord, createLinkedRecord, setCursorPos, setSelectedRows, fetchTable, fetchCurrentTable } = useGrist();
   const [records, setRecords] = useState<RowRecord[]>([]);
   const [projetChoices, setProjetChoices] = useState<string[]>([]);
   const [projetColorMap, setProjetColorMap] = useState<Map<string, ProjetColor>>(new Map());
@@ -690,10 +690,10 @@ export function TodoWidget() {
   const isDragOverSection = (key: SectionKey) =>
     dragTarget?.type === 'section' && dragTarget.key === key;
 
-  const isProjectActive = (id: number) =>
+  const isProjectActive = (id: string) =>
     activeFilter.type === 'project' && activeFilter.id === id;
 
-  const isDragOverProject = (id: number) =>
+  const isDragOverProject = (id: string) =>
     dragTarget?.type === 'project' && dragTarget.id === id;
 
   return (
