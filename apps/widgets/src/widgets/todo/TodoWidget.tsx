@@ -649,13 +649,6 @@ export function TodoWidget() {
                     </div>
                   )}
                 </div>
-                {activeFilter.type !== 'project' && projetName && (
-                  <span
-                    className="todo-widget__projet-chip"
-                    style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
-                    onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); }}
-                  >{projetName}</span>
-                )}
               </div>
             </div>
 
@@ -677,6 +670,13 @@ export function TodoWidget() {
                   )}
                 </div>
               </div>
+              {activeFilter.type !== 'project' && projetName && (
+                <span
+                  className="todo-widget__projet-chip"
+                  style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
+                  onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); }}
+                >{projetName}</span>
+              )}
             </div>
           </li>
         );
