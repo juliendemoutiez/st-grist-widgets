@@ -17,6 +17,8 @@ interface CommonProps {
   placeholder?: string;
   addLabel?: string;
   onAdd?: () => void;
+  /** When provided, shows a "Créer 'xxx'" option for unrecognized search text. */
+  onCreate?: (label: string) => void;
   relation?: boolean;
   onClickSelected?: (value: string) => void;
   avatar?: boolean;
@@ -72,6 +74,11 @@ export function PickerSelect(props: PickerSelectProps) {
   const filtered = options.filter((o) =>
     o.label.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const canCreate =
+    props.onCreate != null &&
+    search.trim().length > 0 &&
+    !options.some((o) => o.label.toLowerCase() === search.trim().toLowerCase());
 
   const openDropdown = useCallback(() => {
     if (triggerRef.current) {
@@ -269,7 +276,7 @@ export function PickerSelect(props: PickerSelectProps) {
                 Effacer
               </li>
             )}
-            {filtered.length === 0 ? (
+            {filtered.length === 0 && !canCreate ? (
               <li className="picker-select__empty">Aucun résultat</li>
             ) : (
               filtered.map((opt) => (
@@ -300,6 +307,15 @@ export function PickerSelect(props: PickerSelectProps) {
                   )}
                 </li>
               ))
+            )}
+            {canCreate && (
+              <li
+                className={`picker-select__option picker-select__option--create${filtered.length > 0 ? ' picker-select__option--create--bordered' : ''}`}
+                onClick={() => { props.onCreate!(search.trim()); setSearch(''); if (!isMulti) closeDropdown(); }}
+              >
+                <span className="material-icons">add</span>
+                Créer &ldquo;{search.trim()}&rdquo;
+              </li>
             )}
           </ul>
           {props.onAdd && (

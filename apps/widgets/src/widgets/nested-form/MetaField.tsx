@@ -30,6 +30,8 @@ interface MetaFieldProps {
   refLabelCol?: string;
   /** Show a mailto: link icon next to the field value */
   mailto?: boolean;
+  /** Called when the user creates a new choice in a Choice/ChoiceList field */
+  onCreateChoice?: (label: string, color?: { fillColor: string; textColor: string }) => Promise<void>;
 }
 
 export function MetaRow({ icon, label, children }: { icon: string; label: string; children: React.ReactNode }) {
@@ -42,6 +44,23 @@ export function MetaRow({ icon, label, children }: { icon: string; label: string
       <div className="meta-row__value">{children}</div>
     </div>
   );
+}
+
+const CHOICE_PALETTE: { fillColor: string; textColor: string }[] = [
+  { fillColor: '#fecdd3', textColor: '#9f1239' },
+  { fillColor: '#fed7aa', textColor: '#9a3412' },
+  { fillColor: '#fef08a', textColor: '#854d0e' },
+  { fillColor: '#bbf7d0', textColor: '#14532d' },
+  { fillColor: '#bfdbfe', textColor: '#1e3a8a' },
+  { fillColor: '#ddd6fe', textColor: '#4c1d95' },
+  { fillColor: '#fbcfe8', textColor: '#9d174d' },
+  { fillColor: '#a5f3fc', textColor: '#164e63' },
+  { fillColor: '#d9f99d', textColor: '#3f6212' },
+  { fillColor: '#fde68a', textColor: '#92400e' },
+];
+
+function randomChoiceColor() {
+  return CHOICE_PALETTE[Math.floor(Math.random() * CHOICE_PALETTE.length)];
 }
 
 /** Build picker options from Choice/ChoiceList widgetOptions. */
@@ -231,40 +250,72 @@ function applyTransform(val: string, transform?: 'uppercase' | 'capitalize'): st
   return val.replace(/(^|[\s-])(\S)/g, (_, sep, c) => sep + c.toUpperCase());
 }
 
-export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, avatar, transform, refLabelCol, mailto }: MetaFieldProps) {
+export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, avatar, transform, refLabelCol, mailto, onCreateChoice }: MetaFieldProps) {
   const rawType = columnMeta?.type ?? 'Text';
   const type = rawType.startsWith('DateTime') ? 'DateTime' : rawType;
   const refTarget = parseRefTarget(type);
   const refListTarget = parseRefListTarget(type);
   const { options: refOptions, loading: refLoading } = useRefOptions(refTarget ?? refListTarget, refReloadTrigger, refLabelCol);
   const [hlEditing, setHlEditing] = useState(false);
+  const [extraChoices, setExtraChoices] = useState<PickerOption[]>([]);
 
   if (type === 'Choice') {
-    const options = buildChoiceOptions(columnMeta!);
+    const baseOptions = buildChoiceOptions(columnMeta!);
+    const allOptions = [
+      ...baseOptions,
+      ...extraChoices.filter((e) => !baseOptions.some((o) => o.value === e.value)),
+    ];
     const strValue = value != null && value !== '' ? String(value) : undefined;
+
+    const handleCreateChoice = onCreateChoice
+      ? (newLabel: string) => {
+          const color = randomChoiceColor();
+          setExtraChoices((prev) => [...prev, { value: newLabel, label: newLabel, ...color }]);
+          onChange(newLabel);
+          onBlur?.();
+          onCreateChoice(newLabel, color).catch(() => {});
+        }
+      : undefined;
+
     return (
       <MetaRow icon={icon} label={label}>
         <PickerSelect
-          options={options}
+          options={allOptions}
           value={strValue}
           onChange={(v) => { onChange(v ?? ''); onBlur?.(); }}
           placeholder="Choisir..."
           avatar={avatar}
+          onCreate={handleCreateChoice}
         />
       </MetaRow>
     );
   }
 
   if (type === 'ChoiceList') {
-    const options = buildChoiceOptions(columnMeta!);
+    const baseOptions = buildChoiceOptions(columnMeta!);
+    const allOptions = [
+      ...baseOptions,
+      ...extraChoices.filter((e) => !baseOptions.some((o) => o.value === e.value)),
+    ];
     const arrValue = decodeChoiceList(value);
+
+    const handleCreate = onCreateChoice
+      ? (newLabel: string) => {
+          setExtraChoices((prev) => [...prev, { value: newLabel, label: newLabel }]);
+          onChange(['L', ...arrValue, newLabel]);
+          onBlur?.();
+          onCreateChoice(newLabel).catch(() => {});
+        }
+      : undefined;
+
     return (
       <MetaRow icon={icon} label={label}>
         <PickerSelect
           mode="multi"
-          options={options}
+          options={allOptions}
           value={arrValue}
           onChange={(v) => { onChange(['L', ...v]); onBlur?.(); }}
+          onCreate={handleCreate}
         />
       </MetaRow>
     );
@@ -395,20 +446,26 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
     }
     return (
       <MetaRow icon={icon} label={label}>
-        <input
-          type="date"
-          className="meta-row__input"
-          value={toDateInput(value)}
-          required
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') (e.target as HTMLElement).blur();
-          }}
-          onBlur={() => onBlur?.()}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (v) onChange(fromDateInput(v));
-          }}
-        />
+        <div className="meta-row__link-wrap">
+          <input
+            type="date"
+            className="meta-row__input"
+            value={toDateInput(value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.target as HTMLElement).blur();
+            }}
+            onBlur={() => onBlur?.()}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v) onChange(fromDateInput(v));
+            }}
+          />
+          {value != null && value !== 0 && (
+            <button type="button" className="meta-row__hl-edit" title="Effacer" onClick={() => { onChange(null); onBlur?.(); }}>
+              <span className="material-icons">close</span>
+            </button>
+          )}
+        </div>
       </MetaRow>
     );
   }

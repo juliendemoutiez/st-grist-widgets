@@ -18,6 +18,8 @@ export default defineConfig({
         'dinum-retention-pipeline': path.resolve(__dirname, 'dinum-retention-pipeline.html'),
         'default-interaction': path.resolve(__dirname, 'default-interaction.html'),
         'note': path.resolve(__dirname, 'note.html'),
+        'todo': path.resolve(__dirname, 'todo.html'),
+        'task-form': path.resolve(__dirname, 'task-form.html'),
       },
     },
   },

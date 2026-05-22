@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGrist } from '../contexts/GristContext';
 
 export interface ColumnMeta {
@@ -16,14 +16,10 @@ export interface ColumnMeta {
  * a map of column metadata keyed by `tableId.colId`.
  */
 export function useColumnMeta(tableId: string) {
-  const { fetchTable } = useGrist();
+  const { fetchTable, dataVersion } = useGrist();
   const [metaMap, setMetaMap] = useState<Record<string, ColumnMeta>>({});
-  const loadedRef = useRef(false);
 
   useEffect(() => {
-    if (loadedRef.current) return;
-    loadedRef.current = true;
-
     (async () => {
       try {
         const [cols, tables] = await Promise.all([
@@ -72,7 +68,7 @@ export function useColumnMeta(tableId: string) {
         console.warn('[useColumnMeta] Failed to fetch column metadata:', err);
       }
     })();
-  }, [fetchTable, tableId]);
+  }, [fetchTable, tableId, dataVersion]);
 
   return metaMap;
 }

@@ -18,7 +18,7 @@ interface RecordFormProps {
 }
 
 export function RecordForm({ config, mode, children }: RecordFormProps) {
-  const { record, updateCurrentRecord, fetchTable, createRecord, updateRecord, setCursorPos } = useGrist();
+  const { record, updateCurrentRecord, fetchTable, createRecord, updateRecord, setCursorPos, updateColumnWidgetOptions } = useGrist();
   const columnMeta = useColumnMeta(config.table);
   const { push, pop, resetToRoot, stack, popResult, clearPopResult } = useNavigation();
 
@@ -80,6 +80,10 @@ export function RecordForm({ config, mode, children }: RecordFormProps) {
           const col = table[f.colId] as unknown[] | undefined;
           vals[f.colId] = col?.[rowIdx] ?? null;
         }
+        if (config.headerDateColId) {
+          const col = table[config.headerDateColId] as unknown[] | undefined;
+          vals[config.headerDateColId] = col?.[rowIdx] ?? null;
+        }
         console.log(`[RecordForm] Field values from ${config.table}:`, vals);
         setFields(vals);
       } catch (err) {
@@ -114,6 +118,10 @@ export function RecordForm({ config, mode, children }: RecordFormProps) {
           for (const f of config.fields) {
             const col = table[f.colId] as unknown[] | undefined;
             vals[f.colId] = col?.[rowIdx] ?? null;
+          }
+          if (config.headerDateColId) {
+            const col = table[config.headerDateColId] as unknown[] | undefined;
+            vals[config.headerDateColId] = col?.[rowIdx] ?? null;
           }
           setFields(vals);
         } catch (err) {
@@ -384,6 +392,18 @@ export function RecordForm({ config, mode, children }: RecordFormProps) {
             onChange={(v) => handleFieldChange(f.colId, v)}
             onBlur={() => saveField(f.colId)}
             columnMeta={columnMeta[f.colId]}
+            onCreateChoice={
+              f.createChoice
+                ? async (newLabel: string, color?: { fillColor: string; textColor: string }) => {
+                    const meta = columnMeta[f.colId];
+                    const current = meta?.widgetOptions ?? {};
+                    const choices = [...(current.choices ?? []), newLabel];
+                    const choiceOptions = { ...(current.choiceOptions ?? {}) };
+                    if (color) choiceOptions[newLabel] = { fillColor: color.fillColor, textColor: color.textColor };
+                    await updateColumnWidgetOptions(config.table, f.colId, { ...current, choices, choiceOptions });
+                  }
+                : undefined
+            }
             addLabel={f.addLabel}
             onAdd={
               f.refAddScreen
@@ -421,17 +441,21 @@ export function RecordForm({ config, mode, children }: RecordFormProps) {
         const id = mode === 'currentRecord' ? recordId : subFormRecordId.current;
         return id != null ? children(id) : null;
       })()}
-      {markdownFields.map((f) => (
-        <MarkdownEditor
-          key={f.colId}
-          icon={f.icon}
-          label={f.label}
-          value={fields[f.colId] != null ? String(fields[f.colId]) : ''}
-          onChange={(v) => handleFieldChange(f.colId, v)}
-          onBlur={() => saveField(f.colId)}
-          readOnly={f.readOnly}
-        />
-      ))}
+      {markdownFields.map((f) => {
+        const id = mode === 'currentRecord' ? recordId : subFormRecordId.current;
+        return (
+          <MarkdownEditor
+            key={f.colId}
+            icon={f.icon}
+            label={f.label}
+            value={fields[f.colId] != null ? String(fields[f.colId]) : ''}
+            onChange={(v) => handleFieldChange(f.colId, v)}
+            onBlur={() => saveField(f.colId)}
+            readOnly={f.readOnly}
+            resetToken={id}
+          />
+        );
+      })}
     </ScreenShell>
     </>
   );

@@ -31,8 +31,12 @@ interface GristContextValue {
   updateRecord: (tableId: string, id: number, fields: Record<string, unknown>) => Promise<void>;
   /** Delete a record from a table. */
   deleteRecord: (tableId: string, id: number) => Promise<void>;
+  /** Update a column's widgetOptions (e.g. to add a new choice). */
+  updateColumnWidgetOptions: (tableId: string, colId: string, options: unknown) => Promise<void>;
   /** Move the Grist cursor to a specific row. */
   setCursorPos: (rowId: number) => Promise<void>;
+  /** Notify linked widgets of the selected row (allowSelectBy). */
+  setSelectedRows: (rowIds: number[]) => Promise<void>;
   /**
    * Fetch ALL rows with ALL columns from the widget's linked table,
    * regardless of column visibility in the Grist section.
@@ -84,8 +88,10 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     });
     grist.onRecords((records) => {
       tableCache.current.clear();
-      setAllRecords(records ?? []);
+      const recs = records ?? [];
+      setAllRecords(recs);
       setDataVersion((v) => v + 1);
+      if (recs.length === 0) setRecord(null);
     });
   }, []);
 
@@ -151,9 +157,23 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     tableCache.current.delete(tableId);
   }, []);
 
+  const updateColumnWidgetOptions = useCallback(async (tableId: string, colId: string, options: unknown) => {
+    if (!grist) throw new Error('Grist API not available');
+    await grist.docApi.applyUserActions([
+      ['ModifyColumn', tableId, colId, { widgetOptions: JSON.stringify(options) }],
+    ]);
+    tableCache.current.delete('_grist_Tables_column');
+    setDataVersion((v) => v + 1);
+  }, []);
+
   const setCursorPos = useCallback(async (rowId: number) => {
     if (!grist) throw new Error('Grist API not available');
     await grist.setCursorPos({ rowId });
+  }, []);
+
+  const setSelectedRows = useCallback(async (rowIds: number[]) => {
+    if (!grist) throw new Error('Grist API not available');
+    await grist.setSelectedRows(rowIds);
   }, []);
 
   const fetchCurrentTable = useCallback(async (): Promise<RowRecord[]> => {
@@ -172,7 +192,7 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
   }, []);
 
   return (
-    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, setCursorPos, fetchCurrentTable }}>
+    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, updateColumnWidgetOptions, setCursorPos, setSelectedRows, fetchCurrentTable }}>
       {children}
     </GristContext.Provider>
   );

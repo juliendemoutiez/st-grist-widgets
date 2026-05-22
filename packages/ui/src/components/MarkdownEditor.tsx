@@ -12,6 +12,8 @@ interface MarkdownEditorProps {
   onChange: (value: string) => void;
   onBlur: () => void;
   readOnly?: boolean;
+  /** Changing this value forces the editor content to sync even if userEdited is true (e.g. on record switch). */
+  resetToken?: string | number | null;
 }
 
 /** A single toolbar button. Uses a Material Icon when `icon` is set, or a text label when `text` is set. */
@@ -43,7 +45,7 @@ function TbBtn({
   );
 }
 
-export function MarkdownEditor({ icon, label, value, onChange, onBlur, readOnly }: MarkdownEditorProps) {
+export function MarkdownEditor({ icon, label, value, onChange, onBlur, readOnly, resetToken }: MarkdownEditorProps) {
   // Track whether the content was changed by the user (not programmatic updates)
   const userEdited = useRef(false);
 
@@ -66,15 +68,19 @@ export function MarkdownEditor({ icon, label, value, onChange, onBlur, readOnly 
     },
   });
 
-  // Sync external value changes (e.g. initial load from Grist) into the editor
+  // Sync external value changes (e.g. initial load from Grist, record switch) into the editor
   const prevValue = useRef(value);
+  const prevResetToken = useRef(resetToken);
   useEffect(() => {
     if (!editor) return;
-    if (value !== prevValue.current && !userEdited.current) {
+    const tokenChanged = resetToken !== prevResetToken.current;
+    prevResetToken.current = resetToken;
+    if (tokenChanged || (value !== prevValue.current && !userEdited.current)) {
+      userEdited.current = false;
       editor.commands.setContent(value || '');
     }
     prevValue.current = value;
-  }, [value, editor]);
+  }, [value, editor, resetToken]);
 
   // Save on blur
   const handleBlur = useCallback(() => {

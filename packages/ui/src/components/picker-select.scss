@@ -165,6 +165,18 @@
       font-size: 16px;
     }
   }
+
+  &--create {
+    color: var(--c--contextuals--content--semantic--accent--primary, #1a73e8);
+
+    .material-icons {
+      font-size: 16px;
+    }
+
+    &--bordered {
+      border-top: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
+    }
+  }
 }
 
 .picker-select__checkbox {
