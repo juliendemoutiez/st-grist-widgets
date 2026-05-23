@@ -11,6 +11,7 @@ html, body {
     border-radius: 0.5rem;
     background: var(--c--contextuals--background--surface--primary);
     border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
+    container-type: inline-size;
   }
 
   // ─── Sidebar nav ──────────────────────────────────────────────────────────
@@ -43,7 +44,7 @@ html, body {
     display: none;
   }
 
-  @media (max-width: 600px) {
+  @container (max-width: 600px) {
     &__nav-toggle {
       display: flex;
       align-items: center;
@@ -145,6 +146,13 @@ html, body {
     padding: 1.5rem 2rem;
     min-width: 0;
     min-height: 0;
+  }
+
+  @container (max-width: 600px) {
+    &__main {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 
   // ─── Header ───────────────────────────────────────────────────────────────
