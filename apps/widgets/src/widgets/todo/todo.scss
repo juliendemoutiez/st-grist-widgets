@@ -72,6 +72,21 @@ html, body {
         transform: translateX(0);
       }
     }
+
+    &__title {
+      overflow: hidden;
+
+      .todo-widget__title-icon,
+      .todo-widget__title-dot {
+        display: none;
+      }
+    }
+
+    &__title-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   &__nav-item {

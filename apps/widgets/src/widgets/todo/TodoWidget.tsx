@@ -213,6 +213,7 @@ const SECTIONS = [
   { key: 'Boîte de réception', label: 'Boîte de réception', icon: 'inbox' },
   { key: "Aujourd'hui", label: "Aujourd'hui", icon: 'today' },
   { key: 'Prochainement', label: 'Prochainement', icon: 'schedule' },
+  { key: 'Terminées', label: 'Terminées', icon: 'check_circle' },
 ] as const;
 
 type SectionKey = typeof SECTIONS[number]['key'];
@@ -373,11 +374,16 @@ export function TodoWidget() {
   }, [fetchTable, dataVersion]);
 
   const isAujourdhui = activeFilter.type === 'section' && activeFilter.key === "Aujourd'hui";
+  const isTerminees = activeFilter.type === 'section' && activeFilter.key === 'Terminées';
 
   const filteredRecords = useMemo(() => {
     let base: typeof records;
     if (activeFilter.type === 'section') {
-      base = records.filter((r) => String(r[LISTE_COL] ?? '') === activeFilter.key);
+      if (activeFilter.key === 'Terminées') {
+        base = records.filter((r) => Boolean(r[DONE_COL]));
+      } else {
+        base = records.filter((r) => String(r[LISTE_COL] ?? '') === activeFilter.key);
+      }
     } else if (activeFilter.type === 'project') {
       base = records.filter((r) => String(r[PROJET_COL] ?? '') === activeFilter.id);
     } else {
@@ -391,12 +397,16 @@ export function TodoWidget() {
     const doneFirst = (a: RowRecord, b: RowRecord) => Number(Boolean(a[DONE_COL])) - Number(Boolean(b[DONE_COL]));
 
     const PRIORITY_ORDER: Record<string, number> = { P1: 0, P2: 1, P3: 2 };
+    const byCompletion = (a: RowRecord, b: RowRecord) =>
+      ((b[COMPLETION_COL] as number) || 0) - ((a[COMPLETION_COL] as number) || 0);
     if (sortMode === 'priority') {
       return [...visible].sort((a, b) => {
         if (isProjectOrTag) { const d = doneFirst(a, b); if (d !== 0) return d; }
         const pa = PRIORITY_ORDER[String(a[PRIORITE_COL] ?? '')] ?? 99;
         const pb = PRIORITY_ORDER[String(b[PRIORITE_COL] ?? '')] ?? 99;
-        return pa !== pb ? pa - pb : ((a[ORDRE_COL] as number) || 0) - ((b[ORDRE_COL] as number) || 0);
+        return pa !== pb ? pa - pb : isTerminees
+          ? byCompletion(a, b)
+          : ((a[ORDRE_COL] as number) || 0) - ((b[ORDRE_COL] as number) || 0);
       });
     }
     if (sortMode === 'name') {
@@ -407,9 +417,11 @@ export function TodoWidget() {
     }
     return [...visible].sort((a, b) => {
       if (isProjectOrTag) { const d = doneFirst(a, b); if (d !== 0) return d; }
-      return ((a[ORDRE_COL] as number) || 0) - ((b[ORDRE_COL] as number) || 0);
+      return isTerminees
+        ? byCompletion(a, b)
+        : ((a[ORDRE_COL] as number) || 0) - ((b[ORDRE_COL] as number) || 0);
     });
-  }, [records, activeFilter, isAujourdhui, showDoneProject, sortMode]);
+  }, [records, activeFilter, isAujourdhui, isTerminees, showDoneProject, sortMode]);
 
   const doneRecords = useMemo(() => {
     if (!isAujourdhui) return [];
@@ -417,7 +429,6 @@ export function TodoWidget() {
     todayStart.setHours(0, 0, 0, 0);
     const todayTs = todayStart.getTime() / 1000;
     const done = records.filter((r) => {
-      if (String(r[LISTE_COL] ?? '') !== "Aujourd'hui") return false;
       if (!Boolean(r[DONE_COL])) return false;
       const completedTs = r[COMPLETION_COL] as number | null;
       return completedTs != null && completedTs >= todayTs;
@@ -438,7 +449,9 @@ export function TodoWidget() {
 
   const handleToggle = async (id: number, done: boolean) => {
     const now = done ? Math.floor(Date.now() / 1000) : null;
-    await updateLinkedRecord(id, { [DONE_COL]: done, [COMPLETION_COL]: now });
+    const fields: Record<string, unknown> = { [DONE_COL]: done, [COMPLETION_COL]: now };
+    if (done) fields[LISTE_COL] = '';
+    await updateLinkedRecord(id, fields);
   };
 
   const handleDelete = async (id: number) => {
@@ -714,23 +727,26 @@ export function TodoWidget() {
     <div className="todo-widget__root">
       {navOpen && <div className="todo-widget__nav-overlay" onClick={() => setNavOpen(false)} />}
       <nav className={`todo-widget__nav${navOpen ? ' todo-widget__nav--open' : ''}`}>
-        {SECTIONS.map((section) => (
-          <button
-            key={section.key}
-            className={[
-              'todo-widget__nav-item',
-              isSectionActive(section.key) ? 'todo-widget__nav-item--active' : '',
-              isDragOverSection(section.key) ? 'todo-widget__nav-item--drag-over' : '',
-            ].filter(Boolean).join(' ')}
-            onClick={() => { setActiveFilter({ type: 'section', key: section.key }); setNavOpen(false); }}
-            onDragOver={(e) => { e.preventDefault(); if (draggingId === null) return; setDragTarget({ type: 'section', key: section.key }); setDropIndicatorId(null); }}
-            onDragLeave={() => setDragTarget(null)}
-            onDrop={(e) => { e.preventDefault(); handleDrop({ type: 'section', key: section.key }); }}
-          >
-            <span className="material-icons">{section.icon}</span>
-            <span>{section.label}</span>
-          </button>
-        ))}
+        {SECTIONS.map((section) => {
+          const noDrop = section.key === 'Terminées';
+          return (
+            <button
+              key={section.key}
+              className={[
+                'todo-widget__nav-item',
+                isSectionActive(section.key) ? 'todo-widget__nav-item--active' : '',
+                !noDrop && isDragOverSection(section.key) ? 'todo-widget__nav-item--drag-over' : '',
+              ].filter(Boolean).join(' ')}
+              onClick={() => { setActiveFilter({ type: 'section', key: section.key }); setNavOpen(false); }}
+              onDragOver={noDrop ? undefined : (e) => { e.preventDefault(); if (draggingId === null) return; setDragTarget({ type: 'section', key: section.key }); setDropIndicatorId(null); }}
+              onDragLeave={noDrop ? undefined : () => setDragTarget(null)}
+              onDrop={noDrop ? undefined : (e) => { e.preventDefault(); handleDrop({ type: 'section', key: section.key }); }}
+            >
+              <span className="material-icons">{section.icon}</span>
+              <span>{section.label}</span>
+            </button>
+          );
+        })}
 
         {projetEntries.length > 0 && (
           <>
@@ -807,7 +823,7 @@ export function TodoWidget() {
                   : undefined}
               />
             )}
-            {activeLabel}
+            <span className="todo-widget__title-label">{activeLabel}</span>
           </h1>
           <div className="todo-widget__header-actions">
             <SortButton sortMode={sortMode} onSort={setSortMode} />
@@ -835,19 +851,24 @@ export function TodoWidget() {
 
         {(() => {
           const visibleList = isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords;
-          return visibleList.length === 0 && !showNewRow ? (
-            <div className="todo-widget__empty">
-              <span className="material-icons todo-widget__empty-icon">check_circle</span>
-              <p className="todo-widget__empty-text">Aucune tâche</p>
-              <button className="todo-widget__empty-btn" onClick={showNewTaskInput}>
-                <span className="material-icons">add</span>
-                Créer une tâche
-              </button>
-            </div>
-          ) : renderList(visibleList, sortMode === 'manual');
+          if (visibleList.length === 0 && !showNewRow) {
+            return (
+              <div className="todo-widget__empty">
+                <span className="material-icons todo-widget__empty-icon">check_circle</span>
+                <p className="todo-widget__empty-text">{isTerminees ? 'Aucune tâche terminée' : 'Aucune tâche'}</p>
+                {!isTerminees && (
+                  <button className="todo-widget__empty-btn" onClick={showNewTaskInput}>
+                    <span className="material-icons">add</span>
+                    Créer une tâche
+                  </button>
+                )}
+              </div>
+            );
+          }
+          return renderList(visibleList, !isTerminees && sortMode === 'manual');
         })()}
 
-        {(filteredRecords.length > 0 || (isAujourdhui && showDone && doneRecords.length > 0) || showNewRow) && (
+        {!isTerminees && (filteredRecords.length > 0 || (isAujourdhui && showDone && doneRecords.length > 0) || showNewRow) && (
           <div className="todo-widget__new-row">
             <span className="todo-widget__checkbox todo-widget__checkbox--dim" aria-hidden="true" />
             <input
