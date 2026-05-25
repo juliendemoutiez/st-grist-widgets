@@ -58,6 +58,7 @@
   border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
   border-radius: 0.5rem;
   overflow: hidden;
+  container-type: inline-size;
 }
 
 .screen-shell__header {
@@ -119,7 +120,12 @@
     }
 
     &:focus {
+      overflow: auto;
+      text-overflow: clip;
+      scrollbar-width: none;
       box-shadow: 0 0 0 2px var(--c--contextuals--content--semantic--brand--tertiary);
+
+      &::-webkit-scrollbar { display: none; }
     }
   }
 
@@ -188,6 +194,7 @@
   &__value {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
     color: var(--c--contextuals--content--semantic--neutral--primary);
   }
 
@@ -350,6 +357,7 @@
     }
   }
 }
+
 
 .chip {
   display: inline-block;

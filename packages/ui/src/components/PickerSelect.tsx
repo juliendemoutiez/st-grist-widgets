@@ -83,11 +83,13 @@ export function PickerSelect(props: PickerSelectProps) {
   const openDropdown = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const width = 220;
+      const left = Math.min(rect.left, window.innerWidth - width - 4);
       setDropdownStyle({
         position: 'fixed',
         top: rect.bottom + 2,
-        left: rect.left,
-        width: 220,
+        left: Math.max(0, left),
+        width,
       });
     }
     setOpen(true);
