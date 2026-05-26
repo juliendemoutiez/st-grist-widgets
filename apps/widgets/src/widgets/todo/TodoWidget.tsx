@@ -662,7 +662,7 @@ export function TodoWidget() {
                     </div>
                   )}
                 </div>
-                {activeFilter.type !== 'project' && projetName && (
+                {projetName && (
                   <span
                     className="todo-widget__projet-chip"
                     style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}

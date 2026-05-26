@@ -67,12 +67,14 @@ function randomChoiceColor() {
 function buildChoiceOptions(meta: ColumnMeta): PickerOption[] {
   const choices = meta.widgetOptions?.choices ?? [];
   const choiceOpts = meta.widgetOptions?.choiceOptions ?? {};
-  return choices.map((label) => ({
-    value: label,
-    label,
-    fillColor: choiceOpts[label]?.fillColor,
-    textColor: choiceOpts[label]?.textColor,
-  }));
+  return [...choices]
+    .sort((a, b) => a.localeCompare(b, 'fr'))
+    .map((label) => ({
+      value: label,
+      label,
+      fillColor: choiceOpts[label]?.fillColor,
+      textColor: choiceOpts[label]?.textColor,
+    }));
 }
 
 /** Hook to fetch rows from a Ref target table. Returns options and a loading flag. */
