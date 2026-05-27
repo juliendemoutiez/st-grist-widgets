@@ -550,10 +550,6 @@ export function TodoWidget() {
     [projetChoices, usedProjets],
   );
 
-  const usedEtiquettes = useMemo(
-    () => new Set(records.flatMap((r) => decodeChoiceList(r[ETIQUETTES_COL]))),
-    [records],
-  );
 
   const activeLabel =
     activeFilter.type === 'section'
