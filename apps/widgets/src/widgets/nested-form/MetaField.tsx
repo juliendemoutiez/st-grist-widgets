@@ -193,20 +193,6 @@ function fromDateTimeLocal(str: string): number {
   return Math.floor(new Date(str).getTime() / 1000);
 }
 
-/** Convert a Grist Date timestamp (UTC midnight) to a date input value (YYYY-MM-DD). */
-function toDateInput(value: unknown): string {
-  const d = gristTsToDate(value);
-  if (!d) return '';
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
-}
-
-/** Convert a date input value (YYYY-MM-DD) back to a Grist Date timestamp (UTC midnight, seconds). */
-function fromDateInput(str: string): number {
-  const [y, m, d] = str.split('-').map(Number);
-  return Math.floor(Date.UTC(y, m - 1, d) / 1000);
-}
-
 /**
  * Decode a Grist ChoiceList value to a plain string array.
  * Grist encodes ChoiceList as ['L', 'val1', 'val2', ...].

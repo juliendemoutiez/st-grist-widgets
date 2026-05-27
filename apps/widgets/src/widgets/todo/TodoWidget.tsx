@@ -268,7 +268,7 @@ export function TodoWidget() {
   const [projetChoices, setProjetChoices] = useState<string[]>([]);
   const [projetColorMap, setProjetColorMap] = useState<Map<string, ProjetColor>>(new Map());
   const [etiquettesChoices, setEtiquettesChoices] = useState<string[]>([]);
-  const [etiquettesColorMap, setEtiquettesColorMap] = useState<Map<string, ProjetColor>>(new Map());
+  const [, setEtiquettesColorMap] = useState<Map<string, ProjetColor>>(new Map());
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ type: 'section', key: "Aujourd'hui" });
   const [dragTarget, setDragTarget] = useState<DragTarget>(null);
@@ -555,18 +555,10 @@ export function TodoWidget() {
     [records],
   );
 
-  const etiquetteEntries = useMemo(
-    () => etiquettesChoices.filter((t) => usedEtiquettes.has(t)).sort((a, b) => a.localeCompare(b, 'fr')),
-    [etiquettesChoices, usedEtiquettes],
-  );
-
   const activeLabel =
     activeFilter.type === 'section'
       ? (SECTIONS.find((s) => s.key === activeFilter.key)?.label ?? activeFilter.key)
       : activeFilter.label;
-
-  const isTagActive = (id: string) => activeFilter.type === 'tag' && activeFilter.id === id;
-
 
   const renderList = (list: RowRecord[], allowReorder = false) => (
     <>
