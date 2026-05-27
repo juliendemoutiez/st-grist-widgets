@@ -1,6 +1,7 @@
 // Components
 export { PickerSelect } from './components/PickerSelect';
 export type { PickerOption } from './components/PickerSelect';
+export { DatePickerSelect } from './components/DatePickerSelect';
 export { MarkdownEditor } from './components/MarkdownEditor';
 
 // Contexts
