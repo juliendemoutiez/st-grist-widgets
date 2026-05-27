@@ -211,6 +211,61 @@
     min-height: 26px;
   }
 
+  &__date-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  &__date-input {
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.125rem 0.25rem;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--c--contextuals--content--semantic--neutral--primary);
+    background: transparent;
+    outline: none;
+    min-height: 26px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    position: relative;
+
+    &:hover {
+      background-color: var(--c--contextuals--background--semantic--neutral--tertiary);
+    }
+
+    /* Chrome: full-width overlay so any click opens the picker */
+    &::-webkit-calendar-picker-indicator {
+      position: absolute;
+      inset: 0;
+      width: auto;
+      height: auto;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Empty state: hide native date segments text */
+    &--empty {
+      color: transparent;
+
+      &::-webkit-datetime-edit {
+        color: transparent;
+      }
+    }
+  }
+
+  &__date-placeholder {
+    position: absolute;
+    left: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 13px;
+    color: var(--c--contextuals--content--semantic--neutral--tertiary);
+  }
+
   &__hl-chip {
     display: inline-flex;
     align-items: center;
@@ -348,13 +403,14 @@
       }
     }
 
-    /* Hide native date controls (clear button, spinner, calendar dropdown) */
+    /* Hide native date controls (clear button, spinner) */
     &[type="date"]::-webkit-clear-button,
-    &[type="date"]::-webkit-inner-spin-button,
-    &[type="date"]::-webkit-calendar-picker-indicator {
+    &[type="date"]::-webkit-inner-spin-button {
       display: none;
       -webkit-appearance: none;
     }
+
+
   }
 }
 

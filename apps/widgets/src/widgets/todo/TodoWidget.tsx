@@ -165,6 +165,7 @@ function TaskNameSpan({ name, isDone, isEditing, onStartEdit, onSave, onCancel }
       ref={ref}
       contentEditable={isEditing || undefined}
       suppressContentEditableWarning
+      data-placeholder={isEditing ? 'Nouvelle tâche...' : undefined}
       className={['todo-widget__name', isDone ? 'todo-widget__name--done' : '', isEditing ? 'todo-widget__name--editing' : ''].filter(Boolean).join(' ')}
       onClick={(e) => {
         if (!isEditing) { clickPosRef.current = { x: e.clientX, y: e.clientY }; onStartEdit(); }
@@ -269,15 +270,14 @@ export function TodoWidget() {
   const [etiquettesChoices, setEtiquettesChoices] = useState<string[]>([]);
   const [etiquettesColorMap, setEtiquettesColorMap] = useState<Map<string, ProjetColor>>(new Map());
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
-  const [newTask, setNewTask] = useState('');
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>({ type: 'section', key: "Aujourd'hui" });
   const [dragTarget, setDragTarget] = useState<DragTarget>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dropIndicatorId, setDropIndicatorId] = useState<number | 'end' | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const pendingSelectId = useRef<number | null>(null);
+  const pendingEditId = useRef<number | null>(null);
   const [navOpen, setNavOpen] = useState(false);
-  const [showNewRow, setShowNewRow] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showDone, setShowDone] = useState(() => {
     const saved = localStorage.getItem('todo-show-done');
@@ -314,7 +314,6 @@ export function TodoWidget() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, [showHeaderMenu]);
-  const newTaskInputRef = useRef<HTMLInputElement>(null);
   const headerMenuWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -324,15 +323,23 @@ export function TodoWidget() {
   }, [dataVersion, fetchCurrentTable]);
 
   useEffect(() => {
-    if (pendingSelectId.current === null) return;
-    const id = pendingSelectId.current;
-    if (allRecords.some((r) => r.id === id)) {
-      pendingSelectId.current = null;
-      setSelectedId(id);
-      void setCursorPos(id);
-      void setSelectedRows([id]);
+    if (pendingSelectId.current !== null) {
+      const id = pendingSelectId.current;
+      if (allRecords.some((r) => r.id === id)) {
+        pendingSelectId.current = null;
+        setSelectedId(id);
+        void setCursorPos(id);
+        void setSelectedRows([id]);
+      }
     }
-  }, [allRecords, setCursorPos, setSelectedRows]);
+    if (pendingEditId.current !== null) {
+      const id = pendingEditId.current;
+      if (records.some((r) => r.id === id)) {
+        pendingEditId.current = null;
+        setEditingId(id);
+      }
+    }
+  }, [allRecords, records, setCursorPos, setSelectedRows]);
 
   useEffect(() => {
     fetchTable('_grist_Tables_column').then((table) => {
@@ -382,7 +389,10 @@ export function TodoWidget() {
       if (activeFilter.key === 'Terminées') {
         base = records.filter((r) => Boolean(r[DONE_COL]));
       } else {
-        base = records.filter((r) => String(r[LISTE_COL] ?? '') === activeFilter.key);
+        base = records.filter((r) =>
+          String(r[LISTE_COL] ?? '') === activeFilter.key &&
+          (activeFilter.key !== 'Boîte de réception' || !String(r[PROJET_COL] ?? '')),
+        );
       }
     } else if (activeFilter.type === 'project') {
       base = records.filter((r) => String(r[PROJET_COL] ?? '') === activeFilter.id);
@@ -458,44 +468,21 @@ export function TodoWidget() {
     await updateLinkedRecord(id, { [SUPPRIME_COL]: true });
   };
 
-  const doCreateTask = async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
+  const handleAddTask = async () => {
     const maxOrder = filteredRecords.reduce((max, r) => Math.max(max, (r[ORDRE_COL] as number) || 0), 0);
-    const fields: Record<string, unknown> = { [NAME_COL]: trimmed, [ORDRE_COL]: maxOrder + 10 };
+    const fields: Record<string, unknown> = { [NAME_COL]: '', [ORDRE_COL]: maxOrder + 10 };
     if (activeFilter.type === 'section') fields[LISTE_COL] = activeFilter.key;
     else if (activeFilter.type === 'project') { fields[PROJET_COL] = activeFilter.id; fields[LISTE_COL] = 'Boîte de réception'; }
     else if (activeFilter.type === 'tag') { fields[LISTE_COL] = 'Boîte de réception'; fields[ETIQUETTES_COL] = ['L', activeFilter.id]; }
     const id = await createLinkedRecord(fields);
-    if (id) pendingSelectId.current = id;
-  };
-
-  const handleNewTaskKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      const text = newTask;
-      setNewTask('');
-      doCreateTask(text).then(() => setTimeout(() => newTaskInputRef.current?.focus(), 0));
-    }
-    if (e.key === 'Escape') { setNewTask(''); setShowNewRow(false); }
-  };
-
-  const handleNewTaskBlur = () => {
-    const text = newTask;
-    setNewTask('');
-    doCreateTask(text);
-    if (filteredRecords.length === 0) setShowNewRow(false);
-  };
-
-  const showNewTaskInput = () => {
-    setShowNewRow(true);
-    setTimeout(() => newTaskInputRef.current?.focus(), 0);
+    if (id) { pendingSelectId.current = id; pendingEditId.current = id; }
   };
 
   const startEdit = (id: number) => setEditingId(id);
 
   const saveEdit = async (id: number, text: string) => {
     setEditingId(null);
-    if (text) await updateLinkedRecord(id, { [NAME_COL]: text });
+    await updateLinkedRecord(id, { [NAME_COL]: text || 'Nouvelle tâche' });
   };
 
   const cancelEdit = () => setEditingId(null);
@@ -516,7 +503,9 @@ export function TodoWidget() {
   const handleDrop = async (target: DragTarget) => {
     if (draggingId == null || !target) return;
     if (target.type === 'section') {
-      await updateLinkedRecord(draggingId, { [LISTE_COL]: target.key });
+      const fields: Record<string, unknown> = { [LISTE_COL]: target.key };
+      if (target.key === 'Boîte de réception') fields[PROJET_COL] = '';
+      await updateLinkedRecord(draggingId, fields);
     } else {
       await updateLinkedRecord(draggingId, { [PROJET_COL]: target.id });
     }
@@ -524,6 +513,32 @@ export function TodoWidget() {
     setDragTarget(null);
   };
 
+
+  const navCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const section of SECTIONS) {
+      if (section.key === 'Terminées') {
+        counts[`section:${section.key}`] = records.filter((r) => Boolean(r[DONE_COL])).length;
+      } else {
+        counts[`section:${section.key}`] = records.filter(
+          (r) => !Boolean(r[DONE_COL]) &&
+          String(r[LISTE_COL] ?? '') === section.key &&
+          (section.key !== 'Boîte de réception' || !String(r[PROJET_COL] ?? '')),
+        ).length;
+      }
+    }
+    for (const name of projetChoices) {
+      counts[`project:${name}`] = records.filter(
+        (r) => !Boolean(r[DONE_COL]) && String(r[PROJET_COL] ?? '') === name,
+      ).length;
+    }
+    for (const tag of etiquettesChoices) {
+      counts[`tag:${tag}`] = records.filter(
+        (r) => !Boolean(r[DONE_COL]) && decodeChoiceList(r[ETIQUETTES_COL]).includes(tag),
+      ).length;
+    }
+    return counts;
+  }, [records, projetChoices, etiquettesChoices]);
 
   const usedProjets = useMemo(
     () => new Set(records.map((r) => String(r[PROJET_COL] ?? '')).filter(Boolean)),
@@ -569,6 +584,7 @@ export function TodoWidget() {
         const priority = record[PRIORITE_COL] ? String(record[PRIORITE_COL]) : null;
         const PRIORITY_DEFAULTS: Record<string, string> = { P1: '#ef4444', P2: '#f97316', P3: '#3b82f6' };
         const priorityColor = priority ? (PRIORITY_DEFAULTS[priority] ?? null) : null;
+        const isNew = editingId === record.id && name === '';
 
         return (
           <li
@@ -602,15 +618,19 @@ export function TodoWidget() {
               setDraggingId(null);
               setDragTarget(null);
             } : undefined}
-            onClick={(e) => { e.stopPropagation(); setSelectedId(record.id); setCursorPos(record.id); setSelectedRows([record.id]); }}
+            onMouseDown={isNew ? (e) => e.preventDefault() : undefined}
+            onClick={isNew ? (e) => e.stopPropagation() : (e) => { e.stopPropagation(); setSelectedId(record.id); setCursorPos(record.id); setSelectedRows([record.id]); }}
           >
-            <span className="todo-widget__drag-handle" aria-hidden="true">
-              <span className="material-icons">drag_indicator</span>
-            </span>
+            {!isNew && (
+              <span className="todo-widget__drag-handle" aria-hidden="true">
+                <span className="material-icons">drag_indicator</span>
+              </span>
+            )}
 
             <button
               className={`todo-widget__checkbox${isDone ? ' todo-widget__checkbox--checked' : ''}`}
               style={priority && !isDone && priorityColor ? { backgroundColor: `${priorityColor}18`, borderColor: priorityColor } : undefined}
+              disabled={editingId === record.id && name === ''}
               onClick={(e) => { e.stopPropagation(); handleToggle(record.id, !isDone); }}
               aria-label={isDone ? 'Marquer comme non terminé' : 'Marquer comme terminé'}
             >
@@ -672,25 +692,27 @@ export function TodoWidget() {
               </div>
             </div>
 
-            <div className="todo-widget__side">
-              <div className="todo-widget__actions">
-<div className="todo-widget__menu-wrap">
-                  <button
-                    className="todo-widget__action-btn"
-                    onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === record.id ? null : record.id); }}
-                    aria-label="Plus d'options"
-                  >
-                    <span className="material-icons">more_horiz</span>
-                  </button>
-                  {menuOpenId === record.id && (
-                    <DropdownMenu
-                      onDelete={() => handleDelete(record.id)}
-                      onClose={() => setMenuOpenId(null)}
-                    />
-                  )}
+            {!isNew && (
+              <div className="todo-widget__side">
+                <div className="todo-widget__actions">
+                  <div className="todo-widget__menu-wrap">
+                    <button
+                      className="todo-widget__action-btn"
+                      onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === record.id ? null : record.id); }}
+                      aria-label="Plus d'options"
+                    >
+                      <span className="material-icons">more_horiz</span>
+                    </button>
+                    {menuOpenId === record.id && (
+                      <DropdownMenu
+                        onDelete={() => handleDelete(record.id)}
+                        onClose={() => setMenuOpenId(null)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </li>
         );
       })}
@@ -743,7 +765,10 @@ export function TodoWidget() {
               onDrop={noDrop ? undefined : (e) => { e.preventDefault(); handleDrop({ type: 'section', key: section.key }); }}
             >
               <span className="material-icons">{section.icon}</span>
-              <span>{section.label}</span>
+              <span className="todo-widget__nav-item-label">{section.label}</span>
+              {(navCounts[`section:${section.key}`] ?? 0) > 0 && (
+                <span className="todo-widget__nav-count">{navCounts[`section:${section.key}`]}</span>
+              )}
             </button>
           );
         })}
@@ -768,39 +793,18 @@ export function TodoWidget() {
                 >
                   <span
                     className="todo-widget__nav-chip-dot"
-                    style={color ? { backgroundColor: `color-mix(in srgb, ${color.text} 35%, ${color.fill})` } : undefined}
+                    style={color ? { backgroundColor: color.fill, boxShadow: `0 0 0 2px ${color.text}60` } : undefined}
                   />
-                  {name}
+                  <span className="todo-widget__nav-item-label">{name}</span>
+                  {(navCounts[`project:${name}`] ?? 0) > 0 && (
+                    <span className="todo-widget__nav-count">{navCounts[`project:${name}`]}</span>
+                  )}
                 </button>
               );
             })}
           </>
         )}
 
-        {etiquetteEntries.length > 0 && (
-          <>
-            <span className="todo-widget__nav-label">Mes étiquettes</span>
-            {etiquetteEntries.map((tag) => {
-              const color = etiquettesColorMap.get(tag);
-              return (
-                <button
-                  key={tag}
-                  className={[
-                    'todo-widget__nav-item',
-                    isTagActive(tag) ? 'todo-widget__nav-item--active' : '',
-                  ].filter(Boolean).join(' ')}
-                  onClick={() => { setActiveFilter({ type: 'tag', id: tag, label: tag }); setNavOpen(false); }}
-                >
-                  <span
-                    className="material-icons todo-widget__nav-tag-icon"
-                    style={color ? { color: color.text } : undefined}
-                  >sell</span>
-                  {tag}
-                </button>
-              );
-            })}
-          </>
-        )}
       </nav>
 
       <div className="todo-widget__main" onClick={() => { setSelectedId(null); setSelectedRows([]); }}>
@@ -819,7 +823,7 @@ export function TodoWidget() {
               <span
                 className="todo-widget__title-dot"
                 style={projetColorMap.get(activeLabel)
-                  ? { backgroundColor: `color-mix(in srgb, ${projetColorMap.get(activeLabel)!.text} 35%, ${projetColorMap.get(activeLabel)!.fill})` }
+                  ? { backgroundColor: projetColorMap.get(activeLabel)!.fill, boxShadow: `0 0 0 2px ${projetColorMap.get(activeLabel)!.text}60` }
                   : undefined}
               />
             )}
@@ -851,15 +855,15 @@ export function TodoWidget() {
 
         {(() => {
           const visibleList = isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords;
-          if (visibleList.length === 0 && !showNewRow) {
+          if (visibleList.length === 0) {
             return (
               <div className="todo-widget__empty">
                 <span className="material-icons todo-widget__empty-icon">check_circle</span>
                 <p className="todo-widget__empty-text">{isTerminees ? 'Aucune tâche terminée' : 'Aucune tâche'}</p>
                 {!isTerminees && (
-                  <button className="todo-widget__empty-btn" onClick={showNewTaskInput}>
+                  <button className="todo-widget__empty-btn" onClick={() => { void handleAddTask(); }}>
                     <span className="material-icons">add</span>
-                    Créer une tâche
+                    Ajouter une tâche
                   </button>
                 )}
               </div>
@@ -868,20 +872,11 @@ export function TodoWidget() {
           return renderList(visibleList, !isTerminees && sortMode === 'manual');
         })()}
 
-        {!isTerminees && (filteredRecords.length > 0 || (isAujourdhui && showDone && doneRecords.length > 0) || showNewRow) && (
-          <div className="todo-widget__new-row">
-            <span className="todo-widget__checkbox todo-widget__checkbox--dim" aria-hidden="true" />
-            <input
-              ref={newTaskInputRef}
-              className="todo-widget__new-input"
-              type="text"
-              placeholder="Nouvelle tâche..."
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              onKeyDown={handleNewTaskKeyDown}
-              onBlur={handleNewTaskBlur}
-            />
-          </div>
+        {!isTerminees && (isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords).length > 0 && (
+          <button className="todo-widget__add-task-btn" onClick={(e) => { e.stopPropagation(); void handleAddTask(); }}>
+            <span className="material-icons">add</span>
+            Ajouter une tâche
+          </button>
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { UserAvatar } from '@gouvfr-lasuite/ui-kit';
-import { PickerSelect, useGrist } from '@grist-widgets/ui';
+import { PickerSelect, DatePickerSelect, useGrist } from '@grist-widgets/ui';
 import type { PickerOption, ColumnMeta } from '@grist-widgets/ui';
 
 interface MetaFieldProps {
@@ -174,7 +174,7 @@ function formatDate(value: unknown): string {
   if (!d) return '\u2014';
   return d.toLocaleDateString('fr-FR', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
     timeZone: 'UTC',
   });
@@ -448,26 +448,11 @@ export function MetaField({ colId: _colId, icon, label, value, onChange, onBlur,
     }
     return (
       <MetaRow icon={icon} label={label}>
-        <div className="meta-row__link-wrap">
-          <input
-            type="date"
-            className="meta-row__input"
-            value={toDateInput(value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') (e.target as HTMLElement).blur();
-            }}
-            onBlur={() => onBlur?.()}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (v) onChange(fromDateInput(v));
-            }}
-          />
-          {value != null && value !== 0 && (
-            <button type="button" className="meta-row__hl-edit" title="Effacer" onClick={() => { onChange(null); onBlur?.(); }}>
-              <span className="material-icons">close</span>
-            </button>
-          )}
-        </div>
+        <DatePickerSelect
+          value={value as number | null}
+          onChange={(v) => { onChange(v); onBlur?.(); }}
+          placeholder={label}
+        />
       </MetaRow>
     );
   }
