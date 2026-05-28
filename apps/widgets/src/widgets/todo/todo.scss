@@ -499,6 +499,29 @@ html, body {
     }
   }
 
+  &__chips-group {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__liste-chip {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    line-height: 1.4;
+    background-color: #f9fafb;
+    color: #6b7280;
+
+    .material-icons {
+      font-size: 11px;
+    }
+  }
+
   &__projet-chip {
     display: inline-flex;
     align-items: center;

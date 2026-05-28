@@ -12,6 +12,7 @@ const TASK_FORM: FormConfig = {
   headerDatePrefix: 'Créée',
   fields: [
     { colId: 'Projet', icon: 'folder_open', label: 'Projet', createChoice: true },
+    { colId: 'Liste', icon: 'inbox', label: 'Liste' },
     { colId: 'Priorite', icon: 'flag', label: 'Priorité' },
     { colId: 'Etiquettes', icon: 'sell', label: 'Étiquettes', createChoice: true },
     { colId: 'Date_d_echeance', icon: 'calendar_today', label: 'Échéance' },

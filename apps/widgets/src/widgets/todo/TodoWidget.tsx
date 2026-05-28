@@ -573,6 +573,8 @@ export function TodoWidget() {
         const PRIORITY_DEFAULTS: Record<string, string> = { P1: '#ef4444', P2: '#f97316', P3: '#3b82f6' };
         const priorityColor = priority ? (PRIORITY_DEFAULTS[priority] ?? null) : null;
         const isNew = editingId === record.id && name === '';
+        const listeValue = String(record[LISTE_COL] ?? '');
+        const showListeChip = activeFilter.type === 'project' && (listeValue === "Aujourd'hui" || listeValue === 'Prochainement');
 
         return (
           <li
@@ -671,11 +673,18 @@ export function TodoWidget() {
                   )}
                 </div>
                 {projetName && (
-                  <span
-                    className="todo-widget__projet-chip"
-                    style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
-                    onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); }}
-                  >{projetName}</span>
+                  <div className="todo-widget__chips-group">
+                    {showListeChip && (
+                      <span className="todo-widget__liste-chip" title={listeValue}>
+                        <span className="material-icons">{listeValue === "Aujourd'hui" ? 'today' : 'schedule'}</span>
+                      </span>
+                    )}
+                    <span
+                      className="todo-widget__projet-chip"
+                      style={projetColor ? { backgroundColor: projetColor.fill, color: projetColor.text } : undefined}
+                      onClick={(e) => { e.stopPropagation(); setActiveFilter({ type: 'project', id: projetName, label: projetName }); }}
+                    >{projetName}</span>
+                  </div>
                 )}
               </div>
             </div>
@@ -686,7 +695,8 @@ export function TodoWidget() {
                   <div className="todo-widget__menu-wrap">
                     <button
                       className="todo-widget__action-btn"
-                      onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === record.id ? null : record.id); }}
+                      onMouseDown={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === record.id ? null : record.id); }}
+                      onClick={(e) => e.stopPropagation()}
                       aria-label="Plus d'options"
                     >
                       <span className="material-icons">more_horiz</span>
