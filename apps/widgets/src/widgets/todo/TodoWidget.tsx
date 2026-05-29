@@ -388,11 +388,15 @@ export function TodoWidget() {
     if (activeFilter.type === 'section') {
       if (activeFilter.key === 'Terminées') {
         base = records.filter((r) => Boolean(r[DONE_COL]));
-      } else {
+      } else if (activeFilter.key === 'Boîte de réception') {
         base = records.filter((r) =>
-          String(r[LISTE_COL] ?? '') === activeFilter.key &&
-          (activeFilter.key !== 'Boîte de réception' || !String(r[PROJET_COL] ?? '')),
+          !Boolean(r[DONE_COL]) &&
+          !String(r[PROJET_COL] ?? '') &&
+          String(r[LISTE_COL] ?? '') !== "Aujourd'hui" &&
+          String(r[LISTE_COL] ?? '') !== 'Prochainement',
         );
+      } else {
+        base = records.filter((r) => String(r[LISTE_COL] ?? '') === activeFilter.key);
       }
     } else if (activeFilter.type === 'project') {
       base = records.filter((r) => String(r[PROJET_COL] ?? '') === activeFilter.id);
@@ -471,9 +475,9 @@ export function TodoWidget() {
   const handleAddTask = async () => {
     const maxOrder = filteredRecords.reduce((max, r) => Math.max(max, (r[ORDRE_COL] as number) || 0), 0);
     const fields: Record<string, unknown> = { [NAME_COL]: '', [ORDRE_COL]: maxOrder + 10 };
-    if (activeFilter.type === 'section') fields[LISTE_COL] = activeFilter.key;
-    else if (activeFilter.type === 'project') { fields[PROJET_COL] = activeFilter.id; fields[LISTE_COL] = 'Boîte de réception'; }
-    else if (activeFilter.type === 'tag') { fields[LISTE_COL] = 'Boîte de réception'; fields[ETIQUETTES_COL] = ['L', activeFilter.id]; }
+    if (activeFilter.type === 'section') fields[LISTE_COL] = activeFilter.key === 'Boîte de réception' ? '' : activeFilter.key;
+    else if (activeFilter.type === 'project') { fields[PROJET_COL] = activeFilter.id; fields[LISTE_COL] = ''; }
+    else if (activeFilter.type === 'tag') { fields[LISTE_COL] = ''; fields[ETIQUETTES_COL] = ['L', activeFilter.id]; }
     const id = await createLinkedRecord(fields);
     if (id) { pendingSelectId.current = id; pendingEditId.current = id; }
   };
@@ -503,7 +507,7 @@ export function TodoWidget() {
   const handleDrop = async (target: DragTarget) => {
     if (draggingId == null || !target) return;
     if (target.type === 'section') {
-      const fields: Record<string, unknown> = { [LISTE_COL]: target.key };
+      const fields: Record<string, unknown> = { [LISTE_COL]: target.key === 'Boîte de réception' ? '' : target.key };
       if (target.key === 'Boîte de réception') fields[PROJET_COL] = '';
       await updateLinkedRecord(draggingId, fields);
     } else {
@@ -519,11 +523,16 @@ export function TodoWidget() {
     for (const section of SECTIONS) {
       if (section.key === 'Terminées') {
         counts[`section:${section.key}`] = records.filter((r) => Boolean(r[DONE_COL])).length;
-      } else {
+      } else if (section.key === 'Boîte de réception') {
         counts[`section:${section.key}`] = records.filter(
           (r) => !Boolean(r[DONE_COL]) &&
-          String(r[LISTE_COL] ?? '') === section.key &&
-          (section.key !== 'Boîte de réception' || !String(r[PROJET_COL] ?? '')),
+          !String(r[PROJET_COL] ?? '') &&
+          String(r[LISTE_COL] ?? '') !== "Aujourd'hui" &&
+          String(r[LISTE_COL] ?? '') !== 'Prochainement',
+        ).length;
+      } else {
+        counts[`section:${section.key}`] = records.filter(
+          (r) => !Boolean(r[DONE_COL]) && String(r[LISTE_COL] ?? '') === section.key,
         ).length;
       }
     }
