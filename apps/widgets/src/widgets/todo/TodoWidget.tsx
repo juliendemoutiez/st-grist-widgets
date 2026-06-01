@@ -1,5 +1,6 @@
 import './todo.scss';
 import React, { useEffect, useLayoutEffect, useRef, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import type { RowRecord } from 'grist-plugin-api';
 import { useGrist } from '@grist-widgets/ui';
 
@@ -276,9 +277,12 @@ export function TodoWidget() {
   const [dropIndicatorId, setDropIndicatorId] = useState<number | 'end' | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const pendingSelectId = useRef<number | null>(null);
-  const pendingEditId = useRef<number | null>(null);
+  const [draftActive, setDraftActive] = useState(false);
+  const [draftText, setDraftText] = useState('');
+  const draftRef = useRef<HTMLInputElement>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [initialized, setInitialized] = useState(false);
   const [showDone, setShowDone] = useState(() => {
     const saved = localStorage.getItem('todo-show-done');
     return saved === null ? true : saved === 'true';
@@ -319,6 +323,7 @@ export function TodoWidget() {
   useEffect(() => {
     fetchCurrentTable().then((rows) => {
       setRecords(rows.filter((r) => !r[SUPPRIME_COL]));
+      setInitialized(true);
     }).catch(() => {});
   }, [dataVersion, fetchCurrentTable]);
 
@@ -332,14 +337,7 @@ export function TodoWidget() {
         void setSelectedRows([id]);
       }
     }
-    if (pendingEditId.current !== null) {
-      const id = pendingEditId.current;
-      if (records.some((r) => r.id === id)) {
-        pendingEditId.current = null;
-        setEditingId(id);
-      }
-    }
-  }, [allRecords, records, setCursorPos, setSelectedRows]);
+  }, [allRecords, setCursorPos, setSelectedRows]);
 
   useEffect(() => {
     fetchTable('_grist_Tables_column').then((table) => {
@@ -472,14 +470,30 @@ export function TodoWidget() {
     await updateLinkedRecord(id, { [SUPPRIME_COL]: true });
   };
 
-  const handleAddTask = async () => {
+  const handleAddTask = () => {
+    flushSync(() => {
+      setDraftActive(true);
+      setDraftText('');
+    });
+    draftRef.current?.focus();
+  };
+
+  const handleDraftSave = async () => {
+    const text = draftText.trim() || 'Nouvelle tâche';
+    setDraftActive(false);
+    setDraftText('');
     const maxOrder = filteredRecords.reduce((max, r) => Math.max(max, (r[ORDRE_COL] as number) || 0), 0);
-    const fields: Record<string, unknown> = { [NAME_COL]: '', [ORDRE_COL]: maxOrder + 10 };
+    const fields: Record<string, unknown> = { [NAME_COL]: text, [ORDRE_COL]: maxOrder + 10 };
     if (activeFilter.type === 'section') fields[LISTE_COL] = activeFilter.key === 'Boîte de réception' ? '' : activeFilter.key;
     else if (activeFilter.type === 'project') { fields[PROJET_COL] = activeFilter.id; fields[LISTE_COL] = ''; }
     else if (activeFilter.type === 'tag') { fields[LISTE_COL] = ''; fields[ETIQUETTES_COL] = ['L', activeFilter.id]; }
     const id = await createLinkedRecord(fields);
-    if (id) { pendingSelectId.current = id; pendingEditId.current = id; }
+    if (id) pendingSelectId.current = id;
+  };
+
+  const handleDraftCancel = () => {
+    setDraftActive(false);
+    setDraftText('');
   };
 
   const startEdit = (id: number) => setEditingId(id);
@@ -860,15 +874,24 @@ export function TodoWidget() {
           </div>
         </div>
 
-        {(() => {
+        {!initialized ? (
+          <ul className="todo-widget__list">
+            {[60, 45, 75, 50, 65].map((w, i) => (
+              <li key={i} className="todo-widget__skeleton-item">
+                <span className="todo-widget__skeleton-checkbox" />
+                <span className="todo-widget__skeleton-line" style={{ width: `${w}%` }} />
+              </li>
+            ))}
+          </ul>
+        ) : (() => {
           const visibleList = isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords;
-          if (visibleList.length === 0) {
+          if (visibleList.length === 0 && !draftActive) {
             return (
               <div className="todo-widget__empty">
                 <span className="material-icons todo-widget__empty-icon">check_circle</span>
                 <p className="todo-widget__empty-text">{isTerminees ? 'Aucune tâche terminée' : 'Aucune tâche'}</p>
                 {!isTerminees && (
-                  <button className="todo-widget__empty-btn" onClick={() => { void handleAddTask(); }}>
+                  <button className="todo-widget__empty-btn" onClick={() => { handleAddTask(); }}>
                     <span className="material-icons">add</span>
                     Ajouter une tâche
                   </button>
@@ -876,11 +899,35 @@ export function TodoWidget() {
               </div>
             );
           }
-          return renderList(visibleList, !isTerminees && sortMode === 'manual');
+          return (
+            <>
+              {renderList(visibleList, !isTerminees && sortMode === 'manual')}
+              {draftActive && (
+                <ul className="todo-widget__list">
+                  <li className="todo-widget__item">
+                    <button className="todo-widget__checkbox" disabled aria-hidden="true" />
+                    <input
+                      ref={draftRef}
+                      type="text"
+                      className="todo-widget__draft-name"
+                      value={draftText}
+                      placeholder="Nouvelle tâche..."
+                      onChange={(e) => setDraftText(e.target.value)}
+                      onBlur={() => { void handleDraftSave(); }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); void handleDraftSave(); }
+                        if (e.key === 'Escape') { e.preventDefault(); handleDraftCancel(); }
+                      }}
+                    />
+                  </li>
+                </ul>
+              )}
+            </>
+          );
         })()}
 
-        {!isTerminees && (isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords).length > 0 && (
-          <button className="todo-widget__add-task-btn" onClick={(e) => { e.stopPropagation(); void handleAddTask(); }}>
+        {initialized && !draftActive && !isTerminees && (isAujourdhui && showDone ? [...filteredRecords, ...doneRecords] : filteredRecords).length > 0 && (
+          <button className="todo-widget__add-task-btn" onClick={(e) => { e.stopPropagation(); handleAddTask(); }}>
             <span className="material-icons">add</span>
             Ajouter une tâche
           </button>

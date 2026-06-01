@@ -1,3 +1,8 @@
+@keyframes todo-shimmer {
+  from { background-position: -400px 0; }
+  to   { background-position:  400px 0; }
+}
+
 html, body {
   overflow: hidden;
 }
@@ -12,6 +17,56 @@ html, body {
     background: var(--c--contextuals--background--surface--primary);
     border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
     container-type: inline-size;
+  }
+
+  // ─── Skeleton loader ──────────────────────────────────────────────────────
+
+  &__skeleton-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
+  }
+
+  &__skeleton-checkbox,
+  &__skeleton-line {
+    background: linear-gradient(
+      90deg,
+      #e5e7eb 25%,
+      #f3f4f6 50%,
+      #e5e7eb 75%
+    );
+    background-size: 600px 100%;
+    animation: todo-shimmer 1.4s ease-in-out infinite;
+  }
+
+  &__skeleton-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+  }
+
+  &__draft-name {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font: inherit;
+    font-size: 14px;
+    color: var(--c--contextuals--content--semantic--neutral--primary);
+    padding: 0;
+    min-width: 0;
+
+    &::placeholder {
+      color: var(--c--contextuals--content--semantic--neutral--tertiary);
+    }
   }
 
   // ─── Sidebar nav ──────────────────────────────────────────────────────────
