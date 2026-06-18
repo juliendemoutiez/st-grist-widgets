@@ -16,7 +16,7 @@ export interface ColumnMeta {
  * a map of column metadata keyed by `tableId.colId`.
  */
 export function useColumnMeta(tableId: string) {
-  const { fetchTable, dataVersion } = useGrist();
+  const { fetchTable } = useGrist();
   const [metaMap, setMetaMap] = useState<Record<string, ColumnMeta>>({});
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export function useColumnMeta(tableId: string) {
         console.warn('[useColumnMeta] Failed to fetch column metadata:', err);
       }
     })();
-  }, [fetchTable, tableId, dataVersion]);
+  }, [fetchTable, tableId]);
 
   return metaMap;
 }

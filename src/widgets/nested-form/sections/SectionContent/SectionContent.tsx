@@ -1,4 +1,5 @@
 import '../sections.scss';
+import { useMemo } from 'react';
 import type { SectionConfig, TimelineSectionConfig, CommentSectionConfig } from '@grist-widgets/ui';
 import { TimelineSection } from '../TimelineSection/TimelineSection';
 import { SubtasksSection } from '../SubtasksSection/SubtasksSection';
@@ -11,9 +12,14 @@ interface SectionContentProps {
 }
 
 export function SectionContent({ section, recordId, parentTable }: SectionContentProps) {
-  if (section.type === 'timeline') {
+  const timelineConfig = useMemo(() => {
+    if (section.type !== 'timeline') return null;
     const { type: _type, ...config } = section as TimelineSectionConfig;
-    return <TimelineSection config={config} filterId={recordId} />;
+    return config;
+  }, [section]);
+
+  if (section.type === 'timeline' && timelineConfig) {
+    return <TimelineSection config={timelineConfig} filterId={recordId} />;
   }
   if (section.type === 'tasks') {
     return <SubtasksSection table={section.table} col={section.col} parentId={recordId} title={section.title} icon={section.icon} />;

@@ -55,7 +55,7 @@ export function useTodoData() {
         } catch {}
       }
     }).catch(() => {});
-  }, [fetchTable, dataVersion]);
+  }, [fetchTable]);
 
   return { records, projetChoices, projetColorMap, etiquettesChoices, initialized };
 }

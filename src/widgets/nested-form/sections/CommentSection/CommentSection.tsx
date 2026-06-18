@@ -10,7 +10,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ table, col, parentId, title, icon }: CommentSectionProps) {
-  const { fetchTable, updateRecord, dataVersion } = useGrist();
+  const { fetchTable, updateRecord } = useGrist();
   const [value, setValue] = useState('');
   const savedValue = useRef('');
 
@@ -26,8 +26,7 @@ export function CommentSection({ table, col, parentId, title, icon }: CommentSec
         savedValue.current = text;
       } catch { /* ignore */ }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parentId, dataVersion]);
+  }, [parentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = useCallback(async () => {
     try {

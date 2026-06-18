@@ -209,8 +209,19 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     });
   }, []);
 
+  const contextValue = useMemo(() => ({
+    record, allRecords, isReady, dataVersion, widgetOptions, saveWidgetOptions,
+    isConfiguringWidget, setIsConfiguringWidget,
+    updateCurrentRecord, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord,
+    fetchTable, createRecord, updateRecord, deleteRecord, updateColumnWidgetOptions,
+    setCursorPos, setSelectedRows, fetchCurrentTable,
+  }), [record, allRecords, isReady, dataVersion, widgetOptions, saveWidgetOptions,
+    isConfiguringWidget, updateCurrentRecord, updateLinkedRecord, createLinkedRecord,
+    deleteLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord,
+    updateColumnWidgetOptions, setCursorPos, setSelectedRows, fetchCurrentTable]);
+
   return (
-    <GristContext.Provider value={{ record, allRecords, isReady, dataVersion, widgetOptions, saveWidgetOptions, isConfiguringWidget, setIsConfiguringWidget, updateCurrentRecord, updateLinkedRecord, createLinkedRecord, deleteLinkedRecord, fetchTable, createRecord, updateRecord, deleteRecord, updateColumnWidgetOptions, setCursorPos, setSelectedRows, fetchCurrentTable }}>
+    <GristContext.Provider value={contextValue}>
       {children}
     </GristContext.Provider>
   );

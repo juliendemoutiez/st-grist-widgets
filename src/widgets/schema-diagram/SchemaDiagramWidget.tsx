@@ -262,7 +262,7 @@ const OPTIONS_PLACEHOLDER = JSON.stringify(
 
 export function SchemaDiagramWidget() {
   const {
-    fetchTable, dataVersion,
+    fetchTable,
     widgetOptions, saveWidgetOptions,
     isConfiguringWidget, setIsConfiguringWidget,
   } = useGrist();
@@ -283,7 +283,12 @@ export function SchemaDiagramWidget() {
       const gristTableIds = tablesRaw.tableId as string[];
       const idToTableId: Record<number, string> = {};
       for (let i = 0; i < gristIds.length; i++) idToTableId[gristIds[i]] = gristTableIds[i];
-      setTableIds((gristTableIds as string[]).filter(t => !t.startsWith('_grist_')));
+      const nextTableIds = (gristTableIds as string[]).filter(t => !t.startsWith('_grist_'));
+      setTableIds(prev =>
+        prev.length === nextTableIds.length && prev.every((id, i) => id === nextTableIds[i])
+          ? prev
+          : nextTableIds,
+      );
 
       const cColIds = colsRaw.colId as string[];
       const cTypes = colsRaw.type as string[];
@@ -306,7 +311,7 @@ export function SchemaDiagramWidget() {
   useEffect(() => {
     const t = setTimeout(() => loadSchema(), 100);
     return () => clearTimeout(t);
-  }, [loadSchema, dataVersion]);
+  }, [loadSchema]);
 
   // ── Fetch row counts ──────────────────────────────────────────────────────
   useEffect(() => {

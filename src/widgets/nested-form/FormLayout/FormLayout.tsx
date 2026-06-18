@@ -91,8 +91,7 @@ export function FormLayout({ config, mode, children }: FormLayoutProps) {
         console.warn(`[FormLayout] Failed to fetch full row from ${config.table}:`, err);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [record]);
+  }, [recordId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (mode !== 'subForm') return;
