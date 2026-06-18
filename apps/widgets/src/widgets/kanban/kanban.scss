@@ -149,8 +149,23 @@ div#root .c__app {
 .kanban-card__footer {
   margin-top: 8px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
+}
+
+.kanban-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kanban-card__chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .kanban-card__badge {
@@ -163,17 +178,21 @@ div#root .c__app {
   border-radius: 4px;
   background: var(--c--contextuals--background--semantic--brand--tertiary);
   color: var(--c--contextuals--content--semantic--brand--tertiary);
+  max-width: 100%;
+  min-width: 0;
 
   .material-icons {
     font-size: 13px;
+    flex-shrink: 0;
   }
 }
 
 .kanban-card__user {
-  margin-left: auto;
   flex-shrink: 0;
+  align-self: flex-end;
   display: inline-flex;
   align-items: center;
+  margin-bottom: 2px;
 }
 
 .kanban-card__meta {
@@ -183,9 +202,12 @@ div#root .c__app {
   font-size: 11px;
   font-weight: 500;
   color: var(--c--contextuals--content--semantic--neutral--tertiary);
+  max-width: 100%;
+  min-width: 0;
 
   .material-icons {
     font-size: 13px;
+    flex-shrink: 0;
   }
 
   &--overdue {

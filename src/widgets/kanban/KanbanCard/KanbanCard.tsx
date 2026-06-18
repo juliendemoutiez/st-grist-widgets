@@ -46,22 +46,24 @@ export function KanbanCard({ record, columns, isSelected, onClick, onDragStart, 
       {subtitle && <div className="kanban-card__subtitle">{subtitle}</div>}
       {hasMeta && (
         <div className="kanban-card__footer">
-          {columns.badges?.map(({ key, icon }) => {
-            const value = record[key] != null ? String(record[key]) : null;
-            if (!value) return null;
-            return (
-              <span key={key} className="kanban-card__badge">
-                <span className="material-icons">{icon}</span>
-                {value}
+          <div className="kanban-card__chips">
+            {columns.badges?.map(({ key, icon }) => {
+              const value = record[key] != null ? String(record[key]) : null;
+              if (!value) return null;
+              return (
+                <span key={key} className="kanban-card__badge">
+                  <span className="material-icons">{icon}</span>
+                  <span className="kanban-card__chip-label">{value}</span>
+                </span>
+              );
+            })}
+            {dueDateStr && (
+              <span className={`kanban-card__meta${isOverdue ? ' kanban-card__meta--overdue' : ''}`}>
+                <span className="material-icons">event</span>
+                <span className="kanban-card__chip-label">{dueDateStr}</span>
               </span>
-            );
-          })}
-          {dueDateStr && (
-            <span className={`kanban-card__meta${isOverdue ? ' kanban-card__meta--overdue' : ''}`}>
-              <span className="material-icons">event</span>
-              {dueDateStr}
-            </span>
-          )}
+            )}
+          </div>
           {assignee && (
             <span className="kanban-card__user">
               <UserAvatar fullName={assignee} size="xsmall" />

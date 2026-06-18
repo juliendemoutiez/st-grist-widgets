@@ -41,18 +41,20 @@ export function KanbanCard({ record, isSelected, prochaineDate, isOverdue, onCli
       {pourQui && <div className="kanban-card__subtitle">{pourQui}</div>}
       {(effectifs || dateStr || lead) && (
         <div className="kanban-card__footer">
-          {effectifs && (
-            <span className="kanban-card__badge">
-              <span className="material-icons">people</span>
-              {effectifs}
-            </span>
-          )}
-          {dateStr && (
-            <span className={`kanban-card__meta${isOverdue ? ' kanban-card__meta--overdue' : ''}`}>
-              <span className="material-icons">event</span>
-              {dateStr}
-            </span>
-          )}
+          <div className="kanban-card__chips">
+            {effectifs && (
+              <span className="kanban-card__badge">
+                <span className="material-icons">people</span>
+                <span className="kanban-card__chip-label">{effectifs}</span>
+              </span>
+            )}
+            {dateStr && (
+              <span className={`kanban-card__meta${isOverdue ? ' kanban-card__meta--overdue' : ''}`}>
+                <span className="material-icons">event</span>
+                <span className="kanban-card__chip-label">{dateStr}</span>
+              </span>
+            )}
+          </div>
           {lead && (
             <span className="kanban-card__user">
               <UserAvatar fullName={lead} size="xsmall" />
