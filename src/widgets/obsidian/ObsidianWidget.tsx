@@ -290,7 +290,7 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
   });
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor || editor.isDestroyed) return;
     if (autoSaveTimer.current) { clearTimeout(autoSaveTimer.current); autoSaveTimer.current = null; }
     userEditedContent.current = false;
     editor.commands.setContent(parseContent(item[CONTENT_COL]));
@@ -298,7 +298,7 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
   }, [item.id, editor]);
 
   useEffect(() => {
-    if (!editor || !focusEnd) return;
+    if (!editor || editor.isDestroyed || !focusEnd) return;
     editor.commands.focus('end');
   }, [focusEnd, editor]);
 
