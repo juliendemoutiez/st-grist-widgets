@@ -1,0 +1,328 @@
+{
+  "initialScreen": "ProjetForm",
+  "screens": {
+    "ProjetForm": {
+      "mode": "currentRecord",
+      "table": "Projets",
+      "titleColId": "Nom",
+      "titleDefault": "Sans titre",
+      "titlePlaceholder": "Titre du projet",
+      "headerDateColId": "Cree_le",
+      "headerDatePrefix": "Créé",
+      "newRecordLabel": "Nouveau projet",
+      "emptyMessage": "Cliquez sur un projet pour afficher les détails",
+      "fields": [
+        {
+          "colId": "Pour_qui_",
+          "icon": "group",
+          "label": "Pour qui"
+        },
+        {
+          "colId": "Statut",
+          "icon": "flag",
+          "label": "Statut"
+        },
+        {
+          "colId": "Priorite",
+          "icon": "priority_high",
+          "label": "Priorité"
+        },
+        {
+          "colId": "Lien_CR",
+          "icon": "link",
+          "label": "Lien CR"
+        },
+        {
+          "colId": "Effectifs",
+          "icon": "people",
+          "label": "Effectifs"
+        },
+        {
+          "colId": "Solutions_actuelles",
+          "icon": "inventory_2",
+          "label": "Solutions actuelles"
+        },
+        {
+          "colId": "Interet_pour_La_Suite",
+          "icon": "favorite",
+          "label": "Intérêt pour La Suite"
+        },
+        {
+          "colId": "Besoin",
+          "icon": "build",
+          "label": "Besoin"
+        },
+        {
+          "colId": "Sentiment_envers_LaSuite",
+          "icon": "sentiment_satisfied",
+          "label": "Sentiment envers La Suite"
+        },
+        {
+          "colId": "Echeance_contrat",
+          "icon": "calendar_month",
+          "label": "Echéance contrat"
+        },
+        {
+          "colId": "Lead",
+          "icon": "person",
+          "label": "Lead",
+          "avatar": true
+        },
+        {
+          "colId": "Organisation",
+          "icon": "business",
+          "label": "Organisation",
+          "addLabel": "Ajouter une organisation",
+          "refAddScreen": "OrgForm",
+          "refEditScreen": "OrgForm"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour_par",
+          "icon": "account_circle",
+          "label": "Dernière mise à jour par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_le",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour",
+          "icon": "update",
+          "label": "Dernière mise à jour le",
+          "readOnly": true
+        }
+      ],
+      "sections": [
+        {
+          "type": "timeline",
+          "table": "Interactions",
+          "filterCol": "Projets",
+          "refType": "RefList",
+          "dateCol": "Date",
+          "typeCol": "Type",
+          "detailCol": "Prochaine_etape",
+          "addScreen": "InteractionForm",
+          "addDateCol": "Date",
+          "editScreen": "InteractionForm",
+          "title": "Interactions",
+          "icon": "chat",
+          "emptyMessage": "Aucune interaction"
+        }
+      ]
+    },
+    "InteractionForm": {
+      "mode": "subForm",
+      "table": "Interactions",
+      "titleColId": "Titre",
+      "titleDefault": "Nouvelle interaction",
+      "titlePlaceholder": "",
+      "titleReadOnly": true,
+      "headerDateColId": "Cree_le",
+      "headerDatePrefix": "Créé",
+      "fields": [
+        {
+          "colId": "Date",
+          "icon": "event",
+          "label": "Date"
+        },
+        {
+          "colId": "Projets",
+          "icon": "folder",
+          "label": "Projet",
+          "readOnly": true,
+          "refLabelCol": "Nom"
+        },
+        {
+          "colId": "Type",
+          "icon": "label",
+          "label": "Type",
+          "readOnly": true
+        },
+        {
+          "colId": "Produits",
+          "icon": "inventory_2",
+          "label": "Produits",
+          "readOnly": true
+        },
+        {
+          "colId": "Contacts",
+          "icon": "people",
+          "label": "Contacts",
+          "addLabel": "Ajouter un contact",
+          "refAddScreen": "ContactForm",
+          "refEditScreen": "ContactForm",
+          "refLabelCol": "Nom_Complet"
+        },
+        {
+          "colId": "Contacts_internes",
+          "icon": "group",
+          "label": "Contacts internes",
+          "refEditScreen": "ContactForm",
+          "refLabelCol": "Nom_Complet"
+        },
+        {
+          "colId": "Date_de_prochaine_interaction",
+          "icon": "calendar_month",
+          "label": "Date de prochaine interaction"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_le",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Prochaine_etape",
+          "icon": "notes",
+          "label": "Prochaine étape",
+          "markdown": true
+        }
+      ]
+    },
+    "ContactForm": {
+      "mode": "subForm",
+      "table": "Contacts",
+      "titleColId": "Nom_Complet",
+      "titleDefault": "Nouveau contact",
+      "titlePlaceholder": "",
+      "titleReadOnly": true,
+      "headerDateColId": "Cree_le",
+      "headerDatePrefix": "Créé",
+      "fields": [
+        {
+          "colId": "Nom",
+          "icon": "person",
+          "label": "Nom",
+          "transform": "uppercase"
+        },
+        {
+          "colId": "Prenom",
+          "icon": "badge",
+          "label": "Prénom",
+          "transform": "capitalize"
+        },
+        {
+          "colId": "Email",
+          "icon": "email",
+          "label": "Email"
+        },
+        {
+          "colId": "Fonction",
+          "icon": "work",
+          "label": "Fonction"
+        },
+        {
+          "colId": "Organisation",
+          "icon": "business",
+          "label": "Organisation",
+          "refLabelCol": "Nom",
+          "refEditScreen": "OrgForm"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour_par",
+          "icon": "account_circle",
+          "label": "Dernière mise à jour par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_le",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour",
+          "icon": "update",
+          "label": "Dernière mise à jour le",
+          "readOnly": true
+        }
+      ]
+    },
+    "OrgForm": {
+      "mode": "subForm",
+      "table": "Organisations",
+      "titleColId": "Nom",
+      "titleDefault": "Sans titre",
+      "titlePlaceholder": "Nom de l'organisation",
+      "headerDateColId": "Cree_le",
+      "headerDatePrefix": "Créé",
+      "fields": [
+        {
+          "colId": "Nature_juridique",
+          "icon": "gavel",
+          "label": "Nature juridique"
+        },
+        {
+          "colId": "Organisation_de_rattachement",
+          "icon": "business",
+          "label": "Organisation de rattachement",
+          "addLabel": "Ajouter une organisation",
+          "refAddScreen": "OrgForm",
+          "refEditScreen": "OrgForm",
+          "refLabelCol": "Nom"
+        },
+        {
+          "colId": "Contacts",
+          "icon": "people",
+          "label": "Contacts",
+          "addLabel": "Ajouter un contact",
+          "refAddScreen": "ContactForm",
+          "refEditScreen": "ContactForm",
+          "refLabelCol": "Nom_Complet"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour_par",
+          "icon": "account_circle",
+          "label": "Dernière mise à jour par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_le",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour",
+          "icon": "update",
+          "label": "Dernière mise à jour le",
+          "readOnly": true
+        }
+      ]
+    }
+  }
+}

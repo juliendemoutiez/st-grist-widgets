@@ -1,0 +1,108 @@
+.form-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
+  background: var(--c--contextuals--background--surface--primary);
+  border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.form-shell__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--c--contextuals--background--semantic--neutral--tertiary);
+  border-radius: 0.5rem 0.5rem 0 0;
+  border-bottom: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
+}
+
+.form-shell__back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  cursor: pointer;
+  color: var(--c--contextuals--content--semantic--neutral--secondary);
+  border-radius: 0.25rem;
+
+  &:hover {
+    background-color: var(--c--contextuals--background--semantic--neutral--tertiary);
+  }
+
+  .material-icons {
+    font-size: 1rem;
+  }
+}
+
+.form-shell__title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+
+  &--editable {
+    position: relative;
+    display: inline-block;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0.125rem 0.25rem;
+    min-width: 100px;
+    max-width: 100%;
+    cursor: text;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      background-color: var(--c--contextuals--background--semantic--neutral--tertiary);
+    }
+
+    &:focus {
+      overflow: auto;
+      text-overflow: clip;
+      scrollbar-width: none;
+      box-shadow: 0 0 0 2px var(--c--contextuals--content--semantic--brand--tertiary);
+
+      &::-webkit-scrollbar { display: none; }
+    }
+  }
+
+  &--empty {
+    &::before {
+      content: attr(data-default);
+    }
+
+    &:focus::before {
+      content: attr(data-placeholder);
+      position: absolute;
+      color: var(--c--contextuals--content--semantic--neutral--tertiary);
+      font-weight: 400;
+      pointer-events: none;
+    }
+  }
+}
+
+.form-shell__header-right {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--c--contextuals--content--semantic--neutral--tertiary);
+  white-space: nowrap;
+}
+
+.form-shell__content {
+  padding: 0.75rem 1rem;
+  overflow-y: auto;
+  flex: 1;
+}

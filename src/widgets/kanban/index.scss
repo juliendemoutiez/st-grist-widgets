@@ -1,0 +1,24 @@
+/* Override globals for kanban full-height layout */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+div#root {
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+div#root .c__app {
+  height: 100%;
+}
+
+.kanban-layout {
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 12px;
+  box-sizing: border-box;
+}

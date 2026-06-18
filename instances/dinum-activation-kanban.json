@@ -1,0 +1,24 @@
+{
+  "statuses": [
+    "1. RDV découverte",
+    "2. Focus produit",
+    "3. Expérimentation lancée",
+    "4. Suivi bizdev",
+    "5. Bilan expérimentation",
+    "6. Autonomie",
+    "7. Perdu / En pause"
+  ],
+  "columns": {
+    "status": "Statut",
+    "title": "Nom",
+    "subtitle": "Pour_qui_",
+    "badges": [
+      {
+        "key": "Effectifs",
+        "icon": "people"
+      }
+    ],
+    "dueDate": "Date_de_prochaine_interaction",
+    "assignee": "Lead"
+  }
+}

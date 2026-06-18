@@ -1,0 +1,23 @@
+{
+  "statuses": [
+    "8. Suivi objections",
+    "9. Engagement déploiement",
+    "10. Suivi déploiement",
+    "11. Arrêts licences",
+    "12. Elargissement LaSuite",
+    "13. En pause"
+  ],
+  "columns": {
+    "status": "Statut",
+    "title": "Nom",
+    "subtitle": "Pour_qui_",
+    "badges": [
+      {
+        "key": "Effectifs",
+        "icon": "people"
+      }
+    ],
+    "dueDate": "Date_de_prochaine_interaction",
+    "assignee": "Lead"
+  }
+}
