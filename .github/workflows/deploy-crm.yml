@@ -4,7 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/widgets/**'
+      - 'src/**'
+      - 'pages/**'
       - 'packages/ui/**'
       - '.github/workflows/deploy-crm.yml'
   workflow_dispatch:
@@ -28,12 +29,12 @@ jobs:
 
       - run: pnpm install --no-frozen-lockfile
 
-      - run: pnpm --filter widgets build
+      - run: pnpm build
         env:
           VITE_BASE_URL: /${{ github.event.repository.name }}/
 
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./apps/widgets/dist
+          publish_dir: ./dist
           destination_dir: .
