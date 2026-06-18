@@ -1,4 +1,4 @@
-import './obsidian.scss';
+import './notes.scss';
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -108,13 +108,13 @@ const NoteMentionList = React.forwardRef<MentionListHandle, MentionState>(
 
     return (
       <div
-        className="obsidian-mention-list"
+        className="notes-mention-list"
         style={{ position: 'fixed', top: rect.bottom + 4, left: rect.left }}
       >
         {items.map((item, index) => (
           <button
             key={item.id}
-            className={`obsidian-mention-list__item${index === selectedIndex ? ' obsidian-mention-list__item--selected' : ''}`}
+            className={`notes-mention-list__item${index === selectedIndex ? ' notes-mention-list__item--selected' : ''}`}
             onMouseDown={(e) => {
               e.preventDefault();
               command({ id: String(item.id), label: String(item[TITLE_COL] ?? ''), emoji: String(item[ICON_COL] ?? DEFAULT_ICON) });
@@ -163,22 +163,22 @@ function EmojiPicker({ value, onChange }: { value: string; onChange: (e: string)
   }, [open]);
 
   return (
-    <div className="obsidian__emoji-wrap" ref={wrapRef}>
+    <div className="notes__emoji-wrap" ref={wrapRef}>
       <button
         type="button"
-        className={`obsidian__emoji-btn${open ? ' obsidian__emoji-btn--open' : ''}`}
+        className={`notes__emoji-btn${open ? ' notes__emoji-btn--open' : ''}`}
         onClick={() => setOpen((o) => !o)}
         title="Choisir un emoji"
       >
         {value || '📝'}
       </button>
       {open && (
-        <div className="obsidian__emoji-picker">
+        <div className="notes__emoji-picker">
           {COMMON_EMOJIS.map((emoji) => (
             <button
               key={emoji}
               type="button"
-              className={`obsidian__emoji-option${emoji === value ? ' obsidian__emoji-option--active' : ''}`}
+              className={`notes__emoji-option${emoji === value ? ' notes__emoji-option--active' : ''}`}
               onClick={() => { onChange(emoji); setOpen(false); }}
             >
               {emoji}
@@ -249,14 +249,14 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
       Placeholder.configure({ placeholder: 'Commencez à écrire…' }),
       Markdown.configure({ html: false, transformPastedText: true, transformCopiedText: true }),
       Mention.configure({
-        HTMLAttributes: { class: 'obsidian-mention' },
+        HTMLAttributes: { class: 'notes-mention' },
         renderHTML({ options, node }: { options: { HTMLAttributes: Record<string, unknown> }; node: { attrs: Record<string, unknown> } }) {
           const noteId = Number(node.attrs.id);
           const record = allRecordsRef.current.find(r => r.id === noteId);
           const emoji = record ? String(record[ICON_COL] ?? '') : '';
           const children: unknown[] = [];
-          if (emoji) children.push(['span', { class: 'obsidian-mention__emoji' }, emoji]);
-          children.push(['span', { class: 'obsidian-mention__label' }, String(node.attrs.label ?? '')]);
+          if (emoji) children.push(['span', { class: 'notes-mention__emoji' }, emoji]);
+          children.push(['span', { class: 'notes-mention__label' }, String(node.attrs.label ?? '')]);
           return ['span', { ...options.HTMLAttributes, 'data-note-id': String(node.attrs.id) }, ...children];
         },
         suggestion: {
@@ -336,25 +336,25 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
         <NoteMentionList ref={mentionListRef} {...mentionState} />,
         document.body,
       )}
-      <div className="obsidian__editor">
-        <div className="obsidian__editor-inner">
+      <div className="notes__editor">
+        <div className="notes__editor-inner">
           {breadcrumbs.length > 0 && (
-            <div className="obsidian__breadcrumb">
+            <div className="notes__breadcrumb">
               {breadcrumbs.map((p, i) => (
                 <React.Fragment key={p.id}>
-                  <button className="obsidian__breadcrumb-item" onClick={() => onNavigate(p.id)}>
-                    {p[ICON_COL] && <span className="obsidian__breadcrumb-emoji">{String(p[ICON_COL])}</span>}
+                  <button className="notes__breadcrumb-item" onClick={() => onNavigate(p.id)}>
+                    {p[ICON_COL] && <span className="notes__breadcrumb-emoji">{String(p[ICON_COL])}</span>}
                     <span>{String(p[TITLE_COL] ?? '') || 'Sans titre'}</span>
                   </button>
                   {i < breadcrumbs.length - 1 && (
-                    <span className="material-icons obsidian__breadcrumb-sep">chevron_right</span>
+                    <span className="material-icons notes__breadcrumb-sep">chevron_right</span>
                   )}
                 </React.Fragment>
               ))}
             </div>
           )}
-          <div className="obsidian__title-row">
-            <button className="obsidian__nav-toggle" onClick={onOpenSidebar} aria-label="Menu">
+          <div className="notes__title-row">
+            <button className="notes__nav-toggle" onClick={onOpenSidebar} aria-label="Menu">
               <span className="material-icons">menu</span>
             </button>
             <EmojiPicker
@@ -363,7 +363,7 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
             />
             <input
               ref={titleRef}
-              className="obsidian__note-title"
+              className="notes__note-title"
               value={titleDraft}
               placeholder="Sans titre"
               onChange={(e) => setTitleDraft(e.target.value)}
@@ -374,7 +374,7 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
             />
           </div>
 
-          <div className="obsidian__tiptap-wrap" onClick={handleEditorClick}>
+          <div className="notes__tiptap-wrap" onClick={handleEditorClick}>
             {editor && (
               <BubbleMenu editor={editor} options={{ placement: 'top', offset: 8 }}>
                 <div className="rte-bubble">
@@ -402,14 +402,14 @@ function ItemEditor({ item, allRecords, onSaveTitle, onSaveContent, onSaveIcon, 
 
 // ─── Main widget ──────────────────────────────────────────────────────────────
 
-export function ObsidianWidget() {
+export function NotesWidget() {
   const {
     allRecords, record,
     createLinkedRecord, updateLinkedRecord,
     setCursorPos, setSelectedRows,
   } = useGrist();
 
-  const storageKey = `obsidian_expanded_${window.location.pathname}`;
+  const storageKey = `notes_expanded_${window.location.pathname}`;
 
   const [activeView, setActiveView]             = useState<ViewId>('notes');
   const [selectedId, setSelectedId]             = useState<number | null>(null);
@@ -634,7 +634,7 @@ export function ObsidianWidget() {
   useEffect(() => {
     if (menuOpenId === null) return;
     const handler = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest('.obsidian__item-menu')) {
+      if (!(e.target as HTMLElement).closest('.notes__item-menu')) {
         setMenuOpenId(null);
         setMenuPos(null);
       }
@@ -692,7 +692,7 @@ export function ObsidianWidget() {
 
   const renderDropEnd = (groupKey: string, list: RowRecord[]) => (
     <div
-      className={`obsidian__nav-drop-end${dropGroup === groupKey && dropBeforeId === 'end' ? ' obsidian__nav-drop-end--active' : ''}`}
+      className={`notes__nav-drop-end${dropGroup === groupKey && dropBeforeId === 'end' ? ' notes__nav-drop-end--active' : ''}`}
       onDragOver={(e) => {
         const cid = draggingIdRef.current;
         if (cid === null) return;
@@ -732,12 +732,12 @@ export function ObsidianWidget() {
       <React.Fragment key={item.id}>
         <div
           className={[
-            'obsidian__nav-item',
-            isActive     ? 'obsidian__nav-item--active'        : '',
-            isDragging   ? 'obsidian__nav-item--dragging'      : '',
-            isDropBefore ? 'obsidian__nav-item--drop-before'   : '',
-            isNestTarget   ? 'obsidian__nav-item--folder-target'  : '',
-            hasChildren    ? 'obsidian__nav-item--has-children'   : '',
+            'notes__nav-item',
+            isActive     ? 'notes__nav-item--active'        : '',
+            isDragging   ? 'notes__nav-item--dragging'      : '',
+            isDropBefore ? 'notes__nav-item--drop-before'   : '',
+            isNestTarget   ? 'notes__nav-item--folder-target'  : '',
+            hasChildren    ? 'notes__nav-item--has-children'   : '',
           ].filter(Boolean).join(' ')}
           style={depth > 0 ? { paddingLeft: `${0.75 + depth * 0.75}rem` } : undefined}
           onClick={() => void handleSelect(item.id)}
@@ -781,7 +781,7 @@ export function ObsidianWidget() {
           }}
         >
           <span
-            className="obsidian__nav-icon-wrap"
+            className="notes__nav-icon-wrap"
             onClick={hasChildren ? (e) => {
               e.stopPropagation();
               setExpandedFolders((prev) => {
@@ -792,32 +792,32 @@ export function ObsidianWidget() {
             } : undefined}
           >
             {item[ICON_COL] ? (
-              <span className="obsidian__nav-icon obsidian__nav-icon--note obsidian__nav-icon--emoji">
+              <span className="notes__nav-icon notes__nav-icon--note notes__nav-icon--emoji">
                 {String(item[ICON_COL])}
               </span>
             ) : (
-              <span className="material-icons obsidian__nav-icon obsidian__nav-icon--note">
+              <span className="material-icons notes__nav-icon notes__nav-icon--note">
                 {itemIcon(String(item[TYPE_COL] ?? T_NOTE))}
               </span>
             )}
             {hasChildren && (
-              <span className="material-icons obsidian__nav-icon obsidian__nav-icon--caret">
+              <span className="material-icons notes__nav-icon notes__nav-icon--caret">
                 {isExpanded ? 'expand_more' : 'chevron_right'}
               </span>
             )}
           </span>
-          <span className="obsidian__nav-label">
+          <span className="notes__nav-label">
             {String(item[TITLE_COL] ?? '') || 'Sans titre'}
           </span>
           <button
-            className="obsidian__note-add-sub"
+            className="notes__note-add-sub"
             onClick={(e) => { e.stopPropagation(); void handleNewNote(item.id); }}
             title="Nouvelle sous-note"
           >
             <span className="material-icons">add</span>
           </button>
           <button
-            className="obsidian__note-menu-btn"
+            className="notes__note-menu-btn"
             onMouseDown={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -830,9 +830,9 @@ export function ObsidianWidget() {
             <span className="material-icons">more_horiz</span>
           </button>
           {menuOpenId === item.id && menuPos && createPortal(
-            <div className="obsidian__item-menu" style={{ top: menuPos.top, left: menuPos.left }}>
+            <div className="notes__item-menu" style={{ top: menuPos.top, left: menuPos.left }}>
               <button
-                className="obsidian__item-menu__action"
+                className="notes__item-menu__action"
                 onMouseDown={(e) => { e.preventDefault(); void handleArchive(item.id); }}
               >
                 <span className="material-icons">inventory_2</span>
@@ -861,29 +861,29 @@ export function ObsidianWidget() {
     return (
       <React.Fragment key={item.id}>
         <div
-          className={['obsidian__nav-item', 'obsidian__nav-item--no-actions', isActive ? 'obsidian__nav-item--active' : '', hasChildren ? 'obsidian__nav-item--has-children' : ''].filter(Boolean).join(' ')}
+          className={['notes__nav-item', 'notes__nav-item--no-actions', isActive ? 'notes__nav-item--active' : '', hasChildren ? 'notes__nav-item--has-children' : ''].filter(Boolean).join(' ')}
           style={depth > 0 ? { paddingLeft: `${0.75 + depth * 0.75}rem` } : undefined}
           onClick={() => void handleSelect(item.id)}
         >
           <span
-            className="obsidian__nav-icon-wrap"
+            className="notes__nav-icon-wrap"
             onClick={hasChildren ? (e) => {
               e.stopPropagation();
               setExpandedFolders((prev) => { const n = new Set(prev); n.has(item.id) ? n.delete(item.id) : n.add(item.id); return n; });
             } : undefined}
           >
             {item[ICON_COL] ? (
-              <span className="obsidian__nav-icon obsidian__nav-icon--note obsidian__nav-icon--emoji">{String(item[ICON_COL])}</span>
+              <span className="notes__nav-icon notes__nav-icon--note notes__nav-icon--emoji">{String(item[ICON_COL])}</span>
             ) : (
-              <span className="material-icons obsidian__nav-icon obsidian__nav-icon--note">{itemIcon(String(item[TYPE_COL] ?? T_NOTE))}</span>
+              <span className="material-icons notes__nav-icon notes__nav-icon--note">{itemIcon(String(item[TYPE_COL] ?? T_NOTE))}</span>
             )}
             {hasChildren && (
-              <span className="material-icons obsidian__nav-icon obsidian__nav-icon--caret">
+              <span className="material-icons notes__nav-icon notes__nav-icon--caret">
                 {isExpanded ? 'expand_more' : 'chevron_right'}
               </span>
             )}
           </span>
-          <span className="obsidian__nav-label">{String(item[TITLE_COL] ?? '') || 'Sans titre'}</span>
+          <span className="notes__nav-label">{String(item[TITLE_COL] ?? '') || 'Sans titre'}</span>
         </div>
         {hasChildren && isExpanded && children.map((child) => renderArchivedItem(child, depth + 1))}
       </React.Fragment>
@@ -894,15 +894,15 @@ export function ObsidianWidget() {
   const renderFlatItem = (item: RowRecord, subtitle?: string) => (
     <div
       key={item.id}
-      className={`obsidian__nav-item${selectedId === item.id ? ' obsidian__nav-item--active' : ''}`}
+      className={`notes__nav-item${selectedId === item.id ? ' notes__nav-item--active' : ''}`}
       onClick={() => void handleSelect(item.id)}
     >
-      <span className="material-icons obsidian__nav-icon">
+      <span className="material-icons notes__nav-icon">
         {itemIcon(String(item[TYPE_COL] ?? T_NOTE))}
       </span>
-      <div className="obsidian__nav-flat-meta">
-        <span className="obsidian__nav-label">{String(item[TITLE_COL] ?? '') || 'Sans titre'}</span>
-        {subtitle && <span className="obsidian__nav-subtitle">{subtitle}</span>}
+      <div className="notes__nav-flat-meta">
+        <span className="notes__nav-label">{String(item[TITLE_COL] ?? '') || 'Sans titre'}</span>
+        {subtitle && <span className="notes__nav-subtitle">{subtitle}</span>}
       </div>
     </div>
   );
@@ -910,17 +910,17 @@ export function ObsidianWidget() {
   // Notes-section content based on active view
   const renderNotesContent = () => {
     if (activeView === 'daily') {
-      if (dailyItems.length === 0) return <div className="obsidian__empty-list">Aucune note daily</div>;
+      if (dailyItems.length === 0) return <div className="notes__empty-list">Aucune note daily</div>;
       return <>{dailyItems.map((r) => renderFlatItem(r, formatDate(r[CREATED_COL])))}</>;
     }
 
     if (activeView === 'archive') {
-      if (archivedRootItems.length === 0) return <div className="obsidian__empty-list">Aucun élément archivé</div>;
+      if (archivedRootItems.length === 0) return <div className="notes__empty-list">Aucun élément archivé</div>;
       return <>{archivedRootItems.map((r) => renderArchivedItem(r))}</>;
     }
 
     // Notes: tree
-    if (rootItems.length === 0) return <div className="obsidian__empty-list">Aucune note</div>;
+    if (rootItems.length === 0) return <div className="notes__empty-list">Aucune note</div>;
     return (
       <>
         {rootItems.map((item) => renderItem(item, rootItems, 'root'))}
@@ -932,19 +932,19 @@ export function ObsidianWidget() {
   // ── JSX ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="obsidian__root">
-      {sidebarOpen && <div className="obsidian__nav-overlay" onClick={() => setSidebarOpen(false)} />}
-      <aside className={`obsidian__sidebar${sidebarOpen ? ' obsidian__sidebar--open' : ''}`}>
+    <div className="notes__root">
+      {sidebarOpen && <div className="notes__nav-overlay" onClick={() => setSidebarOpen(false)} />}
+      <aside className={`notes__sidebar${sidebarOpen ? ' notes__sidebar--open' : ''}`}>
 
         {/* ── NOTES ── */}
-        <div className="obsidian__notes-section">
-          <div className="obsidian__nav-section-header">
-            <span className="obsidian__nav-section-label">
+        <div className="notes__notes-section">
+          <div className="notes__nav-section-header">
+            <span className="notes__nav-section-label">
               {STATIC_VIEWS.find((v) => v.id === activeView)?.label}
             </span>
             {activeView === 'notes' && (
               <button
-                className="obsidian__nav-section-btn"
+                className="notes__nav-section-btn"
                 onClick={() => void handleNewNote()}
                 title="Nouvelle note"
               >
@@ -953,7 +953,7 @@ export function ObsidianWidget() {
             )}
             {activeView === 'daily' && (
               <button
-                className="obsidian__nav-section-btn"
+                className="notes__nav-section-btn"
                 onClick={() => void handleNewDaily()}
                 title="Nouvelle daily note"
               >
@@ -965,11 +965,11 @@ export function ObsidianWidget() {
         </div>
 
         {/* ── BOTTOM VIEW TABS ── */}
-        <div className="obsidian__view-tabs">
+        <div className="notes__view-tabs">
           {STATIC_VIEWS.map((view) => (
             <button
               key={view.id}
-              className={`obsidian__view-tab${activeView === view.id ? ' obsidian__view-tab--active' : ''}`}
+              className={`notes__view-tab${activeView === view.id ? ' notes__view-tab--active' : ''}`}
               onClick={() => setActiveView(view.id)}
               data-tooltip={view.label}
             >
@@ -977,7 +977,7 @@ export function ObsidianWidget() {
             </button>
           ))}
           <button
-            className="obsidian__daily-create-btn"
+            className="notes__daily-create-btn"
             onClick={() => void handleNewDaily()}
             title="Nouvelle daily note"
           >
@@ -987,9 +987,9 @@ export function ObsidianWidget() {
 
       </aside>
 
-      <main className="obsidian__main">
+      <main className="notes__main">
         {saveStatus !== 'idle' && (
-          <div className={`obsidian__save-status obsidian__save-status--${saveStatus}`}>
+          <div className={`notes__save-status notes__save-status--${saveStatus}`}>
             <span className="material-icons">
               {saveStatus === 'saving' ? 'sync' : 'check_circle'}
             </span>
@@ -1009,13 +1009,13 @@ export function ObsidianWidget() {
             focusEnd={focusEnd}
           />
         ) : (
-          <div className="obsidian__no-selection">
-            <button className="obsidian__nav-toggle obsidian__nav-toggle--no-selection" onClick={() => setSidebarOpen(true)} aria-label="Menu">
+          <div className="notes__no-selection">
+            <button className="notes__nav-toggle notes__nav-toggle--no-selection" onClick={() => setSidebarOpen(true)} aria-label="Menu">
               <span className="material-icons">menu</span>
             </button>
-            <span className="material-icons obsidian__no-selection-icon">edit_note</span>
+            <span className="material-icons notes__no-selection-icon">edit_note</span>
             <p>Sélectionnez une note ou créez-en une nouvelle</p>
-            <button className="obsidian__create-btn" onClick={() => void handleNewNote()}>
+            <button className="notes__create-btn" onClick={() => void handleNewNote()}>
               <span className="material-icons">add</span>
               Nouvelle note
             </button>

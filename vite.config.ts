@@ -17,7 +17,7 @@ export default defineConfig({
         'kanban': path.resolve(__dirname, 'pages/kanban.html'),
         'todo': path.resolve(__dirname, 'pages/todo.html'),
         'schema-diagram': path.resolve(__dirname, 'pages/schema-diagram.html'),
-        'obsidian': path.resolve(__dirname, 'pages/obsidian.html'),
+        'notes': path.resolve(__dirname, 'pages/notes.html'),
       },
     },
   },

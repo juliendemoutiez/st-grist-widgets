@@ -6,7 +6,7 @@ div#root {
   height: 100%;
 }
 
-.obsidian {
+.notes {
   &__root {
     display: flex;
     width: 100%;
@@ -287,9 +287,9 @@ div#root {
       gap: 0.625rem;
       padding: 0.5rem 0.75rem;
 
-      .obsidian__nav-icon { font-size: 18px; color: inherit; }
+      .notes__nav-icon { font-size: 18px; color: inherit; }
 
-      &.obsidian__nav-item--active { font-weight: 600; }
+      &.notes__nav-item--active { font-weight: 600; }
     }
 
     &--folder-target {
@@ -299,7 +299,7 @@ div#root {
       outline-offset: -2px;
     }
 
-    &:hover .obsidian__note-delete {
+    &:hover .notes__note-delete {
       opacity: 1;
     }
   }
@@ -310,14 +310,14 @@ div#root {
     align-items: center;
     justify-content: center;
 
-    .obsidian__nav-icon--caret { display: none; }
+    .notes__nav-icon--caret { display: none; }
   }
 
   &__nav-item--has-children &__nav-icon-wrap {
     cursor: pointer;
 
-    &:hover .obsidian__nav-icon--note { display: none; }
-    &:hover .obsidian__nav-icon--caret { display: flex; }
+    &:hover .notes__nav-icon--note { display: none; }
+    &:hover .notes__nav-icon--caret { display: flex; }
   }
 
   &__nav-icon {
@@ -470,7 +470,7 @@ div#root {
 
     &--saving {
       color: var(--c--contextuals--content--semantic--neutral--tertiary);
-      .material-icons { animation: obsidian-spin 1s linear infinite; }
+      .material-icons { animation: notes-spin 1s linear infinite; }
     }
 
     &--saved {
@@ -478,7 +478,7 @@ div#root {
     }
   }
 
-  @keyframes obsidian-spin {
+  @keyframes notes-spin {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
   }
@@ -714,7 +714,7 @@ div#root {
 
 // ─── Note mention (inline chip) ──────────────────────────────────────────────
 
-.obsidian-mention {
+.notes-mention {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -765,7 +765,7 @@ div#root {
 
 // ─── Note mention suggestion dropdown ────────────────────────────────────────
 
-.obsidian-mention-list {
+.notes-mention-list {
   background: var(--c--contextuals--background--surface--primary);
   border: 1px solid var(--c--contextuals--background--semantic--neutral--secondary);
   border-radius: 0.5rem;
@@ -805,7 +805,7 @@ div#root {
 
 // ─── Note item context menu ──────────────────────────────────────────────────
 
-.obsidian__item-menu {
+.notes__item-menu {
   position: fixed;
   z-index: 9999;
   min-width: 150px;

@@ -22,6 +22,11 @@
     "react-dom": "^19.1.2",
     "tiptap-markdown": "^0.9.0"
   },
+  "pnpm": {
+    "overrides": {
+      "prosemirror-model": "1.25.8"
+    }
+  },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
