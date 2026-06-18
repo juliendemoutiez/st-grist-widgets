@@ -63,34 +63,17 @@ export function FormLayout({ config, mode, children }: FormLayoutProps) {
     prevRecordId.current = recordId;
   }, [mode, recordId, stack.length, resetToRoot]);
   useEffect(() => {
-    if (mode !== 'currentRecord' || recordId == null) return;
+    if (mode !== 'currentRecord' || recordId == null || !record) return;
 
-    (async () => {
-      try {
-        const table = await fetchTable(config.table);
-        const rowIdx = table.id.indexOf(recordId);
-        if (rowIdx === -1) return;
-
-        setTitle(
-          table[config.titleColId]?.[rowIdx] != null
-            ? String((table[config.titleColId] as unknown[])[rowIdx])
-            : '',
-        );
-        const vals: Record<string, unknown> = {};
-        for (const f of config.fields) {
-          const col = table[f.colId] as unknown[] | undefined;
-          vals[f.colId] = col?.[rowIdx] ?? null;
-        }
-        if (config.headerDateColId) {
-          const col = table[config.headerDateColId] as unknown[] | undefined;
-          vals[config.headerDateColId] = col?.[rowIdx] ?? null;
-        }
-        console.log(`[FormLayout] Field values from ${config.table}:`, vals);
-        setFields(vals);
-      } catch (err) {
-        console.warn(`[FormLayout] Failed to fetch full row from ${config.table}:`, err);
-      }
-    })();
+    setTitle(record[config.titleColId] != null ? String(record[config.titleColId]) : '');
+    const vals: Record<string, unknown> = {};
+    for (const f of config.fields) {
+      vals[f.colId] = record[f.colId] ?? null;
+    }
+    if (config.headerDateColId) {
+      vals[config.headerDateColId] = record[config.headerDateColId] ?? null;
+    }
+    setFields(vals);
   }, [recordId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
