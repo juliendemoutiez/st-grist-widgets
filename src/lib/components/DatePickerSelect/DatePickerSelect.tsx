@@ -17,7 +17,7 @@ const WEEKDAYS_FR = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 function gristTsToDate(value: number | null | undefined): Date | null {
   if (value == null || value === 0) return null;
-  return new Date(value * 1000);
+  return new Date(value > 1e10 ? value : value * 1000);
 }
 
 function formatDate(value: number | null | undefined): string {

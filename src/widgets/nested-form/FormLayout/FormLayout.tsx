@@ -64,16 +64,42 @@ export function FormLayout({ config, mode, children }: FormLayoutProps) {
   }, [mode, recordId, stack.length, resetToRoot]);
   useEffect(() => {
     if (mode !== 'currentRecord' || recordId == null || !record) return;
+    let cancelled = false;
 
     setTitle(record[config.titleColId] != null ? String(record[config.titleColId]) : '');
-    const vals: Record<string, unknown> = {};
-    for (const f of config.fields) {
-      vals[f.colId] = record[f.colId] ?? null;
-    }
-    if (config.headerDateColId) {
-      vals[config.headerDateColId] = record[config.headerDateColId] ?? null;
-    }
-    setFields(vals);
+
+    const sanitize = (v: unknown) =>
+      v == null || (typeof v === 'number' && isNaN(v)) ? null : v;
+
+    // grist.onRecord (keepEncoded:false) decodes RefList to display labels and DateTime to
+    // Date objects — neither is what our field renderers expect. fetchTable returns the raw
+    // stored values: ['L', rowId, ...] for RefList, seconds for DateTime.
+    fetchTable(config.table)
+      .then(table => {
+        if (cancelled) return;
+        const rowIdx = (table.id as number[]).indexOf(recordId);
+        if (rowIdx === -1) return;
+        const vals: Record<string, unknown> = {};
+        for (const f of config.fields) {
+          const col = table[f.colId] as unknown[] | undefined;
+          vals[f.colId] = sanitize(col?.[rowIdx] ?? null);
+        }
+        if (config.headerDateColId) {
+          const col = table[config.headerDateColId] as unknown[] | undefined;
+          vals[config.headerDateColId] = sanitize(col?.[rowIdx] ?? null);
+        }
+        setFields(vals);
+      })
+      .catch(err => {
+        if (cancelled) return;
+        console.warn('[FormLayout] fetchTable failed, falling back to onRecord data:', err);
+        const vals: Record<string, unknown> = {};
+        for (const f of config.fields) vals[f.colId] = sanitize(record[f.colId]);
+        if (config.headerDateColId) vals[config.headerDateColId] = sanitize(record[config.headerDateColId]);
+        setFields(vals);
+      });
+
+    return () => { cancelled = true; };
   }, [recordId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -264,6 +290,13 @@ export function FormLayout({ config, mode, children }: FormLayoutProps) {
       const colType = columnMeta[colId]?.type ?? '';
       const isRefList = colType.startsWith('RefList:');
 
+      if (isNaN(numId)) {
+        // Sub-form record creation failed — discard without corrupting the field.
+        setRefReloadKey((k) => k + 1);
+        clearPopResult();
+        return;
+      }
+
       let newValue: unknown;
       if (isRefList) {
         const current = fieldsRef.current[colId];
@@ -315,7 +348,7 @@ export function FormLayout({ config, mode, children }: FormLayoutProps) {
   const createdAt = useMemo(() => {
     if (config.headerDateColId) {
       const ts = fields[config.headerDateColId];
-      if (ts != null && typeof ts === 'number' && ts > 0) return new Date(ts * 1000);
+      if (ts != null && typeof ts === 'number' && ts > 0) return new Date(ts > 1e10 ? ts : ts * 1000);
     }
     return new Date();
   }, [config.headerDateColId, fields]);

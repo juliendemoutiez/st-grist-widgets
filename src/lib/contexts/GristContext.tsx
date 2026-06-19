@@ -95,6 +95,12 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
     });
     grist.onRecord((data) => {
       console.log('grist.onRecord fired:', JSON.stringify(data));
+      // Log raw values that JSON.stringify would hide (NaN → null, undefined → dropped)
+      for (const [k, v] of Object.entries(data)) {
+        if (typeof v === 'number' && (isNaN(v) || !isFinite(v))) {
+          console.warn(`[onRecord] column "${k}" has numeric anomaly:`, v);
+        }
+      }
       tableCache.current.clear();
       setRecord(data);
       setIsReady(true);
@@ -150,11 +156,10 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
 
   const createRecord = useCallback(async (tableId: string, fields: Record<string, unknown>) => {
     if (!grist) throw new Error('Grist API not available');
-    const result = await grist.docApi.applyUserActions([
-      ['AddRecord', tableId, null, fields],
-    ]);
+    const table = await grist.getTable(tableId);
+    const newId = await table.create({ fields });
     tableCache.current.delete(tableId);
-    return (result as { retValues: number[] }).retValues[0];
+    return typeof newId === 'object' && newId !== null ? (newId as { id: number }).id : newId as number;
   }, []);
 
   const updateRecord = useCallback(async (tableId: string, id: number, fields: Record<string, unknown>) => {

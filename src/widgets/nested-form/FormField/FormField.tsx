@@ -199,7 +199,8 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
   }
 
   if (refTarget) {
-    const strValue = value != null && value !== 0 ? String(value) : undefined;
+    const numValue = Number(value);
+    const strValue = value != null && value !== 0 && !Number.isNaN(numValue) ? String(value) : undefined;
     if (refLoading && strValue) {
       return <FormRow icon={icon} label={label}><span className="meta-row__skeleton" /></FormRow>;
     }

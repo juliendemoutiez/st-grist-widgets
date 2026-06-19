@@ -10,12 +10,13 @@ export function parseRefListTarget(type: string): string | null {
   return match ? match[1] : null;
 }
 
-/** Decode a Grist RefList value to a number array. Grist encodes RefList as ['L', id1, id2, ...]. */
+/** Decode a Grist RefList value to a number array. Grist encodes RefList as ['L', id1, id2, ...].
+ * grist.onRecord (keepEncoded:false) may send display labels instead of IDs — NaN entries are dropped. */
 export function decodeRefList(value: unknown): number[] {
   if (!Array.isArray(value)) return [];
   const arr = value as unknown[];
-  if (arr.length > 0 && arr[0] === 'L') return arr.slice(1).map(Number);
-  return arr.map(Number);
+  const nums = arr[0] === 'L' ? arr.slice(1).map(Number) : arr.map(Number);
+  return nums.filter(n => !isNaN(n));
 }
 
 /** Decode a Grist ChoiceList value to a string array. Grist encodes ChoiceList as ['L', 'v1', 'v2', ...]. */
@@ -26,12 +27,14 @@ export function decodeChoiceList(value: unknown): string[] {
   return arr.map(String);
 }
 
-/** Convert a Grist timestamp (seconds since epoch) to a JS Date, or null. */
+/** Convert a Grist timestamp to a JS Date, or null.
+ * grist.onRecord sends DateTime as ms; docApi.fetchTable sends seconds.
+ * Values above 1e10 are treated as ms, others as seconds. */
 export function gristTsToDate(value: unknown): Date | null {
   if (value == null || value === 0) return null;
   const ts = typeof value === 'number' ? value : Number(value);
   if (isNaN(ts)) return null;
-  return new Date(ts * 1000);
+  return new Date(ts > 1e10 ? ts : ts * 1000);
 }
 
 /** Format a Grist timestamp as a localized date+time string. */
