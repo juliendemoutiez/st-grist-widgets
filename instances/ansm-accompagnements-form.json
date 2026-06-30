@@ -1,0 +1,251 @@
+{
+  "initialScreen": "AccompagnementForm",
+  "screens": {
+    "AccompagnementForm": {
+      "mode": "currentRecord",
+      "table": "ANSM_ACCOMPAGNEMENTS",
+      "titleColId": "Reference_unique",
+      "titleDefault": "Nouvel accompagnement",
+      "titlePlaceholder": "Référence...",
+      "titleReadOnly": true,
+      "headerDateColId": "Cree_a",
+      "headerDatePrefix": "Créé",
+      "emptyMessage": "Cliquez sur un accompagnement pour afficher les détails",
+      "fields": [
+        {
+          "colId": "Statut",
+          "icon": "check_circle",
+          "label": "Statut",
+          "readOnly": true
+        },
+        {
+          "colId": "Collectivites",
+          "icon": "location_city",
+          "label": "Collectivités",
+          "refLabelCol": "Libelle_propre",
+          "refEditScreen": "CollectiviteForm",
+          "readOnly": true
+        },
+        {
+          "colId": "Type",
+          "icon": "category",
+          "label": "Type",
+          "readOnly": true
+        },
+        {
+          "colId": "Cabinet",
+          "icon": "business",
+          "label": "Cabinet",
+          "refLabelCol": "Structure",
+          "readOnly": true
+        },
+        {
+          "colId": "Experts",
+          "icon": "group",
+          "label": "Experts",
+          "refLabelCol": "Nom_complet",
+          "readOnly": true
+        },
+        {
+          "colId": "Vague",
+          "icon": "waves",
+          "label": "Vague",
+          "readOnly": true
+        },
+        {
+          "colId": "Date_de_cadrage",
+          "icon": "calendar_month",
+          "label": "Date de cadrage"
+        },
+        {
+          "colId": "Date_d_immersion",
+          "icon": "calendar_month",
+          "label": "Date d'immersion"
+        },
+        {
+          "colId": "Date_de_restitution_finale",
+          "icon": "calendar_month",
+          "label": "Date de restitution finale"
+        },
+        {
+          "colId": "Date_de_cloture",
+          "icon": "calendar_month",
+          "label": "Date de clôture"
+        },
+        {
+          "colId": "Date_de_restitution_intermediaire",
+          "icon": "calendar_month",
+          "label": "Date de restitution intermédiaire"
+        },
+        {
+          "colId": "Lien_livrable_intermediaire",
+          "icon": "link",
+          "label": "Lien livrable intermédiaire"
+        },
+        {
+          "colId": "Lien_livrable_final",
+          "icon": "link",
+          "label": "Lien livrable final"
+        },
+        {
+          "colId": "Recueil_des_infos_et_besoins",
+          "icon": "notes",
+          "label": "Recueil des infos & besoins"
+        }
+      ],
+      "sections": [
+        {
+          "type": "comment",
+          "col": "Commentaires_accompagnement",
+          "title": "Commentaires accompagnement",
+          "icon": "notes"
+        }
+      ]
+    },
+    "CollectiviteForm": {
+      "mode": "subForm",
+      "table": "Collectivites_Total",
+      "titleColId": "Collectivite",
+      "titleDefault": "Nouvelle collectivité",
+      "titlePlaceholder": "Nom de la collectivité",
+      "headerDateColId": "Cree_a",
+      "headerDatePrefix": "Créée",
+      "fields": [
+        {
+          "colId": "Collectivite",
+          "icon": "location_city",
+          "label": "Collectivité"
+        },
+        {
+          "colId": "Typologie",
+          "icon": "category",
+          "label": "Typologie"
+        },
+        {
+          "colId": "Code_INSEE",
+          "icon": "tag",
+          "label": "Code INSEE"
+        },
+        {
+          "colId": "Code_postal",
+          "icon": "markunread_mailbox",
+          "label": "Code postal"
+        },
+        {
+          "colId": "EPCI",
+          "icon": "account_balance",
+          "label": "EPCI"
+        },
+        {
+          "colId": "Departement",
+          "icon": "map",
+          "label": "Département"
+        },
+        {
+          "colId": "Region",
+          "icon": "map",
+          "label": "Région"
+        },
+        {
+          "colId": "Population",
+          "icon": "people",
+          "label": "Population"
+        },
+        {
+          "colId": "Nbre_agents",
+          "icon": "work",
+          "label": "Nombre d'agents"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_a",
+          "icon": "calendar_today",
+          "label": "Créée le",
+          "readOnly": true
+        }
+      ]
+    },
+    "ReferentForm": {
+      "mode": "subForm",
+      "table": "ANSM_REFERENTS",
+      "titleColId": "Nom_complet",
+      "titleDefault": "Nouveau référent",
+      "titlePlaceholder": "",
+      "titleReadOnly": true,
+      "headerDateColId": "Cree_a",
+      "headerDatePrefix": "Créé",
+      "fields": [
+        {
+          "colId": "Nom",
+          "icon": "person",
+          "label": "Nom",
+          "transform": "uppercase"
+        },
+        {
+          "colId": "Prenom",
+          "icon": "badge",
+          "label": "Prénom",
+          "transform": "capitalize"
+        },
+        {
+          "colId": "Email",
+          "icon": "email",
+          "label": "Email",
+          "mailto": true
+        },
+        {
+          "colId": "Telephone",
+          "icon": "phone",
+          "label": "Téléphone"
+        },
+        {
+          "colId": "Fonction",
+          "icon": "work",
+          "label": "Fonction"
+        },
+        {
+          "colId": "Role",
+          "icon": "label",
+          "label": "Rôle"
+        },
+        {
+          "colId": "Modules_Pix",
+          "icon": "school",
+          "label": "Modules Pix"
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour_par",
+          "icon": "account_circle",
+          "label": "Dernière mise à jour par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_a",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour",
+          "icon": "update",
+          "label": "Dernière mise à jour",
+          "readOnly": true
+        }
+      ]
+    }
+  }
+}

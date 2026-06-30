@@ -67,6 +67,7 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
   const [dataVersion, setDataVersion] = useState(0);
   const initRef = useRef(false);
   const tableCache = useRef(new Map<string, CacheEntry>());
+  const linkedTableId = useRef<string | null>(null);
 
   useEffect(() => {
     if (initRef.current) return;
@@ -119,8 +120,13 @@ export function GristProvider({ children, allowSelectBy }: { children: ReactNode
 
   const updateLinkedRecord = useCallback(async (id: number, fields: Record<string, unknown>) => {
     if (!grist) throw new Error('Grist API not available');
-    const table = await grist.getTable();
-    await table.update({ id, fields });
+    // Use applyUserActions instead of table.update() — the latter validates against the
+    // widget's visible column list and rejects writes to hidden columns (e.g. IsExpanded).
+    if (!linkedTableId.current) {
+      const table = await grist.getTable();
+      linkedTableId.current = await table.getTableId();
+    }
+    await grist.docApi.applyUserActions([['UpdateRecord', linkedTableId.current, id, fields]]);
     tableCache.current.clear();
   }, []);
 

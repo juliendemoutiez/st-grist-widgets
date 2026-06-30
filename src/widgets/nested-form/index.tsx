@@ -2,7 +2,7 @@ import './index.scss';
 import { useMemo } from 'react';
 import { NavigationProvider, useNavigation, useGrist, WidgetSettings } from '@grist-widgets/ui';
 import type { NestedFormWidgetConfig, JsonScreenConfig } from '@grist-widgets/ui';
-import { FormLayout } from './FormLayout/FormLayout';
+import { FormScreen } from './FormScreen/FormScreen';
 import { SectionContent } from './sections/SectionContent/SectionContent';
 
 // ── Settings ──────────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ function ScreenRenderer({ screens }: { screens: Record<string, JsonScreenConfig>
             key={`${entry.screen}-${index}`}
             style={{ display: index === stack.length - 1 ? 'block' : 'none' }}
           >
-            <FormLayout config={formConfig} mode={screen.mode}>
+            <FormScreen config={formConfig} mode={screen.mode}>
               {childSections.length > 0
                 ? (recordId) => (
                     <>
@@ -111,7 +111,7 @@ function ScreenRenderer({ screens }: { screens: Record<string, JsonScreenConfig>
                     </>
                   )
                 : undefined}
-            </FormLayout>
+            </FormScreen>
           </div>
         );
       })}

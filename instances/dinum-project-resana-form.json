@@ -1,72 +1,32 @@
 {
-  "initialScreen": "ProjetForm",
+  "initialScreen": "ProjetResanaForm",
   "screens": {
-    "ProjetForm": {
+    "ProjetResanaForm": {
       "mode": "currentRecord",
-      "table": "Projets",
+      "table": "Projets_Resana",
       "titleColId": "Nom",
-      "titleDefault": "Sans titre",
-      "titlePlaceholder": "Titre du projet",
+      "titleDefault": "Nouveau projet Resana",
+      "titlePlaceholder": "Nom du projet",
       "headerDateColId": "Cree_le",
       "headerDatePrefix": "Créé",
-      "newRecordLabel": "Nouveau projet",
       "emptyMessage": "Cliquez sur un projet pour afficher les détails",
       "fields": [
-        {
-          "colId": "Pour_qui_",
-          "icon": "group",
-          "label": "Pour qui"
-        },
         {
           "colId": "Statut",
           "icon": "flag",
           "label": "Statut"
         },
         {
-          "colId": "Priorite",
-          "icon": "priority_high",
-          "label": "Priorité"
+          "colId": "Statut_Resana",
+          "icon": "check_circle",
+          "label": "Statut Resana",
+          "readOnly": true
         },
         {
-          "colId": "Lien_CR",
-          "icon": "link",
-          "label": "Lien CR"
-        },
-        {
-          "colId": "Effectifs",
-          "icon": "people",
-          "label": "Effectifs"
-        },
-        {
-          "colId": "Solutions_actuelles",
-          "icon": "inventory_2",
-          "label": "Solutions actuelles"
-        },
-        {
-          "colId": "Interet_pour_La_Suite",
-          "icon": "favorite",
-          "label": "Intérêt pour La Suite"
-        },
-        {
-          "colId": "Besoin",
-          "icon": "build",
-          "label": "Besoin"
-        },
-        {
-          "colId": "Sentiment_envers_LaSuite",
-          "icon": "sentiment_satisfied",
-          "label": "Sentiment envers La Suite"
-        },
-        {
-          "colId": "Echeance_contrat",
-          "icon": "calendar_month",
-          "label": "Echéance contrat"
-        },
-        {
-          "colId": "Lead",
-          "icon": "person",
-          "label": "Lead",
-          "avatar": true
+          "colId": "Type_de_communication",
+          "icon": "campaign",
+          "label": "Type de communication",
+          "readOnly": true
         },
         {
           "colId": "Organisation",
@@ -77,9 +37,48 @@
           "refEditScreen": "OrgForm"
         },
         {
-          "colId": "usage",
-          "icon": "percent",
-          "label": "% usage",
+          "colId": "Decideur",
+          "icon": "person",
+          "label": "Décideur",
+          "refLabelCol": "Nom_Complet",
+          "addLabel": "Ajouter un contact",
+          "refAddScreen": "ContactForm",
+          "refEditScreen": "ContactForm"
+        },
+        {
+          "colId": "Chef_de_projet",
+          "icon": "manage_accounts",
+          "label": "Chef de projet",
+          "refLabelCol": "Nom_Complet",
+          "addLabel": "Ajouter un contact",
+          "refAddScreen": "ContactForm",
+          "refEditScreen": "ContactForm"
+        },
+        {
+          "colId": "Cible_de_migration",
+          "icon": "calendar_month",
+          "label": "Cible de migration"
+        },
+        {
+          "colId": "Nombre_d_espaces",
+          "icon": "workspaces",
+          "label": "Nombre d'espaces"
+        },
+        {
+          "colId": "Nombre_d_utilisateurs",
+          "icon": "people",
+          "label": "Nombre d'utilisateurs"
+        },
+        {
+          "colId": "Date_de_derniere_interaction",
+          "icon": "history",
+          "label": "Dernière interaction",
+          "readOnly": true
+        },
+        {
+          "colId": "Date_de_prochaine_interaction",
+          "icon": "event",
+          "label": "Prochaine interaction",
           "readOnly": true
         },
         {
@@ -113,21 +112,21 @@
         {
           "type": "timeline",
           "table": "Interactions",
-          "filterCol": "Projets",
+          "filterCol": "Projets_Resana",
           "refType": "RefList",
           "dateCol": "Date",
           "typeCol": "Type",
           "detailCol": "Prochaine_etape",
-          "addScreen": "InteractionForm",
+          "addScreen": "InteractionResanaForm",
           "addDateCol": "Date",
-          "editScreen": "InteractionForm",
+          "editScreen": "InteractionResanaForm",
           "title": "Interactions",
           "icon": "chat",
           "emptyMessage": "Aucune interaction"
         }
       ]
     },
-    "InteractionForm": {
+    "InteractionResanaForm": {
       "mode": "subForm",
       "table": "Interactions",
       "titleColId": "Titre",
@@ -143,9 +142,9 @@
           "label": "Date"
         },
         {
-          "colId": "Projets",
+          "colId": "Projets_Resana",
           "icon": "folder",
-          "label": "Projet",
+          "label": "Projet Resana",
           "readOnly": true,
           "refLabelCol": "Nom"
         },

@@ -15,6 +15,8 @@ interface TodoNavProps {
   projetColorMap: Map<string, ProjetColor>;
   navCounts: Record<string, number>;
   onDrop: (target: DragTarget) => void;
+  projectSort: 'alpha' | 'count';
+  onProjectSort: (s: 'alpha' | 'count') => void;
 }
 
 export function TodoNav({
@@ -30,6 +32,8 @@ export function TodoNav({
   projetColorMap,
   navCounts,
   onDrop,
+  projectSort,
+  onProjectSort,
 }: TodoNavProps) {
   const isSectionActive = (key: SectionKey) =>
     activeFilter.type === 'section' && activeFilter.key === key;
@@ -76,7 +80,18 @@ export function TodoNav({
 
       {projetEntries.length > 0 && (
         <>
-          <span className="todo-widget__nav-label">Mes projets</span>
+          <span className="todo-widget__nav-label">
+            Mes projets
+            <button
+              className="todo-widget__nav-sort-btn"
+              title={projectSort === 'alpha' ? 'Trier par nombre de tâches' : 'Trier alphabétiquement'}
+              onClick={() => onProjectSort(projectSort === 'alpha' ? 'count' : 'alpha')}
+            >
+              <span className="material-icons">
+                {projectSort === 'alpha' ? 'sort_by_alpha' : 'filter_list'}
+              </span>
+            </button>
+          </span>
           {projetEntries.map((name) => {
             const color = projetColorMap.get(name);
             return (

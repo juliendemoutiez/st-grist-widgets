@@ -117,10 +117,14 @@ export function TodoWidget() {
   const [sortMode, setSortMode] = useState<'manual' | 'priority' | 'name'>(() => {
     return (localStorage.getItem('todo-sort-mode') as 'manual' | 'priority' | 'name') ?? 'manual';
   });
+  const [projectSort, setProjectSort] = useState<'alpha' | 'count'>(() => {
+    return (localStorage.getItem('todo-project-sort') as 'alpha' | 'count') ?? 'alpha';
+  });
 
   useEffect(() => { localStorage.setItem('todo-show-done', String(showDone)); }, [showDone]);
   useEffect(() => { localStorage.setItem('todo-show-done-project', String(showDoneProject)); }, [showDoneProject]);
   useEffect(() => { localStorage.setItem('todo-sort-mode', sortMode); }, [sortMode]);
+  useEffect(() => { localStorage.setItem('todo-project-sort', projectSort); }, [projectSort]);
 
   const headerMenuWrapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -335,10 +339,13 @@ export function TodoWidget() {
     [records],
   );
 
-  const projetEntries = useMemo(
-    () => projetChoices.filter((name) => usedProjets.has(name)).sort((a, b) => a.localeCompare(b, 'fr')),
-    [projetChoices, usedProjets],
-  );
+  const projetEntries = useMemo(() => {
+    const filtered = projetChoices.filter((name) => usedProjets.has(name));
+    if (projectSort === 'count') {
+      return [...filtered].sort((a, b) => (navCounts[`project:${b}`] ?? 0) - (navCounts[`project:${a}`] ?? 0));
+    }
+    return [...filtered].sort((a, b) => a.localeCompare(b, 'fr'));
+  }, [projetChoices, usedProjets, projectSort, navCounts]);
 
   const activeLabel =
     activeFilter.type === 'section'
@@ -419,6 +426,8 @@ export function TodoWidget() {
         projetColorMap={projetColorMap}
         navCounts={navCounts}
         onDrop={handleDrop}
+        projectSort={projectSort}
+        onProjectSort={setProjectSort}
       />
 
       <div className="todo-widget__main" onClick={() => { setSelectedId(null); setSelectedRows([]); }}>

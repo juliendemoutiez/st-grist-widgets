@@ -144,6 +144,24 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     ];
     const strValue = value != null && value !== '' ? String(value) : undefined;
 
+    if (readOnly) {
+      const opt = allOptions.find(o => o.value === strValue);
+      return (
+        <FormRow icon={icon} label={label}>
+          <span className="meta-row__value-static">
+            {strValue ? (
+              <span
+                className="picker-select__relation-chip"
+                style={opt?.fillColor ? { backgroundColor: opt.fillColor, color: opt.textColor } : undefined}
+              >
+                {opt?.label ?? strValue}
+              </span>
+            ) : '—'}
+          </span>
+        </FormRow>
+      );
+    }
+
     const handleCreateChoice = onCreateChoice
       ? (newLabel: string) => {
           const color = randomChoiceColor();
@@ -175,6 +193,30 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       ...extraChoices.filter((e) => !baseOptions.some((o) => o.value === e.value)),
     ];
     const arrValue = decodeChoiceList(value);
+
+    if (readOnly) {
+      return (
+        <FormRow icon={icon} label={label}>
+          <span className="meta-row__value-static">
+            {arrValue.length === 0
+              ? '—'
+              : arrValue.map((v) => {
+                  const opt = allOptions.find(o => o.value === v);
+                  return (
+                    <span
+                      key={v}
+                      className="picker-select__relation-chip"
+                      style={opt?.fillColor ? { backgroundColor: opt.fillColor, color: opt.textColor } : undefined}
+                    >
+                      {opt?.label ?? v}
+                    </span>
+                  );
+                })
+            }
+          </span>
+        </FormRow>
+      );
+    }
 
     const handleCreate = onCreateChoice
       ? (newLabel: string) => {
@@ -209,14 +251,16 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       const chipLabel = opt?.label ?? '\u2014';
       return (
         <FormRow icon={icon} label={label}>
-          {strValue ? (
-            <span className="picker-select__relation-chip">
-              {onClickSelected && (
-                <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(strValue, opt?.label ?? '')}>link</span>
-              )}
-              {chipLabel}
-            </span>
-          ) : <span className="meta-row__value-static">{'\u2014'}</span>}
+          <span className="meta-row__value-static">
+            {strValue ? (
+              <span className="picker-select__relation-chip">
+                {onClickSelected && (
+                  <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(strValue, opt?.label ?? '')}>link</span>
+                )}
+                {chipLabel}
+              </span>
+            ) : '\u2014'}
+          </span>
         </FormRow>
       );
     }
@@ -251,20 +295,22 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     if (readOnly) {
       return (
         <FormRow icon={icon} label={label}>
-          {arrValue.length === 0
-            ? <span className="meta-row__value-static">{'\u2014'}</span>
-            : arrValue.map((v) => {
-                const opt = refOptions.find(o => o.value === v);
-                return (
-                  <span key={v} className="picker-select__relation-chip">
-                    {onClickSelected && (
-                      <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(v, opt?.label ?? '')}>link</span>
-                    )}
-                    {opt?.label ?? '\u2014'}
-                  </span>
-                );
-              })
-          }
+          <span className="meta-row__value-static">
+            {arrValue.length === 0
+              ? '\u2014'
+              : arrValue.map((v) => {
+                  const opt = refOptions.find(o => o.value === v);
+                  return (
+                    <span key={v} className="picker-select__relation-chip">
+                      {onClickSelected && (
+                        <span className="material-icons picker-select__relation-link" onClick={() => onClickSelected(v, opt?.label ?? '')}>link</span>
+                      )}
+                      {opt?.label ?? '\u2014'}
+                    </span>
+                  );
+                })
+            }
+          </span>
         </FormRow>
       );
     }
@@ -290,6 +336,13 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
 
   if (type === 'Int' || type === 'Numeric') {
     const numValue = value != null && value !== 0 ? Number(value) : '';
+    if (readOnly) {
+      return (
+        <FormRow icon={icon} label={label}>
+          <span className="meta-row__value-static">{numValue !== '' ? String(numValue) : '—'}</span>
+        </FormRow>
+      );
+    }
     return (
       <FormRow icon={icon} label={label}>
         <input
@@ -356,6 +409,23 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
             onChange(v ? fromDateTimeLocal(v) : null);
           }}
         />
+      </FormRow>
+    );
+  }
+
+  if (type === 'Bool') {
+    const boolValue = Boolean(value);
+    return (
+      <FormRow icon={icon} label={label}>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={boolValue}
+          className={`form-toggle${boolValue ? ' form-toggle--on' : ''}${readOnly ? ' form-toggle--readonly' : ''}`}
+          onClick={() => { if (!readOnly) { onChange(!boolValue); onBlur?.(); } }}
+        >
+          <span className="form-toggle__thumb" />
+        </button>
       </FormRow>
     );
   }

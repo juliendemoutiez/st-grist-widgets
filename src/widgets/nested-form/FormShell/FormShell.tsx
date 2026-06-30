@@ -1,8 +1,8 @@
-import './FormWrapper.scss';
+import './FormShell.scss';
 import { type ReactNode, useRef, useEffect } from 'react';
 import { useNavigation } from '@grist-widgets/ui';
 
-interface FormWrapperProps {
+interface FormShellProps {
   title: string;
   onTitleChange?: (value: string) => void;
   onTitleBlur?: () => void;
@@ -13,7 +13,7 @@ interface FormWrapperProps {
   children: ReactNode;
 }
 
-export function FormWrapper({ title, onTitleChange, onTitleBlur, titleDefault, titlePlaceholder, headerRight, onBack, children }: FormWrapperProps) {
+export function FormShell({ title, onTitleChange, onTitleBlur, titleDefault, titlePlaceholder, headerRight, onBack, children }: FormShellProps) {
   const { stack, pop } = useNavigation();
   const showBack = stack.length > 1;
   const editableRef = useRef<HTMLSpanElement>(null);
