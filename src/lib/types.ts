@@ -13,6 +13,7 @@ export interface FieldDef {
   label: string;
   addLabel?: string;
   readOnly?: boolean;
+  required?: boolean;
   avatar?: boolean;
   /** Text transform applied on blur: 'uppercase' or 'capitalize' (first letter of each word). */
   transform?: 'uppercase' | 'capitalize';
@@ -97,6 +98,8 @@ export interface JsonScreenConfig {
   titleDefault: string;
   titlePlaceholder: string;
   titleReadOnly?: boolean;
+  /** Prepended to the formatted titleColId date value, e.g. "Interaction du ". */
+  titlePrefix?: string;
   headerDateColId?: string;
   headerDatePrefix?: string;
   newRecordLabel?: string;

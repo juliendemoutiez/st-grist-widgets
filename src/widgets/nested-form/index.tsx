@@ -85,6 +85,7 @@ function ScreenRenderer({ screens }: { screens: Record<string, JsonScreenConfig>
           titleDefault: screen.titleDefault,
           titlePlaceholder: screen.titlePlaceholder,
           titleReadOnly: screen.titleReadOnly,
+          titlePrefix: screen.titlePrefix,
           headerDateColId: screen.headerDateColId,
           headerDatePrefix: screen.headerDatePrefix,
           newRecordLabel: screen.newRecordLabel,

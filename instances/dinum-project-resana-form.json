@@ -19,14 +19,12 @@
         {
           "colId": "Statut_Resana",
           "icon": "check_circle",
-          "label": "Statut Resana",
-          "readOnly": true
+          "label": "Statut Resana"
         },
         {
           "colId": "Type_de_communication",
           "icon": "campaign",
-          "label": "Type de communication",
-          "readOnly": true
+          "label": "Type de communication"
         },
         {
           "colId": "Organisation",
@@ -113,7 +111,7 @@
           "type": "timeline",
           "table": "Interactions",
           "filterCol": "Projets_Resana",
-          "refType": "RefList",
+          "refType": "Ref",
           "dateCol": "Date",
           "typeCol": "Type",
           "detailCol": "Prochaine_etape",
@@ -129,17 +127,19 @@
     "InteractionResanaForm": {
       "mode": "subForm",
       "table": "Interactions",
-      "titleColId": "Titre",
-      "titleDefault": "Nouvelle interaction",
+      "titleColId": "Date",
+      "titleDefault": "Interaction",
       "titlePlaceholder": "",
       "titleReadOnly": true,
+      "titlePrefix": "Interaction du ",
       "headerDateColId": "Cree_le",
       "headerDatePrefix": "Créé",
       "fields": [
         {
           "colId": "Date",
           "icon": "event",
-          "label": "Date"
+          "label": "Date",
+          "required": true
         },
         {
           "colId": "Projets_Resana",

@@ -130,17 +130,19 @@
     "InteractionForm": {
       "mode": "subForm",
       "table": "Interactions",
-      "titleColId": "Titre",
-      "titleDefault": "Nouvelle interaction",
+      "titleColId": "Date",
+      "titleDefault": "Interaction",
       "titlePlaceholder": "",
       "titleReadOnly": true,
+      "titlePrefix": "Interaction du ",
       "headerDateColId": "Cree_le",
       "headerDatePrefix": "Créé",
       "fields": [
         {
           "colId": "Date",
           "icon": "event",
-          "label": "Date"
+          "label": "Date",
+          "required": true
         },
         {
           "colId": "Projets",
@@ -152,14 +154,12 @@
         {
           "colId": "Type",
           "icon": "label",
-          "label": "Type",
-          "readOnly": true
+          "label": "Type"
         },
         {
           "colId": "Produits",
           "icon": "inventory_2",
-          "label": "Produits",
-          "readOnly": true
+          "label": "Produits"
         },
         {
           "colId": "Contacts",

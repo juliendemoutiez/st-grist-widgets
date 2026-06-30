@@ -23,6 +23,7 @@ export interface UseFormDataReturn {
   recordId: number | null;
   headerDate: string;
   columnMeta: Record<string, ColumnMeta>;
+  invalidFields: Set<string>;
   onTitleChange: ((v: string) => void) | undefined;
   onTitleBlur: (() => void) | undefined;
   onFieldChange: (colId: string, value: unknown) => void;
@@ -43,6 +44,7 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
   const [title, setTitle] = useState('');
   const [fields, setFields] = useState<Record<string, unknown>>({});
   const [refReloadKey, setRefReloadKey] = useState(0);
+  const [invalidFields, setInvalidFields] = useState<Set<string>>(new Set());
 
   const titleRef = useRef(title);
   titleRef.current = title;
@@ -187,11 +189,22 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Title formula ────────────────────────────────────────────────────────────
+  // ── Title formula / prefix ───────────────────────────────────────────────────
 
   useEffect(() => {
     if (config.titleFormula) setTitle(config.titleFormula(fields));
   }, [fields, config.titleFormula]);
+
+  useEffect(() => {
+    if (!config.titlePrefix) return;
+    const val = fields[config.titleColId];
+    if (typeof val === 'number' && val > 0) {
+      const formatted = new Date(val * 1000).toLocaleDateString('fr-FR', {
+        day: 'numeric', month: 'long', year: 'numeric',
+      });
+      setTitle(config.titlePrefix + formatted);
+    }
+  }, [fields, config.titlePrefix, config.titleColId]);
 
   const refreshTitle = useCallback(async (rowId: number) => {
     if (!config.titleReadOnly || config.titleFormula) return;
@@ -245,6 +258,21 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
   }, [mode, updateCurrentRecord, updateRecord, config.table, config.titleColId, config.titleDefault, config.titleReadOnly, subFormStatus]);
 
   const handleSubFormBack = useCallback(async () => {
+    const invalid = new Set(
+      config.fields
+        .filter(f => f.required && !f.readOnly)
+        .filter(f => {
+          const v = fieldsRef.current[f.colId];
+          return v == null || v === 0 || v === '' ||
+            (Array.isArray(v) && v.length <= 1);
+        })
+        .map(f => f.colId),
+    );
+    if (invalid.size > 0) {
+      setInvalidFields(invalid);
+      return;
+    }
+
     const label = titleRef.current.trim() || config.titleDefault;
 
     if (subFormRecordId.current != null) {
@@ -272,6 +300,12 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
     dirtyFields.current.add(colId);
     fieldsRef.current[colId] = value;
     setFields((prev) => ({ ...prev, [colId]: value }));
+    setInvalidFields((prev) => {
+      if (!prev.has(colId)) return prev;
+      const next = new Set(prev);
+      next.delete(colId);
+      return next;
+    });
   }, []);
 
   // ── Return from ref sub-form ─────────────────────────────────────────────────
@@ -380,6 +414,7 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
     recordId,
     headerDate,
     columnMeta,
+    invalidFields,
     onTitleChange: config.titleReadOnly ? undefined : (v: string) => setTitle(v),
     onTitleBlur: config.titleReadOnly ? undefined : saveTitle,
     onFieldChange: handleFieldChange,

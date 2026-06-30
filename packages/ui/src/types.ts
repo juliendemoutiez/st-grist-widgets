@@ -13,6 +13,7 @@ export interface FieldDef {
   label: string;
   addLabel?: string;
   readOnly?: boolean;
+  required?: boolean;
   avatar?: boolean;
   /** Text transform applied on blur: 'uppercase' or 'capitalize' (first letter of each word). */
   transform?: 'uppercase' | 'capitalize';
@@ -70,6 +71,8 @@ export interface FormConfig {
   titlePlaceholder: string;
   /** When true, the title is displayed but not editable (e.g. for computed columns). */
   titleReadOnly?: boolean;
+  /** Prepended to the formatted titleColId date value, e.g. "Interaction du ". */
+  titlePrefix?: string;
   /**
    * Optional function to compute the displayed title from the current field values.
    * When provided, overrides titleColId for display purposes.

@@ -31,6 +31,8 @@ export function TimelineSection({ config, filterId }: TimelineProps) {
   const [items, setItems] = useState<TimelineItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
+  // Detected at runtime from actual data; falls back to config.refType on first render.
+  const detectedIsRefList = useRef(config.refType === 'RefList');
 
   const prevStackLen = useRef(stack.length);
   useEffect(() => {
@@ -46,7 +48,23 @@ export function TimelineSection({ config, filterId }: TimelineProps) {
       try {
         const table = await fetchTable(config.table);
         const ids = table.id as number[];
-        const filterVals = table[config.filterCol] as unknown[];
+        const filterVals = table[config.filterCol] as unknown[] | undefined;
+
+        if (!filterVals) {
+          console.warn(
+            `[Timeline] Column "${config.filterCol}" not found in table "${config.table}".`,
+            'Available columns:', Object.keys(table).join(', '),
+          );
+          if (!cancelled) setItems([]);
+          return;
+        }
+
+        // Detect actual column format from the first non-empty value.
+        const sample = filterVals.find(v => v !== 0 && v !== null && v !== undefined);
+        if (sample !== undefined) {
+          detectedIsRefList.current = Array.isArray(sample) && (sample as unknown[])[0] === 'L';
+        }
+
         const dates = table[config.dateCol] as unknown[];
         const types = table[config.typeCol] as unknown[];
         const details = config.detailCol ? table[config.detailCol] as unknown[] : null;
@@ -54,10 +72,9 @@ export function TimelineSection({ config, filterId }: TimelineProps) {
         const matched: TimelineItem[] = [];
         for (let i = 0; i < ids.length; i++) {
           const ref = filterVals[i];
-          const matches =
-            config.refType === 'RefList'
-              ? Array.isArray(ref) && ref[0] === 'L' && ref.includes(filterId)
-              : ref === filterId;
+          const matches = detectedIsRefList.current
+            ? Array.isArray(ref) && (ref as unknown[])[0] === 'L' && (ref as unknown[]).includes(filterId)
+            : ref === filterId;
 
           if (!matches) continue;
 
@@ -105,8 +122,7 @@ export function TimelineSection({ config, filterId }: TimelineProps) {
 
   const handleAdd = () => {
     const initialFields: Record<string, unknown> = {
-      [config.filterCol]:
-        config.refType === 'RefList' ? ['L', filterId] : filterId,
+      [config.filterCol]: detectedIsRefList.current ? ['L', filterId] : filterId,
     };
     if (config.addDateCol) {
       const now = new Date();
