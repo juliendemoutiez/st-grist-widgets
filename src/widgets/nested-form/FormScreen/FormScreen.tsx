@@ -16,7 +16,7 @@ interface FormScreenProps {
 export function FormScreen({ config, mode, children }: FormScreenProps) {
   const { updateColumnWidgetOptions } = useGrist();
   const {
-    title, fields, refReloadKey, recordId, headerDate, columnMeta, invalidFields,
+    title, fields, refReloadKey, recordId, headerDate, columnMeta,
     onTitleChange, onTitleBlur, onFieldChange, onFieldBlur,
     onBack, onNewRecord, onRefAdd, onRefEdit,
   } = useFormData(config, mode);
@@ -80,7 +80,7 @@ export function FormScreen({ config, mode, children }: FormScreenProps) {
               onClickSelected={f.refEditScreen ? (v, label) => onRefEdit(f.colId, f.refEditScreen!, v, label) : undefined}
               refReloadTrigger={refReloadKey}
               readOnly={f.readOnly}
-              hasError={invalidFields.has(f.colId)}
+              required={f.required}
               avatar={f.avatar}
               transform={f.transform}
               refLabelCol={f.refLabelCol}

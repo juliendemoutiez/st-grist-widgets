@@ -23,8 +23,7 @@ interface FormFieldProps {
   refReloadTrigger?: number;
   /** When true, render as read-only static display */
   readOnly?: boolean;
-  /** When true, highlight the field as invalid */
-  hasError?: boolean;
+  required?: boolean;
   /** Show a letter avatar before read-only text value */
   avatar?: boolean;
   /** Text transform applied on blur: 'uppercase' or 'capitalize' */
@@ -37,9 +36,9 @@ interface FormFieldProps {
   onCreateChoice?: (label: string, color?: { fillColor: string; textColor: string }) => Promise<void>;
 }
 
-export function FormRow({ icon, label, children, hasError }: { icon: string; label: string; children: React.ReactNode; hasError?: boolean }) {
+export function FormRow({ icon, label, children }: { icon: string; label: string; children: React.ReactNode }) {
   return (
-    <div className={`meta-row${hasError ? ' meta-row--error' : ''}`}>
+    <div className="meta-row">
       <div className="meta-row__label">
         <span className="material-icons">{icon}</span>
         <span>{label}</span>
@@ -129,7 +128,7 @@ function useRefOptions(targetTable: string | null, reloadTrigger?: number, label
 }
 
 
-export function FormField({ colId: _colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, hasError, avatar, transform, refLabelCol, mailto, onCreateChoice }: FormFieldProps) {
+export function FormField({ colId: _colId, icon, label, value, onChange, onBlur, columnMeta, addLabel, onAdd, onClickSelected, refReloadTrigger, readOnly, required, avatar, transform, refLabelCol, mailto, onCreateChoice }: FormFieldProps) {
   const rawType = columnMeta?.type ?? 'Text';
   const type = rawType.startsWith('DateTime') ? 'DateTime' : rawType;
   const refTarget = parseRefTarget(type);
@@ -149,7 +148,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     if (readOnly) {
       const opt = allOptions.find(o => o.value === strValue);
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">
             {strValue ? (
               <span
@@ -175,7 +174,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       : undefined;
 
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <PickerSelect
           options={allOptions}
           value={strValue}
@@ -198,7 +197,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
 
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">
             {arrValue.length === 0
               ? '—'
@@ -230,7 +229,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       : undefined;
 
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <PickerSelect
           mode="multi"
           options={allOptions}
@@ -246,13 +245,13 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     const numValue = Number(value);
     const strValue = value != null && value !== 0 && !Number.isNaN(numValue) ? String(value) : undefined;
     if (refLoading && strValue) {
-      return <FormRow icon={icon} label={label} hasError={hasError}><span className="meta-row__skeleton" /></FormRow>;
+      return <FormRow icon={icon} label={label}><span className="meta-row__skeleton" /></FormRow>;
     }
     if (readOnly) {
       const opt = refOptions.find(o => o.value === strValue);
       const chipLabel = opt?.label ?? '\u2014';
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">
             {strValue ? (
               <span className="picker-select__relation-chip">
@@ -267,7 +266,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       );
     }
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <PickerSelect
           options={refOptions}
           value={strValue}
@@ -289,14 +288,14 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     const arrValue = decodeRefList(value).map(String);
     if (refLoading && arrValue.length > 0) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           {arrValue.map((_, i) => <span key={i} className="meta-row__skeleton" />)}
         </FormRow>
       );
     }
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">
             {arrValue.length === 0
               ? '\u2014'
@@ -317,7 +316,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
       );
     }
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <PickerSelect
           mode="multi"
           options={refOptions}
@@ -340,13 +339,13 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     const numValue = value != null && value !== 0 ? Number(value) : '';
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">{numValue !== '' ? String(numValue) : '—'}</span>
         </FormRow>
       );
     }
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <input
           type="number"
           className="meta-row__input"
@@ -372,17 +371,18 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
   if (type === 'Date') {
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">{formatDate(value)}</span>
         </FormRow>
       );
     }
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <DatePickerSelect
           value={value as number | null}
           onChange={(v) => { onChange(v); onBlur?.(); }}
           placeholder={label}
+          required={required}
         />
       </FormRow>
     );
@@ -391,13 +391,13 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
   if (type === 'DateTime') {
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <span className="meta-row__value-static">{formatDateTime(value)}</span>
         </FormRow>
       );
     }
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <input
           type="datetime-local"
           className="meta-row__input"
@@ -418,7 +418,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
   if (type === 'Bool') {
     const boolValue = Boolean(value);
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <button
           type="button"
           role="switch"
@@ -440,7 +440,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
 
     if (readOnly) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           {parsed
             ? <a href={parsed.url} target="_blank" rel="noopener noreferrer" className="meta-row__hl-chip">{displayText}</a>
             : <span className="meta-row__value-static">{'\u2014'}</span>
@@ -453,7 +453,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
 
     if (parsed && !hlEditing) {
       return (
-        <FormRow icon={icon} label={label} hasError={hasError}>
+        <FormRow icon={icon} label={label}>
           <div className="meta-row__link-wrap">
             <a href={parsed.url} target="_blank" rel="noopener noreferrer" className="meta-row__hl-chip">{displayText}</a>
             <button type="button" className="meta-row__hl-edit" onClick={() => setHlEditing(true)} title="Modifier">
@@ -465,7 +465,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     }
 
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <input
           type="text"
           className="meta-row__input"
@@ -485,7 +485,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
   if (readOnly) {
     const display = value != null && value !== '' ? String(value) : '\u2014';
     return (
-      <FormRow icon={icon} label={label} hasError={hasError}>
+      <FormRow icon={icon} label={label}>
         <span className="meta-row__value-static">
           {avatar && display !== '\u2014' && <UserAvatar fullName={display} size="xsmall" />}
           {display}
@@ -524,7 +524,7 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     </span>
   );
   return (
-    <FormRow icon={icon} label={label} hasError={hasError}>
+    <FormRow icon={icon} label={label}>
       {mailto ? (
         <div className="meta-row__link-wrap">
           {input}

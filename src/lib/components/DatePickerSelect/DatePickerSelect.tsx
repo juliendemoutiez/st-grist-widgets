@@ -6,6 +6,7 @@ interface DatePickerSelectProps {
   value: number | null | undefined;
   onChange: (value: number | null) => void;
   placeholder?: string;
+  required?: boolean;
 }
 
 const MONTHS_FR = [
@@ -45,7 +46,7 @@ function getCalendarDays(year: number, month: number): (Date | null)[] {
   return days;
 }
 
-export function DatePickerSelect({ value, onChange, placeholder = 'Choisir une date...' }: DatePickerSelectProps) {
+export function DatePickerSelect({ value, onChange, placeholder = 'Choisir une date...', required }: DatePickerSelectProps) {
   const [open, setOpen] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<CSSProperties>({ position: 'fixed', visibility: 'hidden' });
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -125,15 +126,17 @@ export function DatePickerSelect({ value, onChange, placeholder = 'Choisir une d
         {displayText || placeholder}
       </button>
 
-      <button
-        type="button"
-        className="meta-row__hl-edit"
-        title="Effacer"
-        style={hasValue ? undefined : { visibility: 'hidden' }}
-        onClick={() => onChange(null)}
-      >
-        <span className="material-icons">close</span>
-      </button>
+      {!required && (
+        <button
+          type="button"
+          className="meta-row__hl-edit"
+          title="Effacer"
+          style={hasValue ? undefined : { visibility: 'hidden' }}
+          onClick={() => onChange(null)}
+        >
+          <span className="material-icons">close</span>
+        </button>
+      )}
 
       {open && createPortal(
         <div className="date-picker-select__dropdown" ref={dropdownRef} style={dropdownStyle}>
@@ -178,7 +181,7 @@ export function DatePickerSelect({ value, onChange, placeholder = 'Choisir une d
             })}
           </div>
 
-          {hasValue && (
+          {hasValue && !required && (
             <button
               type="button"
               className="date-picker-select__clear"
