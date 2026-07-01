@@ -13,6 +13,24 @@ interface FormScreenProps {
   children?: (recordId: number) => ReactNode;
 }
 
+const ALERT_TYPES = ['warning', 'error', 'info'] as const;
+type AlertType = typeof ALERT_TYPES[number];
+
+/**
+ * Alert column values may prefix their message with a type, e.g. "error:: Un projet existe déjà...".
+ * Falls back to "warning" when no recognized prefix is present, so plain-text alerts keep working.
+ */
+function parseAlert(raw: string): { type: AlertType; message: string } {
+  const idx = raw.indexOf('::');
+  if (idx !== -1) {
+    const prefix = raw.slice(0, idx).trim().toLowerCase();
+    if ((ALERT_TYPES as readonly string[]).includes(prefix)) {
+      return { type: prefix as AlertType, message: raw.slice(idx + 2).trim() };
+    }
+  }
+  return { type: 'warning', message: raw };
+}
+
 export function FormScreen({ config, mode, children }: FormScreenProps) {
   const { updateColumnWidgetOptions } = useGrist();
   const {
@@ -20,6 +38,9 @@ export function FormScreen({ config, mode, children }: FormScreenProps) {
     onTitleChange, onTitleBlur, onFieldChange, onFieldBlur,
     onBack, onNewRecord, onRefAdd, onRefEdit,
   } = useFormData(config, mode);
+
+  const alertValue = config.alertColId ? fields[config.alertColId] : null;
+  const alert = alertValue ? parseAlert(String(alertValue)) : null;
 
   const newRecordButton = onNewRecord && (
     <button type="button" className="new-record-btn" onClick={onNewRecord}>
@@ -52,6 +73,11 @@ export function FormScreen({ config, mode, children }: FormScreenProps) {
         headerRight={headerDate}
         onBack={onBack}
       >
+        {alert && (
+          <div className={`form-alert-banner form-alert-banner--${alert.type}`}>
+            <span>{alert.message}</span>
+          </div>
+        )}
         <div className="meta-section">
           {config.fields.map((f) => (
             <FormField

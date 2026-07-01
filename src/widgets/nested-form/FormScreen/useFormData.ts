@@ -106,6 +106,10 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
           const col = table[config.headerDateColId] as unknown[] | undefined;
           vals[config.headerDateColId] = sanitize(col?.[rowIdx] ?? null);
         }
+        if (config.alertColId) {
+          const col = table[config.alertColId] as unknown[] | undefined;
+          vals[config.alertColId] = sanitize(col?.[rowIdx] ?? null);
+        }
         setFields(vals);
       })
       .catch(err => {
@@ -114,6 +118,7 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
         const vals: Record<string, unknown> = {};
         for (const f of config.fields) vals[f.colId] = sanitize(record[f.colId]);
         if (config.headerDateColId) vals[config.headerDateColId] = sanitize(record[config.headerDateColId]);
+        if (config.alertColId) vals[config.alertColId] = sanitize(record[config.alertColId]);
         setFields(vals);
       });
 
@@ -145,6 +150,10 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
               const col = table[config.headerDateColId] as unknown[] | undefined;
               vals[config.headerDateColId] = col?.[rowIdx] ?? null;
             }
+            if (config.alertColId) {
+              const col = table[config.alertColId] as unknown[] | undefined;
+              vals[config.alertColId] = col?.[rowIdx] ?? null;
+            }
             setFields(vals);
           }
         } catch (err) {
@@ -172,6 +181,10 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
               for (const f of config.fields) {
                 const col = table[f.colId] as unknown[] | undefined;
                 vals[f.colId] = col?.[rowIdx] ?? null;
+              }
+              if (config.alertColId) {
+                const col = table[config.alertColId] as unknown[] | undefined;
+                vals[config.alertColId] = col?.[rowIdx] ?? null;
               }
               setFields(vals);
             }

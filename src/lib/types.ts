@@ -102,6 +102,12 @@ export interface JsonScreenConfig {
   titlePrefix?: string;
   headerDateColId?: string;
   headerDatePrefix?: string;
+  /**
+   * Column whose truthy value triggers a banner at the top of the form, showing that value as text.
+   * Prefix the value with a type and "::" to control severity, e.g. "error:: Ce champ est invalide".
+   * Recognized types: 'warning' (default), 'error', 'info'.
+   */
+  alertColId?: string;
   newRecordLabel?: string;
   emptyMessage?: string;
   sections?: SectionConfig[];
@@ -122,6 +128,8 @@ export interface FormConfig {
   titlePlaceholder: string;
   /** When true, the title is displayed but not editable (e.g. for computed columns). */
   titleReadOnly?: boolean;
+  /** Prepended to the formatted titleColId date value, e.g. "Interaction du ". */
+  titlePrefix?: string;
   /**
    * Optional function to compute the displayed title from the current field values.
    * When provided, overrides titleColId for display purposes.
@@ -132,6 +140,12 @@ export interface FormConfig {
   headerDateColId?: string;
   /** Prefix for the relative date, e.g. 'Créé' */
   headerDatePrefix?: string;
+  /**
+   * Column whose truthy value triggers a banner at the top of the form, showing that value as text.
+   * Prefix the value with a type and "::" to control severity, e.g. "error:: Ce champ est invalide".
+   * Recognized types: 'warning' (default), 'error', 'info'.
+   */
+  alertColId?: string;
   fields: FieldDef[];
   /** Label for the "new record" button shown in currentRecord mode. If omitted, no button is shown. */
   newRecordLabel?: string;

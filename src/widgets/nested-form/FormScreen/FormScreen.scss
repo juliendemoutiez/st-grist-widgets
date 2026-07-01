@@ -6,6 +6,33 @@
   color: var(--c--contextuals--content--semantic--neutral--tertiary);
 }
 
+.form-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: pre-line;
+
+  &--warning {
+    background: var(--c--contextuals--background--semantic--warning--tertiary);
+    color: var(--c--contextuals--content--semantic--warning--tertiary);
+  }
+
+  &--error {
+    background: var(--c--contextuals--background--semantic--error--tertiary);
+    color: var(--c--contextuals--content--semantic--error--tertiary);
+  }
+
+  &--info {
+    background: var(--c--contextuals--background--semantic--info--tertiary);
+    color: var(--c--contextuals--content--semantic--info--tertiary);
+  }
+}
+
 .meta-section {
   display: flex;
   flex-direction: column;

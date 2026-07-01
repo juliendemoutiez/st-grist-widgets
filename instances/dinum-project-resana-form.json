@@ -9,6 +9,7 @@
       "titlePlaceholder": "Nom du projet",
       "headerDateColId": "Cree_le",
       "headerDatePrefix": "Créé",
+      "alertColId": "Alerte_Formulaire",
       "emptyMessage": "Cliquez sur un projet pour afficher les détails",
       "fields": [
         {

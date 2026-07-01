@@ -40,6 +40,8 @@ function validateConfig(parsed: unknown): string | null {
     if (typeof s.table !== 'string') return `Screen "${name}".table must be a string`;
     if (!Array.isArray(s.fields)) return `Screen "${name}".fields must be an array`;
     if (typeof s.titleColId !== 'string') return `Screen "${name}".titleColId must be a string`;
+    if (s.alertColId !== undefined && typeof s.alertColId !== 'string')
+      return `Screen "${name}".alertColId must be a string`;
     if (s.sections !== undefined) {
       if (!Array.isArray(s.sections)) return `Screen "${name}".sections must be an array`;
       for (const section of s.sections as unknown[]) {
@@ -88,6 +90,7 @@ function ScreenRenderer({ screens }: { screens: Record<string, JsonScreenConfig>
           titlePrefix: screen.titlePrefix,
           headerDateColId: screen.headerDateColId,
           headerDatePrefix: screen.headerDatePrefix,
+          alertColId: screen.alertColId,
           newRecordLabel: screen.newRecordLabel,
           emptyMessage: screen.emptyMessage,
         };

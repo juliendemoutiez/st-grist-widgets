@@ -83,6 +83,12 @@ export interface FormConfig {
   headerDateColId?: string;
   /** Prefix for the relative date, e.g. 'Créé' */
   headerDatePrefix?: string;
+  /**
+   * Column whose truthy value triggers a banner at the top of the form, showing that value as text.
+   * Prefix the value with a type and "::" to control severity, e.g. "error:: Ce champ est invalide".
+   * Recognized types: 'warning' (default), 'error', 'info'.
+   */
+  alertColId?: string;
   fields: FieldDef[];
   /** Label for the "new record" button shown in currentRecord mode. If omitted, no button is shown. */
   newRecordLabel?: string;
