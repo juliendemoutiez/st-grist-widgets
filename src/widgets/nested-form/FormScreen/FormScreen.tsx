@@ -34,7 +34,7 @@ function parseAlert(raw: string): { type: AlertType; message: string } {
 export function FormScreen({ config, mode, children }: FormScreenProps) {
   const { updateColumnWidgetOptions } = useGrist();
   const {
-    title, fields, refReloadKey, recordId, headerDate, columnMeta,
+    title, fields, refReloadKey, recordId, activeRecordId, headerDate, columnMeta,
     onTitleChange, onTitleBlur, onFieldChange, onFieldBlur,
     onBack, onNewRecord, onRefAdd, onRefEdit,
   } = useFormData(config, mode);
@@ -114,7 +114,7 @@ export function FormScreen({ config, mode, children }: FormScreenProps) {
             />
           ))}
         </div>
-        {children && recordId != null && children(recordId)}
+        {children && activeRecordId != null && children(activeRecordId)}
       </FormShell>
     </>
   );

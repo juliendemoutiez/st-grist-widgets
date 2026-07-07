@@ -23,6 +23,12 @@
           "label": "Statut Resana"
         },
         {
+          "colId": "Projet_de_rattachement",
+          "icon": "folder",
+          "label": "Projet de rattachement",
+          "refLabelCol": "Nom"
+        },
+        {
           "colId": "Type_de_communication",
           "icon": "campaign",
           "label": "Type de communication"

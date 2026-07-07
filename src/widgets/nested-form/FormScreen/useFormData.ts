@@ -21,6 +21,8 @@ export interface UseFormDataReturn {
   refReloadKey: number;
   /** Active Grist row ID — null when no record is selected (currentRecord mode). */
   recordId: number | null;
+  /** Row ID backing this screen's record, in either mode — null until a subForm record is created/loaded. */
+  activeRecordId: number | null;
   headerDate: string;
   columnMeta: Record<string, ColumnMeta>;
   onTitleChange: ((v: string) => void) | undefined;
@@ -395,6 +397,12 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
   }, [config.headerDateColId, fields]);
   const headerDate = useRelativeDate(createdAt, config.headerDatePrefix ?? '');
 
+  // ── Active record id (either mode) ─────────────────────────────────────────────
+
+  const activeRecordId = mode === 'currentRecord'
+    ? recordId
+    : (subFormStatus === 'ready' ? subFormRecordId.current : null);
+
   // ── Return ───────────────────────────────────────────────────────────────────
 
   return {
@@ -402,6 +410,7 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
     fields,
     refReloadKey,
     recordId,
+    activeRecordId,
     headerDate,
     columnMeta,
     onTitleChange: config.titleReadOnly ? undefined : (v: string) => setTitle(v),

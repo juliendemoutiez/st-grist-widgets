@@ -10,27 +10,57 @@
       "titleReadOnly": true,
       "headerDateColId": "Cree_a",
       "headerDatePrefix": "Créé",
+      "alertColId": "Alerte",
       "emptyMessage": "Cliquez sur un accompagnement pour afficher les détails",
       "fields": [
         {
           "colId": "Statut",
           "icon": "check_circle",
-          "label": "Statut",
-          "readOnly": true
+          "label": "Statut"
         },
         {
-          "colId": "Collectivites",
+          "colId": "Collectivite_de_reference",
           "icon": "location_city",
-          "label": "Collectivités",
+          "label": "Collectivité de référence",
           "refLabelCol": "Libelle_propre",
-          "refEditScreen": "CollectiviteForm",
+          "addLabel": "Ajouter une collectivité",
+          "refAddScreen": "CollectiviteForm",
+          "refEditScreen": "CollectiviteForm"
+        },
+        {
+          "colId": "Communes_associees",
+          "icon": "domain",
+          "label": "Communes associées",
+          "refLabelCol": "Libelle_propre",
+          "addLabel": "Ajouter une commune",
+          "refAddScreen": "CollectiviteForm",
+          "refEditScreen": "CollectiviteForm"
+        },
+        {
+          "colId": "Mutualisation_",
+          "icon": "call_split",
+          "label": "Mutualisation",
           "readOnly": true
         },
         {
-          "colId": "Type",
-          "icon": "category",
-          "label": "Type",
-          "readOnly": true
+          "colId": "Referents_collectivite",
+          "icon": "people",
+          "label": "Référents collectivité",
+          "refLabelCol": "Nom_complet",
+          "addLabel": "Ajouter un référent",
+          "refAddScreen": "ReferentForm",
+          "refEditScreen": "ReferentForm"
+        },
+        {
+          "colId": "Vague",
+          "icon": "waves",
+          "label": "Vague"
+        },
+        {
+          "colId": "Expression_de_besoin",
+          "icon": "description",
+          "label": "Expression de besoin",
+          "refLabelCol": "Reference"
         },
         {
           "colId": "Cabinet",
@@ -40,17 +70,23 @@
           "readOnly": true
         },
         {
-          "colId": "Experts",
-          "icon": "group",
-          "label": "Experts",
-          "refLabelCol": "Nom_complet",
+          "colId": "Bon_de_commande",
+          "icon": "receipt_long",
+          "label": "Bon de commande",
+          "refLabelCol": "Reference",
           "readOnly": true
         },
         {
-          "colId": "Vague",
-          "icon": "waves",
-          "label": "Vague",
-          "readOnly": true
+          "colId": "Experts",
+          "icon": "group",
+          "label": "Experts",
+          "refLabelCol": "Nom_complet"
+        },
+        {
+          "colId": "Referent_incubateur",
+          "icon": "support_agent",
+          "label": "Référent incubateur",
+          "refLabelCol": "Nom_complet"
         },
         {
           "colId": "Date_de_cadrage",
@@ -68,19 +104,19 @@
           "label": "Date de restitution finale"
         },
         {
-          "colId": "Date_de_cloture",
-          "icon": "calendar_month",
-          "label": "Date de clôture"
+          "colId": "Engagement_confirme",
+          "icon": "verified",
+          "label": "Engagement confirmé"
         },
         {
-          "colId": "Date_de_restitution_intermediaire",
-          "icon": "calendar_month",
-          "label": "Date de restitution intermédiaire"
+          "colId": "Offre_attribuee",
+          "icon": "local_offer",
+          "label": "Offre attribuée"
         },
         {
-          "colId": "Lien_livrable_intermediaire",
+          "colId": "Lien_CR_immersion",
           "icon": "link",
-          "label": "Lien livrable intermédiaire"
+          "label": "Lien CR immersion"
         },
         {
           "colId": "Lien_livrable_final",
@@ -88,16 +124,103 @@
           "label": "Lien livrable final"
         },
         {
-          "colId": "Recueil_des_infos_et_besoins",
-          "icon": "notes",
-          "label": "Recueil des infos & besoins"
+          "colId": "Courrier_d_attribution",
+          "icon": "mail",
+          "label": "Courrier d'attribution"
+        },
+        {
+          "colId": "Avis_prefecture",
+          "icon": "gavel",
+          "label": "Avis préfecture"
+        },
+        {
+          "colId": "Modules_Pix",
+          "icon": "school",
+          "label": "Modules Pix"
+        },
+        {
+          "colId": "Mail_Pre_Cadrage",
+          "icon": "mark_email_read",
+          "label": "Mail pré-cadrage",
+          "readOnly": true
+        },
+        {
+          "colId": "Mail_Post_Immersion",
+          "icon": "mark_email_read",
+          "label": "Mail post-immersion",
+          "readOnly": true
+        },
+        {
+          "colId": "Mail_Post_Restitution_Intermediaire",
+          "icon": "mark_email_read",
+          "label": "Mail post-restitution intermédiaire",
+          "readOnly": true
+        },
+        {
+          "colId": "Mail_etat_local_OPSN",
+          "icon": "mark_email_read",
+          "label": "Mail état local OPSN",
+          "readOnly": true
+        },
+        {
+          "colId": "Cree_par",
+          "icon": "account_circle",
+          "label": "Créé par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour_par",
+          "icon": "account_circle",
+          "label": "Dernière mise à jour par",
+          "readOnly": true,
+          "avatar": true
+        },
+        {
+          "colId": "Cree_a",
+          "icon": "calendar_today",
+          "label": "Créé le",
+          "readOnly": true
+        },
+        {
+          "colId": "Derniere_mise_a_jour",
+          "icon": "update",
+          "label": "Dernière mise à jour",
+          "readOnly": true
         }
       ],
       "sections": [
         {
+          "type": "timeline",
+          "table": "ANSM_INTERACTIONS",
+          "filterCol": "Accompagnement",
+          "refType": "Ref",
+          "dateCol": "Date",
+          "typeCol": "Type",
+          "detailCol": "Commentaires",
+          "addScreen": "InteractionForm",
+          "addDateCol": "Date",
+          "editScreen": "InteractionForm",
+          "title": "Interactions",
+          "icon": "chat",
+          "emptyMessage": "Aucune interaction"
+        },
+        {
           "type": "comment",
-          "col": "Commentaires_accompagnement",
-          "title": "Commentaires accompagnement",
+          "col": "Commentaires_collectivite",
+          "title": "Commentaires collectivité",
+          "icon": "notes"
+        },
+        {
+          "type": "comment",
+          "col": "Commentaires_appel",
+          "title": "Commentaires appel",
+          "icon": "phone"
+        },
+        {
+          "type": "comment",
+          "col": "Commentaires_expert",
+          "title": "Commentaires expert",
           "icon": "notes"
         }
       ]
@@ -244,6 +367,50 @@
           "icon": "update",
           "label": "Dernière mise à jour",
           "readOnly": true
+        }
+      ]
+    },
+    "InteractionForm": {
+      "mode": "subForm",
+      "table": "ANSM_INTERACTIONS",
+      "titleColId": "Date",
+      "titleDefault": "Nouvelle interaction",
+      "titlePlaceholder": "",
+      "titleReadOnly": true,
+      "titlePrefix": "Interaction du ",
+      "fields": [
+        {
+          "colId": "Accompagnement",
+          "icon": "folder",
+          "label": "Accompagnement",
+          "refLabelCol": "Reference_unique",
+          "readOnly": true
+        },
+        {
+          "colId": "Date",
+          "icon": "event",
+          "label": "Date",
+          "required": true
+        },
+        
+        {
+          "colId": "Type",
+          "icon": "label",
+          "label": "Type"
+        },
+        {
+          "colId": "Contact_incubateur",
+          "icon": "person",
+          "label": "Contact incubateur",
+          "refLabelCol": "Nom_complet"
+        }
+      ],
+      "sections": [
+        {
+          "type": "comment",
+          "col": "Commentaires",
+          "title": "Commentaires",
+          "icon": "notes"
         }
       ]
     }

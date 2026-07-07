@@ -419,15 +419,17 @@ export function FormField({ colId: _colId, icon, label, value, onChange, onBlur,
     const boolValue = Boolean(value);
     return (
       <FormRow icon={icon} label={label}>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={boolValue}
-          className={`form-toggle${boolValue ? ' form-toggle--on' : ''}${readOnly ? ' form-toggle--readonly' : ''}`}
-          onClick={() => { if (!readOnly) { onChange(!boolValue); onBlur?.(); } }}
-        >
-          <span className="form-toggle__thumb" />
-        </button>
+        <div className="meta-row__toggle-wrap">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={boolValue}
+            className={`form-toggle${boolValue ? ' form-toggle--on' : ''}${readOnly ? ' form-toggle--readonly' : ''}`}
+            onClick={() => { if (!readOnly) { onChange(!boolValue); onBlur?.(); } }}
+          >
+            <span className="form-toggle__thumb" />
+          </button>
+        </div>
       </FormRow>
     );
   }

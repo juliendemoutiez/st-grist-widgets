@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "dev:widgets": "pnpm --filter widgets dev",
-    "build:widgets": "pnpm --filter widgets build"
+    "build:widgets": "pnpm --filter widgets build",
+    "sync:presence-numerique": "node --env-file=.env scripts/sync-presence-numerique.mjs"
   },
   "dependencies": {
     "@gouvfr-lasuite/cunningham-react": "^4.2.0",
