@@ -51,6 +51,8 @@ export interface TimelineConfig {
   editScreen: ScreenName;
   /** Column used as the label when pushing editScreen */
   editLabelCol?: string;
+  /** Boolean column used for soft-deletion. When set, items are excluded once true and a delete action is shown. */
+  deletedCol?: string;
   /** Section heading */
   title: string;
   /** Material icon name for the section heading */

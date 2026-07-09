@@ -161,32 +161,6 @@
           "icon": "mark_email_read",
           "label": "Mail état local OPSN",
           "readOnly": true
-        },
-        {
-          "colId": "Cree_par",
-          "icon": "account_circle",
-          "label": "Créé par",
-          "readOnly": true,
-          "avatar": true
-        },
-        {
-          "colId": "Derniere_mise_a_jour_par",
-          "icon": "account_circle",
-          "label": "Dernière mise à jour par",
-          "readOnly": true,
-          "avatar": true
-        },
-        {
-          "colId": "Cree_a",
-          "icon": "calendar_today",
-          "label": "Créé le",
-          "readOnly": true
-        },
-        {
-          "colId": "Derniere_mise_a_jour",
-          "icon": "update",
-          "label": "Dernière mise à jour",
-          "readOnly": true
         }
       ],
       "sections": [
@@ -201,6 +175,7 @@
           "addScreen": "InteractionForm",
           "addDateCol": "Date",
           "editScreen": "InteractionForm",
+          "deletedCol": "Supprimee",
           "title": "Interactions",
           "icon": "chat",
           "emptyMessage": "Aucune interaction"
@@ -278,19 +253,6 @@
           "colId": "Nbre_agents",
           "icon": "work",
           "label": "Nombre d'agents"
-        },
-        {
-          "colId": "Cree_par",
-          "icon": "account_circle",
-          "label": "Créé par",
-          "readOnly": true,
-          "avatar": true
-        },
-        {
-          "colId": "Cree_a",
-          "icon": "calendar_today",
-          "label": "Créée le",
-          "readOnly": true
         }
       ]
     },
@@ -341,32 +303,6 @@
           "colId": "Modules_Pix",
           "icon": "school",
           "label": "Modules Pix"
-        },
-        {
-          "colId": "Cree_par",
-          "icon": "account_circle",
-          "label": "Créé par",
-          "readOnly": true,
-          "avatar": true
-        },
-        {
-          "colId": "Derniere_mise_a_jour_par",
-          "icon": "account_circle",
-          "label": "Dernière mise à jour par",
-          "readOnly": true,
-          "avatar": true
-        },
-        {
-          "colId": "Cree_a",
-          "icon": "calendar_today",
-          "label": "Créé le",
-          "readOnly": true
-        },
-        {
-          "colId": "Derniere_mise_a_jour",
-          "icon": "update",
-          "label": "Dernière mise à jour",
-          "readOnly": true
         }
       ]
     },

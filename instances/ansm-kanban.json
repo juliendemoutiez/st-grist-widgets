@@ -1,0 +1,22 @@
+{
+  "statuses": [
+    "A qualifier",
+    "A traiter",
+    "Prêt à être accompagné",
+    "En cours d'accompagnement",
+    "Clôturé",
+    "Retiré"
+  ],
+  "columns": {
+    "status": "Statut",
+    "title": "Reference_unique",
+    "subtitle": "Collectivite_de_reference",
+    "badges": [
+      {
+        "key": "Vague",
+        "icon": "waves"
+      }
+    ],
+    "assignee": "Referent_incubateur"
+  }
+}
