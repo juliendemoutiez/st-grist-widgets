@@ -1,4 +1,4 @@
-import{u as D,j as n}from"./NavigationContext-BsjkSwXD.js";import{W as R}from"./WidgetSettings-D_3DmFyd.js";import{u as U,a as W,t as z,f as _,h as N,l as C,d as O,g as M,b as S,o as k,B as I,i as y,L as B}from"./primitives-DJJSilu_.js";const v=["var(--series-1)","var(--series-2)","var(--series-3)","var(--series-4)"],F=4,b="__autres",P=`{
+import{u as D,j as n}from"./NavigationContext-BsjkSwXD.js";import{W as R}from"./WidgetSettings-D_3DmFyd.js";import{u as U,a as W,t as z,f as _,h as N,l as C,d as O,g as M,b as S,o as k,B as I,i as y,L as B}from"./primitives-DmYeQJP9.js";const v=["var(--series-1)","var(--series-2)","var(--series-3)","var(--series-4)"],F=4,b="__autres",P=`{
   "titre": "Évolution mensuelle",
   "table": "Snapshots",
   "filtres": [{ "colonne": "dimension", "valeur": "PRODUIT" }],
