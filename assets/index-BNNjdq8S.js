@@ -1,4 +1,4 @@
-import{u as x,j as s}from"./NavigationContext-BsjkSwXD.js";import{W as b}from"./WidgetSettings-D_3DmFyd.js";import{u as j,a as _,g as B,d as C,o as T,l as g,B as E,e as N}from"./primitives-DmYeQJP9.js";const d=["var(--ordinal-1)","var(--ordinal-2)","var(--ordinal-3)","var(--ordinal-4)","var(--ordinal-5)","var(--ordinal-6)","var(--ordinal-7)"],q=`{
+import{u as x,j as s}from"./NavigationContext-BsjkSwXD.js";import{W as b}from"./WidgetSettings-D_3DmFyd.js";import{u as j,a as _,g as B,d as C,o as T,l as g,B as E,e as N}from"./primitives-DjQIAUZA.js";const d=["var(--ordinal-1)","var(--ordinal-2)","var(--ordinal-3)","var(--ordinal-4)","var(--ordinal-5)","var(--ordinal-6)","var(--ordinal-7)"],q=`{
   "titre": "Temps moyen par étape",
   "table": "Historique_Parcours",
   "filtres": [{ "colonne": "champ", "valeur": "parcoursDirecte" }],
