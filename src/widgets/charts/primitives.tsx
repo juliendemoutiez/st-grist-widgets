@@ -423,12 +423,14 @@ export function CarteChaleur({
   echelle = 'racine',
   totaux = true,
   suffixe = '',
+  entetes = 'oblique',
 }: {
   lignes: LigneChaleur[];
   colonnes: { cle: string; libelle: string; libelleLong: string }[];
   echelle?: 'lineaire' | 'racine';
   totaux?: boolean;
   suffixe?: string;
+  entetes?: 'oblique' | 'horizontal';
 }) {
   const { montrer, cacher, noeud } = useInfobulle();
 
@@ -449,8 +451,12 @@ export function CarteChaleur({
    * occupe n × largeurCar × sin(45°) en vertical. La calculer évite le vide
    * d'une hauteur fixe surdimensionnée pour des libellés courts.
    */
+  const oblique = entetes === 'oblique';
   const carsMax = Math.max(5, ...colonnes.map((c) => c.libelle.length));
-  const hauteurEntete = Math.round(Math.min(120, carsMax * 11 * 0.55 * Math.SQRT1_2 + 12));
+  const hauteurEntete = oblique
+    ? Math.round(Math.min(120, carsMax * 11 * 0.55 * Math.SQRT1_2 + 12))
+    : undefined;
+  const classeEntete = oblique ? 'viz__chaleur-oblique' : 'viz__chaleur-droit';
 
   const totalLigne = (l: LigneChaleur) => colonnes.reduce((a, c) => a + (l.cellules[c.cle] ?? 0), 0);
   const totalColonne = (cle: string) => lignes.reduce((a, l) => a + (l.cellules[cle] ?? 0), 0);
@@ -467,7 +473,7 @@ export function CarteChaleur({
                 <th
                   scope="col"
                   key={c.cle}
-                  className="viz__chaleur-oblique"
+                  className={classeEntete}
                   style={{ height: hauteurEntete }}
                   title={c.libelleLong}
                 >
@@ -477,7 +483,7 @@ export function CarteChaleur({
                 </th>
               ))}
               {totaux && (
-                <th scope="col" className="viz__chaleur-oblique viz__chaleur-total" style={{ height: hauteurEntete }}>
+                <th scope="col" className={`${classeEntete} viz__chaleur-total`} style={{ height: hauteurEntete }}>
                   <div>
                     <span>Total</span>
                   </div>

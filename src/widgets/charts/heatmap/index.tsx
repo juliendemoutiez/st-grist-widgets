@@ -91,6 +91,7 @@ export function VueHeatmap({ config: c }: { config: ConfigHeatmap }) {
           colonnes={colonnes}
           echelle={c.echelle}
           totaux={c.totaux !== false}
+          entetes={c.entetes}
           suffixe={c.suffixe}
         />
       </Bloc>

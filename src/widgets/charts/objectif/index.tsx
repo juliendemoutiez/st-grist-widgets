@@ -77,11 +77,6 @@ export function VueObjectif({ config: c }: { config: ConfigObjectif }) {
         }}
       >
         <Jauges lignes={lignes} />
-        {!lignes.length && (
-          <p className="viz__note">
-            Aucun objectif dans <code>{c.objectif.table}</code> : renseignez les cibles pour activer la comparaison.
-          </p>
-        )}
       </Bloc>
   );
 }

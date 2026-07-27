@@ -83,7 +83,8 @@
         "mode": "somme",
         "colonne": "nb"
       },
-      "echelle": "racine"
+      "echelle": "racine",
+      "entetes": "horizontal"
     },
     {
       "type": "barres",

@@ -343,6 +343,27 @@ thead .viz__chaleur-entete {
   vertical-align: bottom;
 }
 
+/* En-tête droit : le libellé se lit horizontalement et passe à la ligne. */
+.viz__chaleur-droit {
+  vertical-align: bottom;
+  padding-bottom: 6px !important;
+
+  div {
+    display: block;
+    text-align: center;
+  }
+
+  span {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text-secondary);
+    white-space: normal; /* le libellé peut se replier sur plusieurs lignes */
+    text-align: center;
+  }
+}
+
 /* En-tête oblique : la colonne reste étroite, le libellé s'écrit en diagonale.
    La hauteur est calculée par le composant d'après le libellé le plus long. */
 .viz__chaleur-oblique {

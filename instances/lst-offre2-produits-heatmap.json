@@ -79,5 +79,6 @@
   "valeur": {
     "mode": "compte"
   },
-  "echelle": "racine"
+  "echelle": "racine",
+  "entetes": "horizontal"
 }

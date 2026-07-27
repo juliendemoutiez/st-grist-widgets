@@ -54,6 +54,12 @@ export interface ConfigHeatmap extends ConfigCommune {
   /** `racine` tasse les écarts d'ordre de grandeur ; monotone, l'ordre tient. */
   echelle?: 'lineaire' | 'racine';
   totaux?: boolean;
+  /**
+   * En-têtes de colonnes. `oblique` (défaut) garde des colonnes étroites quand
+   * elles sont nombreuses ; `horizontal` se lit mieux dès qu'elles sont assez
+   * larges, les libellés passant alors à la ligne si besoin.
+   */
+  entetes?: 'oblique' | 'horizontal';
 }
 
 export interface ConfigBarres extends ConfigCommune {
