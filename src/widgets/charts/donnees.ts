@@ -97,13 +97,30 @@ export function agreger(lignes: Ligne[], valeur?: Valeur): number | null {
   const nombres = lignes
     .map((l) => l[col])
     .filter((v): v is number => typeof v === 'number' && Number.isFinite(v));
-  if (!nombres.length) return mode === 'moyenne' ? null : 0;
+  if (!nombres.length) return mode === 'somme' ? 0 : null;
 
-  const somme = nombres.reduce((a, b) => a + b, 0);
-  const brut = mode === 'moyenne' ? somme / nombres.length : somme;
-  const d = valeur?.decimales ?? (mode === 'moyenne' ? 1 : 0);
+  let brut: number;
+  if (mode === 'mediane') {
+    const tries = [...nombres].sort((a, b) => a - b);
+    const m = Math.floor(tries.length / 2);
+    brut = tries.length % 2 ? tries[m] : (tries[m - 1] + tries[m]) / 2;
+  } else {
+    const somme = nombres.reduce((a, b) => a + b, 0);
+    brut = mode === 'moyenne' ? somme / nombres.length : somme;
+  }
+  const d = valeur?.decimales ?? (mode === 'somme' ? 0 : 1);
   const f = 10 ** d;
   return Math.round(brut * f) / f;
+}
+
+/** Nombre de valeurs réellement agrégeables dans un paquet de lignes. */
+export function compteAgregeable(lignes: Ligne[], valeur?: Valeur): number {
+  const col = valeur?.colonne;
+  if (!col || valeur?.mode === 'compte') return lignes.length;
+  if (valeur?.mode === 'compte-distinct') {
+    return new Set(lignes.map((l) => texte(l[col])).filter(Boolean)).size;
+  }
+  return lignes.filter((l) => typeof l[col] === 'number' && Number.isFinite(l[col] as number)).length;
 }
 
 /** Variante commode là où une absence de valeur se lit comme un zéro. */
@@ -171,3 +188,35 @@ export function formatMois(brut: unknown): string {
 /** Clé de tri chronologique d'une abscisse temporelle. */
 export const cleTemporelle = (brut: unknown): number =>
   typeof brut === 'number' ? brut : 0;
+
+/**
+ * Ramène un horodatage au premier de son mois.
+ *
+ * C'est ce qui donne son sens à `format: 'mois'` : sans ce regroupement, une
+ * colonne horodatée à la seconde produirait une abscisse par enregistrement,
+ * toutes étiquetées avec le même mois.
+ */
+export function debutDeMois(brut: unknown): number | null {
+  if (typeof brut !== 'number' || !brut) return null;
+  const d = new Date(brut * 1000);
+  return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) / 1000);
+}
+
+/** Suite continue de premiers-de-mois entre deux bornes incluses. */
+export function moisEntre(debut: number, fin: number): number[] {
+  const out: number[] = [];
+  const d = new Date(debut * 1000);
+  let a = d.getUTCFullYear();
+  let m = d.getUTCMonth();
+  for (let garde = 0; garde < 600; garde++) {
+    const t = Math.floor(Date.UTC(a, m, 1) / 1000);
+    if (t > fin) break;
+    out.push(t);
+    m += 1;
+    if (m > 11) {
+      m = 0;
+      a += 1;
+    }
+  }
+  return out;
+}

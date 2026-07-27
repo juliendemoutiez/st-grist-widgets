@@ -12,7 +12,7 @@ export interface Filtre {
   valeur: string | number | boolean | (string | number)[];
 }
 
-export type ModeAgregation = 'compte' | 'compte-distinct' | 'somme' | 'moyenne';
+export type ModeAgregation = 'compte' | 'compte-distinct' | 'somme' | 'moyenne' | 'mediane';
 
 export interface Valeur {
   mode: ModeAgregation;
@@ -64,6 +64,12 @@ export interface ConfigHeatmap extends ConfigCommune {
 
 export interface ConfigBarres extends ConfigCommune {
   lignes: Dimension;
+  /**
+   * Ajoute le nombre d'observations derrière chaque valeur. À activer dès que
+   * les effectifs sont faibles : une moyenne sur deux mesures et une moyenne
+   * sur cinquante se ressemblent trop sur un graphique.
+   */
+  afficherEffectif?: boolean;
 }
 
 export interface ConfigLigne extends ConfigCommune {

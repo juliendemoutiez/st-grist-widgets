@@ -5,7 +5,9 @@ import {
   agregerOuZero,
   appliquerFiltres,
   cleTemporelle,
+  debutDeMois,
   formatMois,
+  moisEntre,
   grouper,
   libelleDe,
   ordonner,
@@ -44,23 +46,40 @@ export function VueLigne({ config: c }: { config: ConfigLigne }) {
 
   const filtrees = appliquerFiltres(brutes, c.filtres);
 
-  // Abscisses, triées chronologiquement quand ce sont des dates.
-  const temporel = c.x.format !== 'brut';
+  /*
+   * En `format: 'mois'`, l'abscisse est le mois — pas l'horodatage. Sans ce
+   * regroupement, une colonne datée à la seconde produirait une abscisse par
+   * enregistrement. Les mois sans donnée sont ensuite réintroduits, sinon
+   * l'axe se resserre sur les seules périodes actives et la pente ment.
+   */
+  const parMois = c.x.format === 'mois';
   const parX = new Map<string, Ligne[]>();
   const bruteX = new Map<string, unknown>();
   for (const l of filtrees) {
-    const cle = texte(l[c.x.colonne]);
-    if (!cle) continue;
-    bruteX.set(cle, l[c.x.colonne]);
+    const brut = l[c.x.colonne];
+    const groupe = parMois ? debutDeMois(brut) : brut;
+    if (groupe === null || groupe === undefined || groupe === '') continue;
+    const cle = texte(groupe);
+    bruteX.set(cle, groupe);
     const paquet = parX.get(cle);
     if (paquet) paquet.push(l);
     else parX.set(cle, [l]);
   }
-  const clesX = [...parX.keys()].sort((a, b) =>
-    temporel ? cleTemporelle(bruteX.get(a)) - cleTemporelle(bruteX.get(b)) : a.localeCompare(b, 'fr'),
-  );
+
+  let clesX: string[];
+  if (parMois && parX.size) {
+    const bornes = [...bruteX.values()].map((v) => cleTemporelle(v));
+    clesX = moisEntre(Math.min(...bornes), Math.max(...bornes)).map(String);
+    for (const cle of clesX) if (!bruteX.has(cle)) bruteX.set(cle, Number(cle));
+  } else {
+    const temporel = c.x.format !== 'brut';
+    clesX = [...parX.keys()].sort((a, b) =>
+      temporel ? cleTemporelle(bruteX.get(a)) - cleTemporelle(bruteX.get(b)) : a.localeCompare(b, 'fr'),
+    );
+  }
+
   const abscisses = clesX.map((cle) =>
-    c.x.format === 'mois' ? formatMois(bruteX.get(cle)) : libelleDe(c.x, cle),
+    parMois ? formatMois(bruteX.get(cle)) : libelleDe(c.x, cle),
   );
 
   // Une seule série si aucune colonne de séries n'est configurée.

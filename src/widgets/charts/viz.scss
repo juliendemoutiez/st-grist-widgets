@@ -421,3 +421,9 @@ thead .viz__chaleur-entete {
   font-size: 18px;
   font-weight: 700;
 }
+
+/* Mention discrète accolée à une étiquette : effectif, précision… */
+.viz__annotation {
+  font-weight: 400;
+  fill: var(--text-muted);
+}

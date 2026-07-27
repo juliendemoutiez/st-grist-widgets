@@ -1,10 +1,10 @@
 {
-  "titre": "Offre 2 - indirect : déploiement par outil",
+  "titre": "Offre 2 - indirect : Déploiement par outil",
   "blocs": [
     {
       "type": "heatmap",
       "titre": "Collectivités actives par région et par outil",
-      "sousTitre": "Une collectivité équipée de plusieurs outils est comptée dans chaque colonne.",
+      "sousTitre": "Une collectivité équipée de plusieurs outils est comptée dans chaque colonne",
       "table": "Deploiements",
       "filtres": [
         {
@@ -142,7 +142,7 @@
     {
       "type": "ligne",
       "titre": "Évolution mensuelle",
-      "sousTitre": "Effectifs figés au premier de chaque mois.",
+      "sousTitre": "Nombre de collectivités au premier de chaque mois",
       "table": "Snapshots",
       "filtres": [
         {

@@ -91,6 +91,8 @@ export interface LigneBarres {
   cle: string;
   libelle: string;
   segments: { cle: string; valeur: number }[];
+  /** Mention discrète après la valeur, p. ex. le nombre d'observations. */
+  annotation?: string;
 }
 
 export function Barres({
@@ -165,6 +167,7 @@ export function Barres({
                 <text className="viz__valeur" x={LARGEUR_LIBELLE + echelle(total) + 8} y={y + HAUTEUR_BARRE / 2} dominantBaseline="central">
                   {nombre(total)}
                   {suffixe}
+                  {ligne.annotation && <tspan className="viz__annotation"> {ligne.annotation}</tspan>}
                 </text>
               </g>
             );

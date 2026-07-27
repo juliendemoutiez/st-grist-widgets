@@ -1,6 +1,14 @@
 import { useGrist, WidgetSettings } from '@grist-widgets/ui';
 import { Barres, Bloc, type LigneBarres, type Serie } from '../primitives';
-import { agreger, appliquerFiltres, grouper, libelleDe, ordonner, useTable } from '../donnees';
+import {
+  agreger,
+  appliquerFiltres,
+  compteAgregeable,
+  grouper,
+  libelleDe,
+  ordonner,
+  useTable,
+} from '../donnees';
 import type { ConfigBarres } from '../types';
 
 /**
@@ -46,9 +54,12 @@ export function VueBarres({ config: c }: { config: ConfigBarres }) {
   // Un groupe sans valeur agrégeable est écarté : une moyenne qui n'existe pas
   // ne doit pas se lire comme une barre à zéro.
   const valeurs = new Map<string, number>();
+  const effectifs = new Map<string, number>();
   for (const [cle, paquet] of grouper(filtrees, c.lignes.colonne)) {
     const v = agreger(paquet, c.valeur);
-    if (v !== null) valeurs.set(cle, v);
+    if (v === null) continue;
+    valeurs.set(cle, v);
+    effectifs.set(cle, compteAgregeable(paquet, c.valeur));
   }
 
   const cles = ordonner(c.lignes, [...valeurs.keys()], (cle) => valeurs.get(cle) ?? 0).filter((cle) =>
@@ -64,6 +75,7 @@ export function VueBarres({ config: c }: { config: ConfigBarres }) {
     cle,
     libelle: libelleDe(c.lignes, cle),
     segments: [{ cle, valeur: valeurs.get(cle) ?? 0 }],
+    annotation: c.afficherEffectif ? `(${effectifs.get(cle) ?? 0})` : undefined,
   }));
   const series: Serie[] = cles.map((cle, i) => ({
     cle,
@@ -76,8 +88,12 @@ export function VueBarres({ config: c }: { config: ConfigBarres }) {
         titre={c.titre}
         sousTitre={c.sousTitre}
         tableau={{
-          entetes: ['', 'Valeur'],
-          lignes: lignes.map((l) => [l.libelle, l.segments[0].valeur]),
+          entetes: c.afficherEffectif ? ['', 'Valeur', 'Observations'] : ['', 'Valeur'],
+          lignes: lignes.map((l) =>
+            c.afficherEffectif
+              ? [l.libelle, l.segments[0].valeur, effectifs.get(l.cle) ?? 0]
+              : [l.libelle, l.segments[0].valeur],
+          ),
         }}
       >
         <Barres lignes={lignes} series={series} suffixe={c.suffixe} />
