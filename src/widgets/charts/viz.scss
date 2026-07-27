@@ -14,8 +14,22 @@
  * Générée en OKLCH depuis la teinte de marque.
  */
 
+/**
+ * `globals.scss` pose 8 px de marge sur #root pour tous les widgets ; sur une
+ * page de graphiques elle se lit comme un liseré blanc autour du tableau de
+ * bord. Cette feuille n'étant chargée que par ces pages, la neutraliser ici
+ * n'affecte aucun autre widget.
+ */
+html,
+body,
+#root {
+  padding: 0;
+  background: #f2f2f0;
+}
+
 .viz {
   color-scheme: light;
+  min-height: 100vh;
 
   /* Fond de page grisé ; les blocs sont des cartes blanches posées dessus. */
   --page: #f2f2f0;
@@ -49,7 +63,7 @@
   --objectif: #b8b6ae;
   --alerte: #e34948;
 
-  padding: 16px;
+  padding: 20px;
   font-family: Marianne, system-ui, -apple-system, sans-serif;
   font-size: 14px;
   color: var(--text-primary);
@@ -105,7 +119,7 @@
   justify-content: flex-start;
   gap: 10px 16px;
   max-width: 1000px;
-  margin: 22px auto 0;
+  margin: 22px auto 8px;
   font-size: 12px;
   color: var(--text-secondary);
 }
@@ -126,9 +140,9 @@
 /* --- Graphiques SVG --- */
 
 /**
- * Les tracés sont dessinés dans un viewBox de 720 et mis à l'échelle par la
- * largeur. Le plafond évite qu'ils s'étirent sur un écran large, où les barres
- * deviendraient démesurées par rapport au texte.
+ * Les tracés sont dessinés dans un viewBox de 1000, calé sur cette largeur
+ * maximale : à pleine largeur l'échelle vaut 1 et le texte garde sa taille
+ * nominale au lieu d'être étiré.
  */
 .viz__svg {
   display: block;

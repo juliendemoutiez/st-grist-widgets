@@ -124,7 +124,7 @@ export function Barres({
             let x = LARGEUR_LIBELLE;
             return (
               <g key={ligne.cle}>
-                <text className="viz__axe" x={LARGEUR_LIBELLE - 8} y={y + HAUTEUR_BARRE - 7} textAnchor="end">
+                <text className="viz__axe" x={LARGEUR_LIBELLE - 8} y={y + HAUTEUR_BARRE / 2} textAnchor="end" dominantBaseline="central">
                   {ligne.libelle}
                 </text>
 
@@ -162,7 +162,7 @@ export function Barres({
                 })}
 
                 {/* Étiquette directe : le relief exigé quand le contraste est faible. */}
-                <text className="viz__valeur" x={LARGEUR_LIBELLE + echelle(total) + 8} y={y + HAUTEUR_BARRE - 7}>
+                <text className="viz__valeur" x={LARGEUR_LIBELLE + echelle(total) + 8} y={y + HAUTEUR_BARRE / 2} dominantBaseline="central">
                   {nombre(total)}
                   {suffixe}
                 </text>
@@ -338,7 +338,7 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
             const pct = ligne.cible > 0 ? Math.round((ligne.realise / ligne.cible) * 100) : null;
             return (
               <g key={ligne.cle}>
-                <text className="viz__axe" x={LARGEUR_LIBELLE - 8} y={y + HAUTEUR_BARRE - 7} textAnchor="end">
+                <text className="viz__axe" x={LARGEUR_LIBELLE - 8} y={y + HAUTEUR_BARRE / 2} textAnchor="end" dominantBaseline="central">
                   {ligne.libelle}
                 </text>
                 {/* Piste = objectif ; la barre colorée est le réalisé. */}
@@ -362,7 +362,7 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
                     strokeWidth={2}
                   />
                 )}
-                <text className="viz__valeur" x={LARGEUR_LIBELLE + Math.max(lReal, lCible) + 8} y={y + HAUTEUR_BARRE - 7}>
+                <text className="viz__valeur" x={LARGEUR_LIBELLE + Math.max(lReal, lCible) + 8} y={y + HAUTEUR_BARRE / 2} dominantBaseline="central">
                   {nombre(ligne.realise)} / {nombre(ligne.cible)}
                   {pct !== null ? `  (${pct} %)` : ''}
                 </text>
