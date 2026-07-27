@@ -1,4 +1,4 @@
-import{u as q,j as n}from"./NavigationContext-BsjkSwXD.js";import{W as E}from"./WidgetSettings-D_3DmFyd.js";import{u as D,a as _,g as f,b,o as h,l as v,c as T,B as W,C as z}from"./primitives-DjQIAUZA.js";const N=`{
+import{u as q,j as n}from"./NavigationContext-BsjkSwXD.js";import{W as E}from"./WidgetSettings-D_3DmFyd.js";import{u as D,a as _,g as f,b,o as h,l as v,c as T,B as W,C as z}from"./primitives-DqwRhpiC.js";const N=`{
   "titre": "Effectifs par région et par outil",
   "table": "Deploiements",
   "filtres": [{ "colonne": "offre", "valeur": "OFFRE_3_DIRECT" }],
