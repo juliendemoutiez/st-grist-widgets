@@ -1,0 +1,388 @@
+/**
+ * Socle visuel des widgets de graphiques. Mode clair uniquement : ils
+ * s'affichent dans Grist, dont le thème est clair.
+ *
+ * Palette catégorielle : le slot 1 porte le bleu de marque du design system,
+ * les slots 2–4 viennent de la palette validée (compétence dataviz).
+ * Revalidés ensemble sur la surface blanche des cartes - pire paire adjacente
+ * CVD ΔE 9,1 / vision normale 22,9. Aqua (2,82) et jaune (2,17) restent sous
+ * 3:1 : la règle de relief impose les étiquettes directes et la vue tableau,
+ * toutes deux présentes.
+ *
+ * Rampe ordinale : les étapes de parcours sont ordonnées, donc une seule
+ * teinte à pas de clarté monotones - jamais la palette catégorielle.
+ * Générée en OKLCH depuis la teinte de marque.
+ */
+
+.viz {
+  color-scheme: light;
+
+  /* Fond de page grisé ; les blocs sont des cartes blanches posées dessus. */
+  --page: #f2f2f0;
+  --surface-1: #ffffff; /* surface des cartes, et donc des graphiques */
+  --surface-2: #f4f4f2; /* remplissages discrets à l'intérieur d'une carte */
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #78766f;
+  --grid: #e4e3df;
+  --neutral: #b8b6ae;
+
+  /* Teinte principale : jeton de marque du design system. En thème
+     `dsfr-light`, celui des widgets, il vaut brand-550 = #3E5DE7. */
+  --series-1: var(--c--contextuals--background--semantic--brand--primary, #3e5de7);
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-autres: #8f8d85;
+
+  /* Rampe ordinale, clair -> foncé le long de l'entonnoir. Générée en OKLCH à
+     teinte et chroma constants, ceux du bleu de marque : clarté monotone,
+     extrémité claire à 2,43:1 sur la surface blanche. */
+  --ordinal-1: #7aa5ff;
+  --ordinal-2: #6991ff;
+  --ordinal-3: #587eff;
+  --ordinal-4: #496cf7;
+  --ordinal-5: #3b59e2;
+  --ordinal-6: #2a40c9;
+  --ordinal-7: #1b21ad;
+
+  --objectif: #b8b6ae;
+  --alerte: #e34948;
+
+  padding: 16px;
+  font-family: Marianne, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--page);
+}
+
+/**
+ * En-tête d'un bloc : titre, sous-titre facultatif, bascule à droite.
+ * La hauteur minimale est calée sur « titre + sous-titre d'une ligne », pour
+ * que les blocs sans sous-titre s'alignent sur les autres.
+ */
+.viz__entete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 56px;
+  padding-inline: 8px;
+  margin-bottom: 16px;
+}
+
+/* --- Blocs graphiques --- */
+
+/* Chaque bloc - titre et graphique - est une carte blanche. */
+.viz__bloc {
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  background: var(--surface-1);
+  border: 1px solid var(--grid);
+  border-radius: 10px;
+}
+
+.viz__bloc-titre {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.viz__bloc-sous-titre {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/**
+ * Placée sous le tracé : l'œil lit d'abord la courbe, la légende ensuite.
+ * Même largeur maximale et même centrage que le SVG, mais contenu calé à
+ * gauche : son bord gauche coïncide donc avec celui du graphique.
+ */
+.viz__legende {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px 16px;
+  max-width: 1000px;
+  margin: 22px auto 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.viz__legende-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viz__puce {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex: none;
+}
+
+/* --- Graphiques SVG --- */
+
+/**
+ * Les tracés sont dessinés dans un viewBox de 720 et mis à l'échelle par la
+ * largeur. Le plafond évite qu'ils s'étirent sur un écran large, où les barres
+ * deviendraient démesurées par rapport au texte.
+ */
+.viz__svg {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  margin-inline: auto;
+  height: auto;
+  overflow: visible;
+}
+
+.viz__axe {
+  font-size: 11px;
+  fill: var(--text-secondary);
+}
+
+.viz__valeur {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.viz__grille {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.viz__marque {
+  transition: opacity 0.12s;
+}
+
+/* Zone de survol : cible plus large que la marque. */
+.viz__cible {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.viz__scroll {
+  overflow-x: auto;
+}
+
+/* --- Infobulle --- */
+
+.viz__infobulle {
+  position: fixed;
+  z-index: 20;
+  max-width: 260px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border: 1px solid var(--grid);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+  pointer-events: none;
+}
+
+.viz__infobulle-titre {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.viz__infobulle-ligne {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.viz__infobulle-valeur {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* --- Vue tableau (relief exigé par le contraste en mode clair) --- */
+
+/* Bascule graphique / données, en haut à droite de chaque bloc. */
+.viz__bascule {
+  display: inline-flex;
+  margin-left: auto;
+  border: 1px solid var(--grid);
+  border-radius: 6px;
+  overflow: hidden;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 26px;
+    padding: 0;
+    color: var(--text-muted);
+    background: var(--surface-1);
+    border: 0;
+    cursor: pointer;
+
+    & + button {
+      border-left: 1px solid var(--grid);
+    }
+
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-2);
+    }
+
+    &[aria-pressed='true'] {
+      color: var(--surface-1);
+      background: var(--series-1);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--series-1);
+      outline-offset: -2px;
+    }
+  }
+
+  .material-icons {
+    font-size: 17px;
+  }
+}
+
+.viz__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 5px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--grid);
+    white-space: nowrap;
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+
+  thead th {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+}
+
+/* --- Carte de chaleur --- */
+
+.viz__chaleur {
+  /* `fixed` répartit l'espace restant à parts égales entre les colonnes de
+     données, une fois la colonne des régions et celle du total fixées. */
+  table-layout: fixed;
+  width: 100%;
+  max-width: 1000px;
+  min-width: 560px;
+  margin-inline: auto;
+  margin-bottom: 16px;
+  border-collapse: separate;
+  border-spacing: 2px; /* respiration entre cases, comme entre segments empilés */
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+
+  th,
+  td {
+    padding: 6px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    border-radius: 3px;
+    background: var(--surface-2);
+    color: var(--text-primary);
+    cursor: default;
+  }
+
+  tfoot td,
+  tfoot th {
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+}
+
+.viz__chaleur-entete {
+  width: 168px;
+  text-align: left !important;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+thead .viz__chaleur-entete {
+  font-weight: 600;
+  color: var(--text-secondary);
+  vertical-align: bottom;
+}
+
+/* En-tête oblique : la colonne reste étroite, le libellé s'écrit en diagonale.
+   La hauteur est calculée par le composant d'après le libellé le plus long. */
+.viz__chaleur-oblique {
+  padding: 0 !important;
+  vertical-align: bottom;
+  overflow: visible;
+
+  > div {
+    width: 26px;
+    transform: translate(18px, -4px) rotate(-45deg);
+    transform-origin: bottom left;
+  }
+
+  span {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+}
+
+/* Fond foncé : le texte bascule en clair pour rester lisible. */
+.viz__chaleur-case--fonce {
+  color: var(--surface-1) !important;
+}
+
+.viz__chaleur-total {
+  width: 60px;
+  font-weight: 600;
+  background: none !important;
+  color: var(--text-primary) !important;
+}
+
+.viz__chaleur-zero {
+  color: var(--text-muted);
+}
+
+.viz__vide {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.viz__note {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.viz__titre {
+  margin: 0 0 16px;
+  padding-inline: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}

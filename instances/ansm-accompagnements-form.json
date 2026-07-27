@@ -22,7 +22,7 @@
           "colId": "Collectivite_de_reference",
           "icon": "location_city",
           "label": "Collectivité de référence",
-          "refLabelCol": "Libelle_propre",
+          "refLabelCol": "Libelle_complet",
           "addLabel": "Ajouter une collectivité",
           "refAddScreen": "CollectiviteForm",
           "refEditScreen": "CollectiviteForm"
@@ -31,7 +31,7 @@
           "colId": "Communes_associees",
           "icon": "domain",
           "label": "Communes associées",
-          "refLabelCol": "Libelle_propre",
+          "refLabelCol": "Libelle_complet",
           "addLabel": "Ajouter une commune",
           "refAddScreen": "CollectiviteForm",
           "refEditScreen": "CollectiviteForm"
@@ -52,28 +52,26 @@
           "refEditScreen": "ReferentForm"
         },
         {
+          "colId": "Eligible",
+          "icon": "verified",
+          "label": "Eligible",
+          "readOnly": true
+        },
+        {
+          "colId": "Offre_attribuee",
+          "icon": "local_offer",
+          "label": "Offre attribuée"
+        },
+        {
           "colId": "Vague",
           "icon": "waves",
           "label": "Vague"
-        },
-        {
-          "colId": "Expression_de_besoin",
-          "icon": "description",
-          "label": "Expression de besoin",
-          "refLabelCol": "Reference"
         },
         {
           "colId": "Cabinet",
           "icon": "business",
           "label": "Cabinet",
           "refLabelCol": "Structure",
-          "readOnly": true
-        },
-        {
-          "colId": "Bon_de_commande",
-          "icon": "receipt_long",
-          "label": "Bon de commande",
-          "refLabelCol": "Reference",
           "readOnly": true
         },
         {
@@ -102,16 +100,6 @@
           "colId": "Date_de_restitution_finale",
           "icon": "calendar_month",
           "label": "Date de restitution finale"
-        },
-        {
-          "colId": "Engagement_confirme",
-          "icon": "verified",
-          "label": "Engagement confirmé"
-        },
-        {
-          "colId": "Offre_attribuee",
-          "icon": "local_offer",
-          "label": "Offre attribuée"
         },
         {
           "colId": "Lien_CR_immersion",
@@ -188,12 +176,6 @@
         },
         {
           "type": "comment",
-          "col": "Commentaires_appel",
-          "title": "Commentaires appel",
-          "icon": "phone"
-        },
-        {
-          "type": "comment",
           "col": "Commentaires_expert",
           "title": "Commentaires expert",
           "icon": "notes"
@@ -202,55 +184,63 @@
     },
     "CollectiviteForm": {
       "mode": "subForm",
-      "table": "Collectivites_Total",
-      "titleColId": "Collectivite",
+      "table": "GLOBAL_COLLECTIVITES",
+      "titleColId": "Libelle",
       "titleDefault": "Nouvelle collectivité",
       "titlePlaceholder": "Nom de la collectivité",
       "headerDateColId": "Cree_a",
       "headerDatePrefix": "Créée",
       "fields": [
         {
-          "colId": "Collectivite",
+          "colId": "Libelle",
           "icon": "location_city",
-          "label": "Collectivité"
+          "label": "Libellé",
+          "readOnly": true
         },
         {
-          "colId": "Typologie",
+          "colId": "Type",
           "icon": "category",
-          "label": "Typologie"
+          "label": "Type",
+          "readOnly": true
         },
         {
           "colId": "Code_INSEE",
           "icon": "tag",
-          "label": "Code INSEE"
+          "label": "Code INSEE",
+          "readOnly": true
         },
         {
           "colId": "Code_postal",
           "icon": "markunread_mailbox",
-          "label": "Code postal"
+          "label": "Code postal",
+          "readOnly": true
         },
         {
-          "colId": "EPCI",
+          "colId": "EPCI_Libelle",
           "icon": "account_balance",
-          "label": "EPCI"
+          "label": "EPCI",
+          "readOnly": true
         },
         {
-          "colId": "Departement",
+          "colId": "Departement_Libelle",
           "icon": "map",
-          "label": "Département"
+          "label": "Département",
+          "readOnly": true
         },
         {
-          "colId": "Region",
+          "colId": "Region_Libelle",
           "icon": "map",
-          "label": "Région"
+          "label": "Région",
+          "readOnly": true
         },
         {
           "colId": "Population",
           "icon": "people",
-          "label": "Population"
+          "label": "Population",
+          "readOnly": true
         },
         {
-          "colId": "Nbre_agents",
+          "colId": "Nombre_agents",
           "icon": "work",
           "label": "Nombre d'agents"
         }

@@ -1,0 +1,79 @@
+/**
+ * Contrat de configuration des widgets de graphiques.
+ *
+ * Aucun de ces types ne connaît le document qui l'utilise : tables, colonnes,
+ * libellés et filtres viennent de `widgetOptions`, éditable depuis Grist et
+ * archivé dans `instances/*.json`.
+ */
+
+/** Filtre d'égalité ; `valeur` peut lister plusieurs valeurs acceptées. */
+export interface Filtre {
+  colonne: string;
+  valeur: string | number | boolean | (string | number)[];
+}
+
+export type ModeAgregation = 'compte' | 'compte-distinct' | 'somme' | 'moyenne';
+
+export interface Valeur {
+  mode: ModeAgregation;
+  /** Colonne à sommer, moyenner ou dédoublonner. Inutile en mode `compte`. */
+  colonne?: string;
+  /** Nombre de décimales à l'affichage. */
+  decimales?: number;
+}
+
+/** Dimension : une colonne, et de quoi la présenter. */
+export interface Dimension {
+  colonne: string;
+  /** Correspondance valeur brute -> libellé affiché. Absente : valeur brute. */
+  libelles?: Record<string, string>;
+  /** Libellés abrégés, pour les en-têtes de colonnes serrés. */
+  libellesCourts?: Record<string, string>;
+  /** Ordre imposé. Les valeurs absentes de la liste sont rejetées. */
+  ordre?: string[];
+  /** À défaut d'ordre imposé : par effectif décroissant, ou alphabétique. */
+  tri?: 'valeur-desc' | 'alpha';
+  /** Ne garder que les modalités effectivement peuplées. */
+  masquerVides?: boolean;
+}
+
+/** Bloc commun à tous les widgets : ce qu'on lit, et comment on l'intitule. */
+export interface ConfigCommune {
+  titre?: string;
+  sousTitre?: string;
+  table: string;
+  filtres?: Filtre[];
+  valeur?: Valeur;
+  /** Suffixe d'unité affiché après les valeurs (« j », « % »…). */
+  suffixe?: string;
+}
+
+export interface ConfigHeatmap extends ConfigCommune {
+  lignes: Dimension;
+  colonnes: Dimension;
+  /** `racine` tasse les écarts d'ordre de grandeur ; monotone, l'ordre tient. */
+  echelle?: 'lineaire' | 'racine';
+  totaux?: boolean;
+}
+
+export interface ConfigBarres extends ConfigCommune {
+  lignes: Dimension;
+}
+
+export interface ConfigLigne extends ConfigCommune {
+  /** Axe des abscisses. `format: mois` attend un horodatage Grist. */
+  x: Dimension & { format?: 'mois' | 'brut' };
+  /** Séries superposées. Absente : une seule série. */
+  series?: Dimension & { max?: number; libelleAutres?: string };
+}
+
+/** Réalisé et objectif viennent de deux tables, jointes sur un groupe commun. */
+export interface ConfigObjectif {
+  titre?: string;
+  sousTitre?: string;
+  realise: { table: string; filtres?: Filtre[]; groupe: string; valeur: Valeur };
+  objectif: { table: string; filtres?: Filtre[]; groupe: string; valeur: Valeur };
+  libelles?: Record<string, string>;
+}
+
+export type Config = ConfigHeatmap | ConfigBarres | ConfigLigne | ConfigObjectif;

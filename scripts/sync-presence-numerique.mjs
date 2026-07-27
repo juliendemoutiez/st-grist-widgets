@@ -29,33 +29,45 @@ const GRIST_API_KEY = requireEnv('GRIST_API_KEY');
 const GRIST_DOC_ID = requireEnv('GRIST_DOC_ID');
 const GRIST_TABLE_ID = process.env.GRIST_TABLE_ID ?? 'Collectivites';
 
-const UPSERT_KEY = 'siret';
 const BATCH_SIZE = 500;
 
 // Grist column id -> { type, label }. Codes (siret, siren, insee, postal...)
 // are kept as Text to preserve leading zeros; only true counts are numeric.
 const COLUMNS = {
-  type: { type: 'Text', label: 'Type' },
-  siret: { type: 'Text', label: 'SIRET' },
-  siren: { type: 'Text', label: 'SIREN' },
-  libelle: { type: 'Text', label: 'Libellé' },
-  population: { type: 'Int', label: 'Population' },
-  code_insee: { type: 'Text', label: 'Code INSEE' },
-  code_postal: { type: 'Text', label: 'Code postal' },
-  epci_libelle: { type: 'Text', label: "Libellé de l'EPCI" },
-  epci_siren: { type: 'Text', label: "SIREN de l'EPCI" },
-  epci_siret: { type: 'Text', label: "SIRET de l'EPCI" },
-  epci_population: { type: 'Int', label: "Population de l'EPCI" },
-  departement_code_insee: { type: 'Text', label: 'Code INSEE du département' },
-  departement_siret: { type: 'Text', label: 'SIRET du département' },
-  region_code_insee: { type: 'Text', label: 'Code INSEE de la région' },
-  region_siret: { type: 'Text', label: 'SIRET de la région' },
-  adresse_messagerie: { type: 'Text', label: 'Adresse e-mail' },
-  site_internet: { type: 'Text', label: 'Site internet' },
-  telephone: { type: 'Text', label: 'Téléphone' },
-  rpnt: { type: 'Text', label: 'RPNT (Référentiel de la Présence Numérique des Territoires)' },
-  service_public_url: { type: 'Text', label: 'Page Service-Public.fr' },
+  Type: { type: 'Text', label: 'Type' },
+  SIRET: { type: 'Text', label: 'SIRET' },
+  SIREN: { type: 'Text', label: 'SIREN' },
+  Libelle: { type: 'Text', label: 'Libellé' },
+  Population: { type: 'Int', label: 'Population' },
+  Code_INSEE: { type: 'Text', label: 'Code INSEE' },
+  Code_postal: { type: 'Text', label: 'Code postal' },
+  EPCI_SIRET: { type: 'Text', label: 'EPCI SIRET' },
+  Departement_Code_INSEE: { type: 'Text', label: 'Département Code INSEE' },
+  Region_Code_INSEE: { type: 'Text', label: 'Région Code INSEE' },
+  Adresse_e_mail: { type: 'Text', label: 'Adresse e-mail' },
+  Site_internet: { type: 'Text', label: 'Site internet' },
+  Telephone: { type: 'Text', label: 'Téléphone' },
+  RPNT: { type: 'Text', label: 'RPNT' },
+  URL_Service_Public_fr: { type: 'Text', label: 'URL Service-Public.fr' },
 };
+
+const DATASET_FIELD_BY_COLUMN = {
+  SIRET: 'siret',
+  SIREN: 'siren',
+  Libelle: 'libelle',
+  Population: 'population',
+  Code_postal: 'code_postal',
+  EPCI_SIRET: 'epci_siret',
+  Departement_Code_INSEE: 'departement_code_insee',
+  Region_Code_INSEE: 'region_code_insee',
+  Adresse_e_mail: 'adresse_messagerie',
+  Site_internet: 'site_internet',
+  Telephone: 'telephone',
+  RPNT: 'rpnt',
+  URL_Service_Public_fr: 'service_public_url',
+};
+
+const UPSERT_COLUMN = 'SIRET';
 
 // Dataset "type" values -> French display labels.
 const TYPE_LABELS = {
@@ -144,15 +156,15 @@ function resolveCodeInsee(record) {
 function toGristFields(record) {
   const fields = {};
   for (const colId of Object.keys(COLUMNS)) {
-    if (colId === 'type') {
+    if (colId === 'Type') {
       fields[colId] = TYPE_LABELS[record.type] ?? record.type ?? null;
       continue;
     }
-    if (colId === 'code_insee') {
+    if (colId === 'Code_INSEE') {
       fields[colId] = resolveCodeInsee(record);
       continue;
     }
-    const value = record[colId];
+    const value = record[DATASET_FIELD_BY_COLUMN[colId]];
     fields[colId] = Array.isArray(value) ? value.join(', ') : (value ?? null);
   }
   return fields;
@@ -161,7 +173,7 @@ function toGristFields(record) {
 async function upsertBatch(records) {
   const body = {
     records: records.map((record) => ({
-      require: { [UPSERT_KEY]: record[UPSERT_KEY] },
+      require: { [UPSERT_COLUMN]: record.siret },
       fields: toGristFields(record),
     })),
   };

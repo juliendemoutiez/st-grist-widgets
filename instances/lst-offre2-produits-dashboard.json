@@ -1,0 +1,189 @@
+{
+  "titre": "Offre 2 - indirect : déploiement par outil",
+  "blocs": [
+    {
+      "type": "heatmap",
+      "titre": "Collectivités actives par région et par outil",
+      "sousTitre": "Une collectivité équipée de plusieurs outils est comptée dans chaque colonne.",
+      "table": "Deploiements",
+      "filtres": [
+        {
+          "colonne": "offre",
+          "valeur": "OFFRE_2_INDIRECT"
+        }
+      ],
+      "lignes": {
+        "colonne": "region",
+        "libelles": {
+          "AUVERGNE_RHONE_ALPES": "Auvergne-Rhône-Alpes",
+          "BOURGOGNE_FRANCHE_COMTE": "Bourgogne-Franche-Comté",
+          "BRETAGNE": "Bretagne",
+          "CENTRE_VAL_DE_LOIRE": "Centre-Val de Loire",
+          "CORSE": "Corse",
+          "GRAND_EST": "Grand Est",
+          "HAUTS_DE_FRANCE": "Hauts-de-France",
+          "ILE_DE_FRANCE": "Île-de-France",
+          "NORMANDIE": "Normandie",
+          "NOUVELLE_AQUITAINE": "Nouvelle-Aquitaine",
+          "OCCITANIE": "Occitanie",
+          "PAYS_DE_LA_LOIRE": "Pays de la Loire",
+          "PROVENCE_ALPES_COTE_D_AZUR": "Provence-Alpes-Côte d'Azur",
+          "GUADELOUPE": "Guadeloupe",
+          "GUYANE": "Guyane",
+          "MARTINIQUE": "Martinique",
+          "MAYOTTE": "Mayotte",
+          "REUNION": "La Réunion",
+          "POLYNESIE": "Polynésie"
+        },
+        "tri": "valeur-desc"
+      },
+      "colonnes": {
+        "colonne": "produit",
+        "libelles": {
+          "PROCONNECT": "ProConnect",
+          "MESSAGES": "Messages",
+          "FICHIERS": "Fichiers",
+          "RENDEZ_VOUS": "Rendez-vous",
+          "AGENTS_EN_INTERVENTION": "Agents en intervention",
+          "ESPACE_SUR_DEMANDE": "Espace sur demande",
+          "PROJETS": "Projets",
+          "GRIST": "Grist",
+          "ANNUAIRE_DES_COLLECTIVITES": "Annuaire des collectivités",
+          "MON_SUIVI_SOCIAL": "Mon suivi social",
+          "MES_ADRESSES": "Mes adresses",
+          "DEVECO": "DevEco",
+          "BAL": "Base adresse locale",
+          "AIDES_TERRITOIRES": "Aides-territoires",
+          "MON_ESPACE_COLLECTIVITE": "Mon espace collectivité",
+          "ADMINISTRATION": "Administration +",
+          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique"
+        },
+        "libellesCourts": {
+          "PROCONNECT": "ProConnect",
+          "MESSAGES": "Messages",
+          "FICHIERS": "Fichiers",
+          "RENDEZ_VOUS": "Rendez-vous",
+          "AGENTS_EN_INTERVENTION": "Agents interv.",
+          "ESPACE_SUR_DEMANDE": "Espace s/ dem.",
+          "PROJETS": "Projets",
+          "GRIST": "Grist",
+          "ANNUAIRE_DES_COLLECTIVITES": "Annuaire",
+          "MON_SUIVI_SOCIAL": "Suivi social",
+          "MES_ADRESSES": "Mes adresses",
+          "DEVECO": "DevEco",
+          "BAL": "BAL",
+          "AIDES_TERRITOIRES": "Aides-terr.",
+          "MON_ESPACE_COLLECTIVITE": "Mon espace",
+          "ADMINISTRATION": "Admin +",
+          "MON_INCLUSION_NUMERIQUE": "Inclusion num."
+        },
+        "tri": "valeur-desc",
+        "masquerVides": true
+      },
+      "valeur": {
+        "mode": "compte"
+      },
+      "echelle": "racine"
+    },
+    {
+      "type": "objectif",
+      "titre": "Collectivités actives comparées à l'objectif",
+      "realise": {
+        "table": "Deploiements",
+        "filtres": [
+          {
+            "colonne": "offre",
+            "valeur": "OFFRE_2_INDIRECT"
+          }
+        ],
+        "groupe": "region",
+        "valeur": {
+          "mode": "compte-distinct",
+          "colonne": "twenty_id"
+        }
+      },
+      "objectif": {
+        "table": "Objectifs",
+        "filtres": [
+          {
+            "colonne": "offre",
+            "valeur": "OFFRE_2_INDIRECT"
+          }
+        ],
+        "groupe": "region",
+        "valeur": {
+          "mode": "somme",
+          "colonne": "cible"
+        }
+      },
+      "libelles": {
+        "AUVERGNE_RHONE_ALPES": "Auvergne-Rhône-Alpes",
+        "BOURGOGNE_FRANCHE_COMTE": "Bourgogne-Franche-Comté",
+        "BRETAGNE": "Bretagne",
+        "CENTRE_VAL_DE_LOIRE": "Centre-Val de Loire",
+        "CORSE": "Corse",
+        "GRAND_EST": "Grand Est",
+        "HAUTS_DE_FRANCE": "Hauts-de-France",
+        "ILE_DE_FRANCE": "Île-de-France",
+        "NORMANDIE": "Normandie",
+        "NOUVELLE_AQUITAINE": "Nouvelle-Aquitaine",
+        "OCCITANIE": "Occitanie",
+        "PAYS_DE_LA_LOIRE": "Pays de la Loire",
+        "PROVENCE_ALPES_COTE_D_AZUR": "Provence-Alpes-Côte d'Azur",
+        "GUADELOUPE": "Guadeloupe",
+        "GUYANE": "Guyane",
+        "MARTINIQUE": "Martinique",
+        "MAYOTTE": "Mayotte",
+        "REUNION": "La Réunion",
+        "POLYNESIE": "Polynésie"
+      }
+    },
+    {
+      "type": "ligne",
+      "titre": "Évolution mensuelle",
+      "sousTitre": "Effectifs figés au premier de chaque mois.",
+      "table": "Snapshots",
+      "filtres": [
+        {
+          "colonne": "dimension",
+          "valeur": "PRODUIT"
+        },
+        {
+          "colonne": "offre",
+          "valeur": "OFFRE_2_INDIRECT"
+        }
+      ],
+      "x": {
+        "colonne": "periode",
+        "format": "mois"
+      },
+      "series": {
+        "colonne": "valeur",
+        "libelles": {
+          "PROCONNECT": "ProConnect",
+          "MESSAGES": "Messages",
+          "FICHIERS": "Fichiers",
+          "RENDEZ_VOUS": "Rendez-vous",
+          "AGENTS_EN_INTERVENTION": "Agents en intervention",
+          "ESPACE_SUR_DEMANDE": "Espace sur demande",
+          "PROJETS": "Projets",
+          "GRIST": "Grist",
+          "ANNUAIRE_DES_COLLECTIVITES": "Annuaire des collectivités",
+          "MON_SUIVI_SOCIAL": "Mon suivi social",
+          "MES_ADRESSES": "Mes adresses",
+          "DEVECO": "DevEco",
+          "BAL": "Base adresse locale",
+          "AIDES_TERRITOIRES": "Aides-territoires",
+          "MON_ESPACE_COLLECTIVITE": "Mon espace collectivité",
+          "ADMINISTRATION": "Administration +",
+          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique"
+        },
+        "max": 4
+      },
+      "valeur": {
+        "mode": "somme",
+        "colonne": "nb"
+      }
+    }
+  ]
+}

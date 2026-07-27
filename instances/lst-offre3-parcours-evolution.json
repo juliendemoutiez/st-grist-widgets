@@ -1,0 +1,21 @@
+{
+  "titre": "Évolution du temps moyen, mois par mois",
+  "sousTitre": "Une pente descendante signale une activation qui s'accélère.",
+  "table": "Historique_Parcours",
+  "filtres": [
+    {
+      "colonne": "champ",
+      "valeur": "parcoursDirecte"
+    }
+  ],
+  "x": {
+    "colonne": "date",
+    "format": "mois"
+  },
+  "valeur": {
+    "mode": "moyenne",
+    "colonne": "duree_etape_jours",
+    "decimales": 1
+  },
+  "suffixe": " j"
+}
