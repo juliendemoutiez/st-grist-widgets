@@ -6,8 +6,11 @@ import {
   appliquerFiltres,
   cleTemporelle,
   debutDeMois,
+  debutDeSemaine,
   formatMois,
+  formatSemaine,
   moisEntre,
+  semainesEntre,
   grouper,
   libelleDe,
   ordonner,
@@ -53,11 +56,14 @@ export function VueLigne({ config: c }: { config: ConfigLigne }) {
    * l'axe se resserre sur les seules périodes actives et la pente ment.
    */
   const parMois = c.x.format === 'mois';
+  const parSemaine = c.x.format === 'semaine';
+  const parPeriode = parMois || parSemaine;
+  const debutPeriode = parMois ? debutDeMois : debutDeSemaine;
   const parX = new Map<string, Ligne[]>();
   const bruteX = new Map<string, unknown>();
   for (const l of filtrees) {
     const brut = l[c.x.colonne];
-    const groupe = parMois ? debutDeMois(brut) : brut;
+    const groupe = parPeriode ? debutPeriode(brut) : brut;
     if (groupe === null || groupe === undefined || groupe === '') continue;
     const cle = texte(groupe);
     bruteX.set(cle, groupe);
@@ -67,9 +73,10 @@ export function VueLigne({ config: c }: { config: ConfigLigne }) {
   }
 
   let clesX: string[];
-  if (parMois && parX.size) {
+  if (parPeriode && parX.size) {
     const bornes = [...bruteX.values()].map((v) => cleTemporelle(v));
-    clesX = moisEntre(Math.min(...bornes), Math.max(...bornes)).map(String);
+    const suite = parMois ? moisEntre : semainesEntre;
+    clesX = suite(Math.min(...bornes), Math.max(...bornes)).map(String);
     for (const cle of clesX) if (!bruteX.has(cle)) bruteX.set(cle, Number(cle));
   } else {
     const temporel = c.x.format !== 'brut';
@@ -78,9 +85,11 @@ export function VueLigne({ config: c }: { config: ConfigLigne }) {
     );
   }
 
-  const abscisses = clesX.map((cle) =>
-    parMois ? formatMois(bruteX.get(cle)) : libelleDe(c.x, cle),
-  );
+  const abscisses = clesX.map((cle) => {
+    if (parMois) return formatMois(bruteX.get(cle));
+    if (parSemaine) return formatSemaine(bruteX.get(cle));
+    return libelleDe(c.x, cle);
+  });
 
   // Une seule série si aucune colonne de séries n'est configurée.
   let series: SerieCourbe[];

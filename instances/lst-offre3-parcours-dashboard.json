@@ -1,5 +1,5 @@
 {
-  "titre": "Offre 3 - direct : avancement des parcours",
+  "titre": "Offre 3 - direct : Avancement des parcours",
   "blocs": [
     {
       "type": "heatmap",
@@ -13,6 +13,10 @@
         {
           "colonne": "offre",
           "valeur": "OFFRE_3_DIRECT"
+        },
+        {
+          "colonne": "periode",
+          "operateur": "maximum"
         }
       ],
       "lignes": {
@@ -143,7 +147,7 @@
       "type": "barres",
       "titre": "Ancienneté médiane des collectivités encore à l'étape",
       "sousTitre": "Temps écoulé depuis leur entrée dans l'étape où elles se trouvent aujourd'hui. Minoré : l'historique commence au 1er juillet.",
-      "table": "Anciennete_Parcours",
+      "table": "Parcours_Courant",
       "filtres": [
         {
           "colonne": "champ",
@@ -196,8 +200,8 @@
     },
     {
       "type": "ligne",
-      "titre": "Évolution du temps moyen, mois par mois",
-      "sousTitre": "Une pente descendante signale une activation qui s'accélère.",
+      "titre": "Évolution du temps médian, semaine par semaine",
+      "sousTitre": "Une pente descendante signale une activation qui s'accélère. Le parcours n'est suivi dans le CRM que depuis juillet.",
       "table": "Historique_Parcours",
       "filtres": [
         {
@@ -207,10 +211,10 @@
       ],
       "x": {
         "colonne": "date",
-        "format": "mois"
+        "format": "semaine"
       },
       "valeur": {
-        "mode": "moyenne",
+        "mode": "mediane",
         "colonne": "duree_etape_jours",
         "decimales": 1
       },

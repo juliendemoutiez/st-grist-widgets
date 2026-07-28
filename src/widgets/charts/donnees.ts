@@ -68,13 +68,34 @@ export function texte(v: unknown): string {
 
 export function appliquerFiltres(lignes: Ligne[], filtres?: Filtre[]): Ligne[] {
   if (!filtres?.length) return lignes;
-  return lignes.filter((l) =>
-    filtres.every((f) => {
-      const attendues = Array.isArray(f.valeur) ? f.valeur.map(String) : [String(f.valeur)];
-      const presentes = valeursDe(l[f.colonne]).map(String);
-      return presentes.some((v) => attendues.includes(v));
-    }),
-  );
+
+  const egalites = filtres.filter((f) => f.operateur !== 'maximum');
+  const maximums = filtres.filter((f) => f.operateur === 'maximum');
+
+  let restantes = egalites.length
+    ? lignes.filter((l) =>
+        egalites.every((f) => {
+          const attendues = Array.isArray(f.valeur) ? f.valeur.map(String) : [String(f.valeur)];
+          const presentes = valeursDe(l[f.colonne]).map(String);
+          return presentes.some((v) => attendues.includes(v));
+        }),
+      )
+    : lignes;
+
+  /*
+   * Les maximums s'évaluent après les égalités : « la dernière période » veut
+   * dire la dernière parmi les lignes déjà retenues, pas dans toute la table.
+   */
+  for (const f of maximums) {
+    const valeurs = restantes
+      .map((l) => l[f.colonne])
+      .filter((v): v is number | string => v !== null && v !== undefined && v !== '');
+    if (!valeurs.length) continue;
+    const max = valeurs.reduce((a, b) => (a >= b ? a : b));
+    restantes = restantes.filter((l) => l[f.colonne] === max);
+  }
+
+  return restantes;
 }
 
 /**
@@ -200,6 +221,30 @@ export function debutDeMois(brut: unknown): number | null {
   if (typeof brut !== 'number' || !brut) return null;
   const d = new Date(brut * 1000);
   return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) / 1000);
+}
+
+/** Ramène un horodatage au lundi de sa semaine. */
+export function debutDeSemaine(brut: unknown): number | null {
+  if (typeof brut !== 'number' || !brut) return null;
+  const d = new Date(brut * 1000);
+  const jour = (d.getUTCDay() + 6) % 7; // lundi = 0
+  const lundi = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - jour);
+  return Math.floor(lundi / 1000);
+}
+
+/** Un horodatage vers « 20 juil. ». */
+export function formatSemaine(brut: unknown): string {
+  if (typeof brut !== 'number' || !brut) return texte(brut);
+  const d = new Date(brut * 1000);
+  return `${d.getUTCDate()} ${MOIS_COURTS[d.getUTCMonth()]}`;
+}
+
+/** Suite continue de lundis entre deux bornes incluses. */
+export function semainesEntre(debut: number, fin: number): number[] {
+  const out: number[] = [];
+  const SEMAINE = 7 * 86400;
+  for (let t = debut, garde = 0; t <= fin && garde < 600; t += SEMAINE, garde++) out.push(t);
+  return out;
 }
 
 /** Suite continue de premiers-de-mois entre deux bornes incluses. */

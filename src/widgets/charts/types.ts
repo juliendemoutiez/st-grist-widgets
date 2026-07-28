@@ -6,10 +6,18 @@
  * archivé dans `instances/*.json`.
  */
 
-/** Filtre d'égalité ; `valeur` peut lister plusieurs valeurs acceptées. */
+/**
+ * Filtre sur une colonne.
+ *
+ * Par défaut, égalité : `valeur` peut lister plusieurs valeurs acceptées.
+ * Avec `operateur: 'maximum'`, aucune valeur n'est attendue — seules les lignes
+ * portant la plus grande valeur de la colonne sont gardées. C'est ce qui permet
+ * de lire la dernière période d'une table de snapshots sans la coder en dur.
+ */
 export interface Filtre {
   colonne: string;
-  valeur: string | number | boolean | (string | number)[];
+  valeur?: string | number | boolean | (string | number)[];
+  operateur?: 'egal' | 'maximum';
 }
 
 export type ModeAgregation = 'compte' | 'compte-distinct' | 'somme' | 'moyenne' | 'mediane';
@@ -73,8 +81,12 @@ export interface ConfigBarres extends ConfigCommune {
 }
 
 export interface ConfigLigne extends ConfigCommune {
-  /** Axe des abscisses. `format: mois` attend un horodatage Grist. */
-  x: Dimension & { format?: 'mois' | 'brut' };
+  /**
+   * Axe des abscisses. `mois` et `semaine` attendent un horodatage Grist et
+   * regroupent les enregistrements sur la période ; `brut` prend la valeur
+   * telle quelle.
+   */
+  x: Dimension & { format?: 'mois' | 'semaine' | 'brut' };
   /** Séries superposées. Absente : une seule série. */
   series?: Dimension & { max?: number; libelleAutres?: string };
 }
