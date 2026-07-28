@@ -131,69 +131,13 @@
           "ORIENTE",
           "CONTACT_EN_COURS",
           "CONFORMITE_EN_COURS",
-          "ACTIVATION_EN_COURS",
-          "ACTIVE"
+          "ACTIVATION_EN_COURS"
         ],
         "masquerVides": true
       },
       "valeur": {
         "mode": "mediane",
         "colonne": "duree_etape_jours",
-        "decimales": 1
-      },
-      "suffixe": " j",
-      "afficherEffectif": true
-    },
-    {
-      "type": "barres",
-      "titre": "Ancienneté médiane des collectivités encore à l'étape",
-      "sousTitre": "Temps écoulé depuis leur entrée dans l'étape où elles se trouvent aujourd'hui. Minoré : l'historique commence au 1er juillet.",
-      "table": "Parcours_Courant",
-      "filtres": [
-        {
-          "colonne": "champ",
-          "valeur": "parcoursIndirecte"
-        }
-      ],
-      "lignes": {
-        "colonne": "etape",
-        "libelles": {
-          "A_CONTACTER": "À contacter",
-          "A_ORIENTER": "À orienter",
-          "ORIENTE": "Orientée",
-          "CONTACT_EN_COURS": "Contact en cours",
-          "PREMIER_APPEL_PROGRAMME": "Premier appel programmé",
-          "CONFORMITE_EN_COURS": "Conformité en cours",
-          "ACTIVATION_EN_COURS": "Activation en cours",
-          "ACTIVE": "Active",
-          "STOP": "Arrêt",
-          "HORS_SEUIL": "Hors seuil",
-          "PAS_COMMENCE": "Pas commencé",
-          "ECHANGES_EN_COURS": "Échanges en cours",
-          "CONTRACTUALISATION": "Contractualisation",
-          "CONFIGURATION": "Configuration",
-          "DIFFUSION": "Diffusion",
-          "INTENTION": "Intention",
-          "CADRAGE_TECHNIQUE": "Cadrage technique",
-          "CHOIX_PRESTA": "Choix prestataire",
-          "ATELIER_TECHNIQUE_1": "Atelier technique 1",
-          "ATELIER_TECHNIQUE_2": "Atelier technique 2",
-          "MISE_EN_PRODUCTION": "Mise en production",
-          "EN_PRODUCTION": "En production"
-        },
-        "ordre": [
-          "A_ORIENTER",
-          "ORIENTE",
-          "CONTACT_EN_COURS",
-          "CONFORMITE_EN_COURS",
-          "ACTIVATION_EN_COURS",
-          "ACTIVE"
-        ],
-        "masquerVides": true
-      },
-      "valeur": {
-        "mode": "mediane",
-        "colonne": "anciennete_jours",
         "decimales": 1
       },
       "suffixe": " j",

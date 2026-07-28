@@ -117,38 +117,9 @@
           "label": "Courrier d'attribution"
         },
         {
-          "colId": "Avis_prefecture",
-          "icon": "gavel",
-          "label": "Avis préfecture"
-        },
-        {
           "colId": "Modules_Pix",
           "icon": "school",
           "label": "Modules Pix"
-        },
-        {
-          "colId": "Mail_Pre_Cadrage",
-          "icon": "mark_email_read",
-          "label": "Mail pré-cadrage",
-          "readOnly": true
-        },
-        {
-          "colId": "Mail_Post_Immersion",
-          "icon": "mark_email_read",
-          "label": "Mail post-immersion",
-          "readOnly": true
-        },
-        {
-          "colId": "Mail_Post_Restitution_Intermediaire",
-          "icon": "mark_email_read",
-          "label": "Mail post-restitution intermédiaire",
-          "readOnly": true
-        },
-        {
-          "colId": "Mail_etat_local_OPSN",
-          "icon": "mark_email_read",
-          "label": "Mail état local OPSN",
-          "readOnly": true
         }
       ],
       "sections": [

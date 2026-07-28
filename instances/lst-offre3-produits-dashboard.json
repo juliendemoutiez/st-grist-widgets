@@ -4,12 +4,16 @@
     {
       "type": "heatmap",
       "titre": "Collectivités actives par région et par outil",
-      "sousTitre": "Une collectivité équipée de plusieurs outils est comptée dans chaque colonne",
+      "sousTitre": "Collectivités arrivées à l'étape « Active » du parcours. Une collectivité équipée de plusieurs outils est comptée dans chaque colonne",
       "table": "Deploiements",
       "filtres": [
         {
           "colonne": "offre",
           "valeur": "OFFRE_3_DIRECT"
+        },
+        {
+          "colonne": "parcours_directe",
+          "valeur": "ACTIVE"
         }
       ],
       "lignes": {
