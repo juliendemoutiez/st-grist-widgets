@@ -34,7 +34,7 @@ function parseAlert(raw: string): { type: AlertType; message: string } {
 export function FormScreen({ config, mode, children }: FormScreenProps) {
   const { updateColumnWidgetOptions } = useGrist();
   const {
-    title, fields, refReloadKey, recordId, activeRecordId, headerDate, columnMeta,
+    title, fields, refReloadKey, recordId, activeRecordId, headerDate, columnMeta, readOnlyFields,
     onTitleChange, onTitleBlur, onFieldChange, onFieldBlur,
     onBack, onNewRecord, onRefAdd, onRefEdit,
   } = useFormData(config, mode);
@@ -105,7 +105,7 @@ export function FormScreen({ config, mode, children }: FormScreenProps) {
               onAdd={f.refAddScreen ? () => onRefAdd(f.colId, f.refAddScreen!) : undefined}
               onClickSelected={f.refEditScreen ? (v, label) => onRefEdit(f.colId, f.refEditScreen!, v, label) : undefined}
               refReloadTrigger={refReloadKey}
-              readOnly={f.readOnly}
+              readOnly={f.readOnly || readOnlyFields.has(f.colId)}
               required={f.required}
               avatar={f.avatar}
               transform={f.transform}

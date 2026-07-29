@@ -15,6 +15,7 @@ export { GristProvider, useGrist } from './contexts/GristContext';
 // Hooks
 export { useColumnMeta } from './hooks/useColumnMeta';
 export type { ColumnMeta } from './hooks/useColumnMeta';
+export { useReadOnlyFields } from './hooks/useReadOnlyFields';
 export { useRelativeDate } from './hooks/useRelativeDate';
 
 // Types

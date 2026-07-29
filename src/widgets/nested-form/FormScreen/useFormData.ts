@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigation, useGrist, useColumnMeta, useRelativeDate } from '@grist-widgets/ui';
+import { useNavigation, useGrist, useColumnMeta, useReadOnlyFields, useRelativeDate } from '@grist-widgets/ui';
 import type { FormConfig, ColumnMeta } from '@grist-widgets/ui';
 
 /** Props carried on the navigation stack when pushing a subForm screen. */
@@ -25,6 +25,8 @@ export interface UseFormDataReturn {
   activeRecordId: number | null;
   headerDate: string;
   columnMeta: Record<string, ColumnMeta>;
+  /** Columns the access rules forbid this user from writing. */
+  readOnlyFields: Set<string>;
   onTitleChange: ((v: string) => void) | undefined;
   onTitleBlur: (() => void) | undefined;
   onFieldChange: (colId: string, value: unknown) => void;
@@ -40,6 +42,7 @@ export interface UseFormDataReturn {
 export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm'): UseFormDataReturn {
   const { record, updateCurrentRecord, fetchTable, createRecord, updateRecord, setCursorPos } = useGrist();
   const columnMeta = useColumnMeta(config.table);
+  const readOnlyFields = useReadOnlyFields(config.table);
   const { push, pop, resetToRoot, stack, popResult, clearPopResult } = useNavigation();
 
   const [title, setTitle] = useState('');
@@ -413,6 +416,7 @@ export function useFormData(config: FormConfig, mode: 'currentRecord' | 'subForm
     activeRecordId,
     headerDate,
     columnMeta,
+    readOnlyFields,
     onTitleChange: config.titleReadOnly ? undefined : (v: string) => setTitle(v),
     onTitleBlur: config.titleReadOnly ? undefined : saveTitle,
     onFieldChange: handleFieldChange,
