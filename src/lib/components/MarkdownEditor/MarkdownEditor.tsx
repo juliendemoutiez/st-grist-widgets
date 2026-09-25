@@ -78,7 +78,8 @@ export function MarkdownEditor({ icon, label, value, onChange, onBlur, readOnly,
     prevResetToken.current = resetToken;
     if (tokenChanged || (value !== prevValue.current && !userEdited.current)) {
       userEdited.current = false;
-      editor.commands.setContent(value || '');
+      // emitUpdate: false — otherwise onUpdate fires and flags this programmatic sync as a user edit
+      editor.commands.setContent(value || '', { emitUpdate: false });
     }
     prevValue.current = value;
   }, [value, editor, resetToken]);
