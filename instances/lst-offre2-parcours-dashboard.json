@@ -4,19 +4,11 @@
     {
       "type": "heatmap",
       "titre": "Collectivités par état de parcours et par région",
-      "table": "Snapshots",
+      "table": "Collectivites_summary_offre_lancee_parcours_directe_parcours_indirecte_produits_actifs_region",
       "filtres": [
         {
-          "colonne": "dimension",
-          "valeur": "ETAT_PARCOURS"
-        },
-        {
-          "colonne": "offre",
-          "valeur": "OFFRE_2_INDIRECT"
-        },
-        {
-          "colonne": "periode",
-          "operateur": "maximum"
+          "colonne": "offre_lancee",
+          "valeur": "EN_INDIRECT"
         }
       ],
       "lignes": {
@@ -45,7 +37,7 @@
         "tri": "valeur-desc"
       },
       "colonnes": {
-        "colonne": "valeur",
+        "colonne": "parcours_indirecte",
         "libelles": {
           "A_CONTACTER": "À contacter",
           "A_ORIENTER": "À orienter",
@@ -83,8 +75,8 @@
         "masquerVides": true
       },
       "valeur": {
-        "mode": "somme",
-        "colonne": "nb"
+        "mode": "compte-distinct",
+        "colonne": "group"
       },
       "echelle": "racine",
       "entetes": "oblique"

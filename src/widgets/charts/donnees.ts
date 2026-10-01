@@ -173,9 +173,11 @@ export function grouper(lignes: Ligne[], colonne: string): Map<string, Ligne[]> 
   return groupes;
 }
 
-export const libelleDe = (dim: Dimension, cle: string) => dim.libelles?.[cle] ?? cle;
+const brutDe = (dim: Dimension, cle: string) =>
+  dim.format === 'mois' ? formatMois(Number(cle)) : cle;
+export const libelleDe = (dim: Dimension, cle: string) => dim.libelles?.[cle] ?? brutDe(dim, cle);
 export const libelleCourtDe = (dim: Dimension, cle: string) =>
-  dim.libellesCourts?.[cle] ?? dim.libelles?.[cle] ?? cle;
+  dim.libellesCourts?.[cle] ?? dim.libelles?.[cle] ?? brutDe(dim, cle);
 
 /**
  * Ordonne les modalités : ordre imposé s'il existe, sinon tri demandé.
@@ -191,6 +193,7 @@ export function ordonner(
     return gardees;
   }
   const cles = [...presentes];
+  if (dim.format === 'mois' && !dim.tri) return cles.sort((a, b) => Number(a) - Number(b));
   if (dim.tri === 'alpha') {
     return cles.sort((a, b) => libelleDe(dim, a).localeCompare(libelleDe(dim, b), 'fr'));
   }

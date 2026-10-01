@@ -5,11 +5,11 @@
       "type": "heatmap",
       "titre": "Collectivités actives par région et par outil",
       "sousTitre": "Collectivités arrivées à l'étape « Active » du parcours. Une collectivité équipée de plusieurs outils est comptée dans chaque colonne",
-      "table": "Deploiements",
+      "table": "Collectivites_summary_offre_lancee_parcours_directe_parcours_indirecte_produits_actifs_region",
       "filtres": [
         {
-          "colonne": "offre",
-          "valeur": "OFFRE_2_INDIRECT"
+          "colonne": "offre_lancee",
+          "valeur": "EN_INDIRECT"
         },
         {
           "colonne": "parcours_indirecte",
@@ -42,7 +42,7 @@
         "tri": "valeur-desc"
       },
       "colonnes": {
-        "colonne": "produit",
+        "colonne": "produits_actifs",
         "libelles": {
           "PROCONNECT": "ProConnect",
           "MESSAGES": "Messages",
@@ -88,7 +88,7 @@
       },
       "valeur": {
         "mode": "compte-distinct",
-        "colonne": "twenty_id"
+        "colonne": "group"
       },
       "echelle": "racine",
       "entetes": "oblique"
@@ -157,16 +157,16 @@
     {
       "type": "ligne",
       "titre": "Évolution mensuelle",
-      "sousTitre": "Nombre de collectivités au premier de chaque mois",
-      "table": "Snapshots",
+      "sousTitre": "Collectivités actives à la fin de chaque mois ; le mois en cours montre l'état actuel",
+      "table": "Etats_Mensuels",
       "filtres": [
         {
-          "colonne": "dimension",
-          "valeur": "PRODUIT"
+          "colonne": "offre_lancee",
+          "valeur": "EN_INDIRECT"
         },
         {
-          "colonne": "offre",
-          "valeur": "OFFRE_2_INDIRECT"
+          "colonne": "parcours_indirecte",
+          "valeur": "ACTIVE"
         }
       ],
       "x": {
@@ -174,7 +174,7 @@
         "format": "mois"
       },
       "series": {
-        "colonne": "valeur",
+        "colonne": "produit",
         "libelles": {
           "PROCONNECT": "ProConnect",
           "MESSAGES": "Messages",

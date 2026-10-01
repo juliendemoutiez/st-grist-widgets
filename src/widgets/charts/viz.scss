@@ -402,6 +402,22 @@ thead .viz__chaleur-entete {
   color: var(--text-muted);
 }
 
+/* Légende d'un dégradé personnalisé : bornes de l'échelle de part et d'autre. */
+.viz__chaleur-legende {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+
+  div {
+    width: 200px;
+    height: 10px;
+    border-radius: 3px;
+  }
+}
+
 .viz__vide {
   padding: 24px;
   text-align: center;

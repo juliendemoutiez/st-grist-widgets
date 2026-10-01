@@ -46,6 +46,11 @@ export interface Dimension {
   tri?: 'valeur-desc' | 'alpha';
   /** Ne garder que les modalités effectivement peuplées. */
   masquerVides?: boolean;
+  /**
+   * `mois` : la colonne porte une date Grist, affichée « oct. 26 » et triée
+   * dans l'ordre chronologique à défaut d'`ordre` ou de `tri`.
+   */
+  format?: 'mois';
 }
 
 /** Bloc commun à tous les widgets : ce qu'on lit, et comment on l'intitule. */
@@ -71,6 +76,19 @@ export interface ConfigHeatmap extends ConfigCommune {
    * larges, les libellés passant alors à la ligne si besoin.
    */
   entetes?: 'oblique' | 'horizontal';
+  /**
+   * Dégradé personnalisé à la place de la rampe bleue : couleurs CSS (`#rrggbb`
+   * ou `rgb()`) réparties à intervalles égaux du bas au haut de l'échelle,
+   * interpolées comme un `linear-gradient`. Une légende s'affiche sous la
+   * grille. Avec un dégradé, zéro est une valeur colorée comme une autre ;
+   * seules les cases sans donnée restent vides.
+   */
+  couleurs?: string[];
+  /**
+   * Bornes de l'échelle de couleur, par exemple `[0, 100]` pour un taux. À
+   * défaut, du minimum au maximum observés.
+   */
+  domaine?: [number, number];
 }
 
 export interface ConfigBarres extends ConfigCommune {
@@ -89,7 +107,7 @@ export interface ConfigLigne extends ConfigCommune {
    * regroupent les enregistrements sur la période ; `brut` prend la valeur
    * telle quelle.
    */
-  x: Dimension & { format?: 'mois' | 'semaine' | 'brut' };
+  x: Omit<Dimension, 'format'> & { format?: 'mois' | 'semaine' | 'brut' };
   /** Séries superposées. Absente : une seule série. */
   series?: Dimension & { max?: number; libelleAutres?: string };
 }

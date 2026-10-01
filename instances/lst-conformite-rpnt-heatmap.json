@@ -1,0 +1,50 @@
+{
+  "titre": "Conformité au RPNT par région",
+  "sousTitre": "Part des collectivités conformes au référentiel de la présence numérique des territoires (critère global), chaque mois",
+  "table": "RPNT_Regions",
+  "lignes": {
+    "colonne": "region",
+    "libelles": {
+      "AUVERGNE_RHONE_ALPES": "Auvergne-Rhône-Alpes",
+      "BOURGOGNE_FRANCHE_COMTE": "Bourgogne-Franche-Comté",
+      "BRETAGNE": "Bretagne",
+      "CENTRE_VAL_DE_LOIRE": "Centre-Val de Loire",
+      "CORSE": "Corse",
+      "GRAND_EST": "Grand Est",
+      "HAUTS_DE_FRANCE": "Hauts-de-France",
+      "ILE_DE_FRANCE": "Île-de-France",
+      "NORMANDIE": "Normandie",
+      "NOUVELLE_AQUITAINE": "Nouvelle-Aquitaine",
+      "OCCITANIE": "Occitanie",
+      "PAYS_DE_LA_LOIRE": "Pays de la Loire",
+      "PROVENCE_ALPES_COTE_D_AZUR": "Provence-Alpes-Côte d'Azur",
+      "GUADELOUPE": "Guadeloupe",
+      "GUYANE": "Guyane",
+      "MARTINIQUE": "Martinique",
+      "MAYOTTE": "Mayotte",
+      "REUNION": "La Réunion"
+    },
+    "tri": "valeur-desc"
+  },
+  "colonnes": {
+    "colonne": "mois",
+    "format": "mois"
+  },
+  "valeur": {
+    "mode": "moyenne",
+    "colonne": "taux",
+    "decimales": 1
+  },
+  "suffixe": " %",
+  "totaux": false,
+  "entetes": "oblique",
+  "couleurs": [
+    "rgb(255, 104, 104)",
+    "rgb(255, 197, 121)",
+    "rgb(0, 144, 129)"
+  ],
+  "domaine": [
+    0,
+    100
+  ]
+}

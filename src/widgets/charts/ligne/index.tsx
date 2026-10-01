@@ -88,7 +88,7 @@ export function VueLigne({ config: c }: { config: ConfigLigne }) {
   const abscisses = clesX.map((cle) => {
     if (parMois) return formatMois(bruteX.get(cle));
     if (parSemaine) return formatSemaine(bruteX.get(cle));
-    return libelleDe(c.x, cle);
+    return libelleDe({ ...c.x, format: undefined }, cle);
   });
 
   // Une seule série si aucune colonne de séries n'est configurée.

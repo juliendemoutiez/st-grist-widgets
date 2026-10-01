@@ -428,6 +428,40 @@ const RAMPE_CHALEUR = [
 /** Au-delà de ce palier, le fond est trop foncé pour du texte sombre. */
 const PALIER_TEXTE_CLAIR = 3;
 
+type Rvb = [number, number, number];
+
+/** `#rrggbb`, `#rgb` ou `rgb(r, g, b)` vers ses trois composantes. */
+function lireCouleur(css: string): Rvb {
+  const hex = css.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const h = hex[1].length === 3 ? [...hex[1]].map((x) => x + x).join('') : hex[1];
+    return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as Rvb;
+  }
+  const rvb = css.match(/rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i);
+  return rvb ? [Number(rvb[1]), Number(rvb[2]), Number(rvb[3])] : [128, 128, 128];
+}
+
+/** Couleur à la position `t` (0 à 1) d'un dégradé à arrêts réguliers, comme `linear-gradient`. */
+function couleurDuDegrade(arrets: Rvb[], t: number): Rvb {
+  if (arrets.length === 1) return arrets[0];
+  const pos = Math.min(1, Math.max(0, t)) * (arrets.length - 1);
+  const i = Math.min(arrets.length - 2, Math.floor(pos));
+  const f = pos - i;
+  return arrets[i].map((a, k) => Math.round(a + (arrets[i + 1][k] - a) * f)) as Rvb;
+}
+
+/**
+ * Le texte clair ne gagne qu'au-dessous de cette luminance relative (WCAG) :
+ * c'est le point où le contraste avec le blanc dépasse celui avec le noir.
+ */
+function fondFonce([r, g, b]: Rvb): boolean {
+  const lin = (c: number) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b) < 0.179;
+}
+
 export function CarteChaleur({
   lignes,
   colonnes,
@@ -437,6 +471,8 @@ export function CarteChaleur({
   totalGeneral,
   suffixe = '',
   entetes = 'oblique',
+  couleurs,
+  domaine,
 }: {
   lignes: LigneChaleur[];
   colonnes: { cle: string; libelle: string; libelleLong: string }[];
@@ -447,6 +483,9 @@ export function CarteChaleur({
   totalGeneral: number;
   suffixe?: string;
   entetes?: 'oblique' | 'horizontal';
+  /** Dégradé personnalisé, cf. `ConfigHeatmap.couleurs`. */
+  couleurs?: string[];
+  domaine?: [number, number];
 }) {
   const { montrer, cacher, noeud } = useInfobulle();
 
@@ -461,6 +500,33 @@ export function CarteChaleur({
     const t = echelle === 'racine' ? Math.sqrt(v) / Math.sqrt(max) : v / max;
     return Math.min(RAMPE_CHALEUR.length - 1, Math.floor(t * RAMPE_CHALEUR.length));
   };
+
+  /*
+   * Avec un dégradé personnalisé, la couleur suit la valeur de façon continue
+   * entre les bornes du domaine, et zéro est coloré : pour un taux, 0 % est
+   * une mesure. Seule une case absente reste vide.
+   */
+  const arrets = couleurs?.length ? couleurs.map(lireCouleur) : null;
+  const observees = lignes.flatMap((l) =>
+    colonnes.map((c) => l.cellules[c.cle]).filter((v): v is number => v !== undefined),
+  );
+  const [bas, haut] = domaine ?? [Math.min(0, ...observees), Math.max(1, ...observees)];
+  const style = (v: number | undefined) => {
+    if (arrets) {
+      if (v === undefined) return { classe: undefined, fond: undefined };
+      const rvb = couleurDuDegrade(arrets, haut > bas ? (v - bas) / (haut - bas) : 0);
+      return {
+        classe: fondFonce(rvb) ? 'viz__chaleur-case--fonce' : undefined,
+        fond: `rgb(${rvb.join(', ')})`,
+      };
+    }
+    const p = palier(v ?? 0);
+    return {
+      classe: p >= PALIER_TEXTE_CLAIR ? 'viz__chaleur-case--fonce' : undefined,
+      fond: p >= 0 ? RAMPE_CHALEUR[p] : undefined,
+    };
+  };
+  const visible = (v: number | undefined) => (arrets ? v !== undefined : (v ?? 0) > 0);
 
   /*
    * Hauteur des en-têtes obliques : un libellé de n caractères écrit à -45°
@@ -510,25 +576,31 @@ export function CarteChaleur({
                   {l.libelle}
                 </th>
                 {colonnes.map((c) => {
-                  const v = l.cellules[c.cle] ?? 0;
-                  const p = palier(v);
+                  const brute = l.cellules[c.cle];
+                  const v = brute ?? 0;
+                  const { classe, fond } = style(brute);
                   return (
                     <td
                       key={c.cle}
-                      className={p >= PALIER_TEXTE_CLAIR ? 'viz__chaleur-case--fonce' : undefined}
-                      style={p >= 0 ? { background: RAMPE_CHALEUR[p] } : undefined}
+                      className={classe}
+                      style={fond ? { background: fond } : undefined}
                       onMouseMove={(e) =>
                         montrer(e, {
                           titre: l.libelle,
                           lignes: [
-                            { libelle: c.libelleLong, valeur: `${nombre(v)}${suffixe}` },
-                            { libelle: 'Total de la ligne', valeur: `${nombre(l.total)}${suffixe}` },
+                            {
+                              libelle: c.libelleLong,
+                              valeur: visible(brute) ? `${nombre(v)}${suffixe}` : 'pas de donnée',
+                            },
+                            ...(totaux
+                              ? [{ libelle: 'Total de la ligne', valeur: `${nombre(l.total)}${suffixe}` }]
+                              : []),
                           ],
                         })
                       }
                       onMouseLeave={cacher}
                     >
-                      {v > 0 ? nombre(v) : <span className="viz__chaleur-zero">·</span>}
+                      {visible(brute) ? nombre(v) : <span className="viz__chaleur-zero">·</span>}
                     </td>
                   );
                 })}
@@ -551,6 +623,13 @@ export function CarteChaleur({
           )}
         </table>
       </div>
+      {arrets && couleurs && (
+        <div className="viz__chaleur-legende" aria-hidden="true">
+          <span>{`${nombre(bas)}${suffixe}`}</span>
+          <div style={{ background: `linear-gradient(90deg, ${couleurs.join(', ')})` }} />
+          <span>{`${nombre(haut)}${suffixe}`}</span>
+        </div>
+      )}
       {noeud}
     </>
   );

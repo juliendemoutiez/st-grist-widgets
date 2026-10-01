@@ -112,6 +112,8 @@ export function VueHeatmap({ config: c }: { config: ConfigHeatmap }) {
           totalGeneral={totalGeneral}
           entetes={c.entetes}
           suffixe={c.suffixe}
+          couleurs={c.couleurs}
+          domaine={c.domaine}
         />
       </Bloc>
   );
