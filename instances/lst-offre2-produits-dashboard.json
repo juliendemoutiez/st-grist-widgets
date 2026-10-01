@@ -87,7 +87,8 @@
         "masquerVides": true
       },
       "valeur": {
-        "mode": "compte"
+        "mode": "compte-distinct",
+        "colonne": "twenty_id"
       },
       "echelle": "racine",
       "entetes": "oblique"

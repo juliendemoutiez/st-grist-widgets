@@ -87,8 +87,8 @@
         "masquerVides": true
       },
       "valeur": {
-        "mode": "somme",
-        "colonne": "count"
+        "mode": "compte-distinct",
+        "colonne": "group"
       },
       "echelle": "racine",
       "entetes": "oblique"

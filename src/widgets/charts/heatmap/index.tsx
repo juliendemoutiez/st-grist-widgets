@@ -8,6 +8,7 @@ import {
   libelleDe,
   ordonner,
   useTable,
+  valeursDe,
 } from '../donnees';
 import type { ConfigHeatmap } from '../types';
 
@@ -64,13 +65,29 @@ export function VueHeatmap({ config: c }: { config: ConfigHeatmap }) {
     cellulesPar.set(cleLigne, cellules);
   }
 
-  const totalDe = (cle: string) =>
-    clesColonnes.reduce((a, col) => a + (cellulesPar.get(cle)?.[col] ?? 0), 0);
+  /*
+   * Les totaux agrègent les lignes sources, ils n'additionnent pas les cases.
+   * Quand une ligne source tombe dans plusieurs colonnes (une collectivité et
+   * ses produits), la somme des cases la compterait plusieurs fois ; avec
+   * `compte-distinct`, le total de ligne reste un nombre de collectivités.
+   * Seules comptent les lignes sources présentes dans une colonne affichée.
+   */
+  const affichees = new Set(clesColonnes);
+  const dansAffichees = (paquet: typeof filtrees) =>
+    paquet.filter((l) => valeursDe(l[c.colonnes.colonne]).some((v) => affichees.has(String(v))));
+
+  const totauxLignes = new Map<string, number>();
+  for (const [cle, paquet] of parLigne) {
+    totauxLignes.set(cle, agregerOuZero(dansAffichees(paquet), c.valeur));
+  }
+  const totalDe = (cle: string) => totauxLignes.get(cle) ?? 0;
+  const totalGeneral = agregerOuZero(dansAffichees([...parLigne.values()].flat()), c.valeur);
 
   const lignes: LigneChaleur[] = ordonner(c.lignes, [...cellulesPar.keys()], totalDe).map((cle) => ({
     cle,
     libelle: libelleDe(c.lignes, cle),
     cellules: cellulesPar.get(cle) ?? {},
+    total: totalDe(cle),
   }));
 
   return (
@@ -91,6 +108,8 @@ export function VueHeatmap({ config: c }: { config: ConfigHeatmap }) {
           colonnes={colonnes}
           echelle={c.echelle}
           totaux={c.totaux !== false}
+          totauxColonnes={poidsColonne}
+          totalGeneral={totalGeneral}
           entetes={c.entetes}
           suffixe={c.suffixe}
         />

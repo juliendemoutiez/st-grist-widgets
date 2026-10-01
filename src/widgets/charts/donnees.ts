@@ -100,6 +100,16 @@ export function appliquerFiltres(lignes: Ligne[], filtres?: Filtre[]): Ligne[] {
 }
 
 /**
+ * Nombre de valeurs distinctes d'une colonne. Une liste (ChoiceList, RefList)
+ * compte chacun de ses éléments : c'est ce qui permet de dénombrer les
+ * collectivités d'une table résumé à partir de sa colonne `group`, même quand
+ * une collectivité figure dans plusieurs lignes.
+ */
+function distincts(lignes: Ligne[], col: string): number {
+  return new Set(lignes.flatMap((l) => valeursDe(l[col]).map(String))).size;
+}
+
+/**
  * Agrège un paquet de lignes selon le mode demandé.
  *
  * Renvoie `null` pour une moyenne sans aucune valeur numérique : un groupe qui
@@ -112,9 +122,7 @@ export function agreger(lignes: Ligne[], valeur?: Valeur): number | null {
 
   if (mode === 'compte' || !col) return lignes.length;
 
-  if (mode === 'compte-distinct') {
-    return new Set(lignes.map((l) => texte(l[col])).filter(Boolean)).size;
-  }
+  if (mode === 'compte-distinct') return distincts(lignes, col);
 
   const nombres = lignes
     .map((l) => l[col])
@@ -139,9 +147,7 @@ export function agreger(lignes: Ligne[], valeur?: Valeur): number | null {
 export function compteAgregeable(lignes: Ligne[], valeur?: Valeur): number {
   const col = valeur?.colonne;
   if (!col || valeur?.mode === 'compte') return lignes.length;
-  if (valeur?.mode === 'compte-distinct') {
-    return new Set(lignes.map((l) => texte(l[col])).filter(Boolean)).size;
-  }
+  if (valeur?.mode === 'compte-distinct') return distincts(lignes, col);
   return lignes.filter((l) => typeof l[col] === 'number' && Number.isFinite(l[col] as number)).length;
 }
 

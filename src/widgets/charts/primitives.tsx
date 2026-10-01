@@ -411,6 +411,8 @@ export interface LigneChaleur {
   cle: string;
   libelle: string;
   cellules: Record<string, number>;
+  /** Total agrégé sur les lignes sources, pas la somme des cases. */
+  total: number;
 }
 
 /** Rampe séquentielle : une seule teinte. C'est une magnitude, pas une identité. */
@@ -431,6 +433,8 @@ export function CarteChaleur({
   colonnes,
   echelle = 'racine',
   totaux = true,
+  totauxColonnes,
+  totalGeneral,
   suffixe = '',
   entetes = 'oblique',
 }: {
@@ -438,6 +442,9 @@ export function CarteChaleur({
   colonnes: { cle: string; libelle: string; libelleLong: string }[];
   echelle?: 'lineaire' | 'racine';
   totaux?: boolean;
+  /** Totaux agrégés sur les lignes sources, comme `LigneChaleur.total`. */
+  totauxColonnes: Map<string, number>;
+  totalGeneral: number;
   suffixe?: string;
   entetes?: 'oblique' | 'horizontal';
 }) {
@@ -466,10 +473,6 @@ export function CarteChaleur({
     ? Math.round(Math.min(120, carsMax * 11 * 0.55 * Math.SQRT1_2 + 12))
     : undefined;
   const classeEntete = oblique ? 'viz__chaleur-oblique' : 'viz__chaleur-droit';
-
-  const totalLigne = (l: LigneChaleur) => colonnes.reduce((a, c) => a + (l.cellules[c.cle] ?? 0), 0);
-  const totalColonne = (cle: string) => lignes.reduce((a, l) => a + (l.cellules[cle] ?? 0), 0);
-  const totalGeneral = lignes.reduce((a, l) => a + totalLigne(l), 0);
 
   return (
     <>
@@ -519,7 +522,7 @@ export function CarteChaleur({
                           titre: l.libelle,
                           lignes: [
                             { libelle: c.libelleLong, valeur: `${nombre(v)}${suffixe}` },
-                            { libelle: 'Total de la ligne', valeur: `${nombre(totalLigne(l))}${suffixe}` },
+                            { libelle: 'Total de la ligne', valeur: `${nombre(l.total)}${suffixe}` },
                           ],
                         })
                       }
@@ -529,7 +532,7 @@ export function CarteChaleur({
                     </td>
                   );
                 })}
-                {totaux && <td className="viz__chaleur-total">{nombre(totalLigne(l))}</td>}
+                {totaux && <td className="viz__chaleur-total">{nombre(l.total)}</td>}
               </tr>
             ))}
           </tbody>
@@ -540,7 +543,7 @@ export function CarteChaleur({
                   Total
                 </th>
                 {colonnes.map((c) => (
-                  <td key={c.cle}>{nombre(totalColonne(c.cle))}</td>
+                  <td key={c.cle}>{nombre(totauxColonnes.get(c.cle) ?? 0)}</td>
                 ))}
                 <td className="viz__chaleur-total">{nombre(totalGeneral)}</td>
               </tr>
