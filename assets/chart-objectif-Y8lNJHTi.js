@@ -1,0 +1,1 @@
+import{z as t,j as r,r as e,A as s,G as i}from"./NavigationContext-sPPvyzTK.js";import"./primitives-BZywE5fZ.js";import{O as o}from"./index-BYX5HhEI.js";t.createRoot(document.getElementById("root")).render(r.jsx(e.StrictMode,{children:r.jsx(s,{theme:"dsfr-light",children:r.jsx(i,{children:r.jsx(o,{})})})}));
