@@ -428,6 +428,16 @@ const RAMPE_CHALEUR = [
 /** Au-delà de ce palier, le fond est trop foncé pour du texte sombre. */
 const PALIER_TEXTE_CLAIR = 3;
 
+/*
+ * Largeur minimale d'une case. Le tableau ne descend pas sous la somme de ses
+ * colonnes : au-delà, `.viz__scroll` fait défiler horizontalement plutôt que
+ * d'écraser les cases. Les deux autres largeurs reprennent celles de viz.scss,
+ * et les 2 px par colonne l'espacement entre cases.
+ */
+const LARGEUR_MIN_CASE = 40;
+const LARGEUR_ENTETE_CHALEUR = 168;
+const LARGEUR_TOTAL_CHALEUR = 60;
+
 type Rvb = [number, number, number];
 
 /** `#rrggbb`, `#rgb` ou `rgb(r, g, b)` vers ses trois composantes. */
@@ -543,7 +553,15 @@ export function CarteChaleur({
   return (
     <>
       <div className="viz__scroll">
-        <table className="viz__chaleur">
+        <table
+          className="viz__chaleur"
+          style={{
+            minWidth: Math.max(
+              560,
+              LARGEUR_ENTETE_CHALEUR + (totaux ? LARGEUR_TOTAL_CHALEUR : 0) + colonnes.length * (LARGEUR_MIN_CASE + 2) + 4,
+            ),
+          }}
+        >
           <thead>
             <tr>
               <th scope="col" className="viz__chaleur-entete" />

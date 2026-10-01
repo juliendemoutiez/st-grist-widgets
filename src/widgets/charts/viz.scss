@@ -316,6 +316,8 @@ body,
   }
 
   tbody td {
+    /* Marge réduite : une case de 40 px doit encore contenir « 40,2 ». */
+    padding-inline: 4px;
     border-radius: 3px;
     background: var(--surface-2);
     color: var(--text-primary);
