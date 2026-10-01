@@ -87,7 +87,7 @@
         "colonne": "nb"
       },
       "echelle": "racine",
-      "entetes": "horizontal"
+      "entetes": "oblique"
     },
     {
       "type": "barres",

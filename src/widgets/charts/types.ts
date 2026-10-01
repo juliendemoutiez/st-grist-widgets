@@ -13,11 +13,14 @@
  * Avec `operateur: 'maximum'`, aucune valeur n'est attendue — seules les lignes
  * portant la plus grande valeur de la colonne sont gardées. C'est ce qui permet
  * de lire la dernière période d'une table de snapshots sans la coder en dur.
+ * Avec `operateur: 'vide'`, seules les lignes dont la colonne n'est pas
+ * renseignée sont gardées — par exemple un objectif sans produit, qui vaut
+ * pour tous les produits.
  */
 export interface Filtre {
   colonne: string;
   valeur?: string | number | boolean | (string | number)[];
-  operateur?: 'egal' | 'maximum';
+  operateur?: 'egal' | 'maximum' | 'vide';
 }
 
 export type ModeAgregation = 'compte' | 'compte-distinct' | 'somme' | 'moyenne' | 'mediane';

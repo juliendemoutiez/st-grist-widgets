@@ -60,7 +60,8 @@
           "AIDES_TERRITOIRES": "Aides-territoires",
           "MON_ESPACE_COLLECTIVITE": "Mon espace collectivité",
           "ADMINISTRATION": "Administration +",
-          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique"
+          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique",
+          "TOUTES_ET_TOUS_CONNECTES": "Toutes et tous connecté·e·s"
         },
         "libellesCourts": {
           "PROCONNECT": "ProConnect",
@@ -79,7 +80,8 @@
           "AIDES_TERRITOIRES": "Aides-terr.",
           "MON_ESPACE_COLLECTIVITE": "Mon espace",
           "ADMINISTRATION": "Admin +",
-          "MON_INCLUSION_NUMERIQUE": "Inclusion num."
+          "MON_INCLUSION_NUMERIQUE": "Inclusion num.",
+          "TOUTES_ET_TOUS_CONNECTES": "Tous connectés"
         },
         "tri": "valeur-desc",
         "masquerVides": true
@@ -88,23 +90,27 @@
         "mode": "compte"
       },
       "echelle": "racine",
-      "entetes": "horizontal"
+      "entetes": "oblique"
     },
     {
       "type": "objectif",
       "titre": "Collectivités actives comparées à l'objectif",
       "realise": {
-        "table": "Deploiements",
+        "table": "Collectivites_summary_offre_lancee_parcours_directe_parcours_indirecte_region",
         "filtres": [
           {
-            "colonne": "offre",
-            "valeur": "OFFRE_2_INDIRECT"
+            "colonne": "offre_lancee",
+            "valeur": "EN_INDIRECT"
+          },
+          {
+            "colonne": "parcours_indirecte",
+            "valeur": "ACTIVE"
           }
         ],
         "groupe": "region",
         "valeur": {
-          "mode": "compte-distinct",
-          "colonne": "twenty_id"
+          "mode": "somme",
+          "colonne": "count"
         }
       },
       "objectif": {
@@ -113,6 +119,10 @@
           {
             "colonne": "offre",
             "valeur": "OFFRE_2_INDIRECT"
+          },
+          {
+            "colonne": "produit",
+            "operateur": "vide"
           }
         ],
         "groupe": "region",
@@ -181,7 +191,8 @@
           "AIDES_TERRITOIRES": "Aides-territoires",
           "MON_ESPACE_COLLECTIVITE": "Mon espace collectivité",
           "ADMINISTRATION": "Administration +",
-          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique"
+          "MON_INCLUSION_NUMERIQUE": "Mon inclusion numérique",
+          "TOUTES_ET_TOUS_CONNECTES": "Toutes et tous connecté·e·s"
         },
         "max": 4
       },

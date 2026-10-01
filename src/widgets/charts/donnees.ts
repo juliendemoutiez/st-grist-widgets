@@ -75,8 +75,9 @@ export function appliquerFiltres(lignes: Ligne[], filtres?: Filtre[]): Ligne[] {
   let restantes = egalites.length
     ? lignes.filter((l) =>
         egalites.every((f) => {
-          const attendues = Array.isArray(f.valeur) ? f.valeur.map(String) : [String(f.valeur)];
           const presentes = valeursDe(l[f.colonne]).map(String);
+          if (f.operateur === 'vide') return presentes.length === 0;
+          const attendues = Array.isArray(f.valeur) ? f.valeur.map(String) : [String(f.valeur)];
           return presentes.some((v) => attendues.includes(v));
         }),
       )

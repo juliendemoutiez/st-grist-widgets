@@ -85,7 +85,7 @@
         "mode": "somme",
         "colonne": "nb"
       },
-      "entetes": "horizontal",
+      "entetes": "oblique",
       "echelle": "racine"
     },
     {
