@@ -97,7 +97,7 @@
       "type": "objectif",
       "titre": "Collectivités actives comparées à l'objectif",
       "realise": {
-        "table": "Collectivites_summary_offre_lancee_parcours_directe_parcours_indirecte_region",
+        "table": "Collectivites_summary_offre_lancee_parcours_directe_parcours_indirecte_produits_actifs_region",
         "filtres": [
           {
             "colonne": "offre_lancee",
@@ -110,8 +110,8 @@
         ],
         "groupe": "region",
         "valeur": {
-          "mode": "somme",
-          "colonne": "count"
+          "mode": "compte-distinct",
+          "colonne": "group"
         }
       },
       "objectif": {
