@@ -1,4 +1,4 @@
-import{w as u,j as e,W as d,z as m,r as f,A as p,G as g}from"./NavigationContext-sPPvyzTK.js";import"./primitives-BIWRhEcW.js";import{V as j}from"./index-BCVFmOc5.js";import{V as x}from"./index-BLh1nIX6.js";import{V as h}from"./index-DojhEXAg.js";import{V as v}from"./index-DZh2xsUl.js";const b=`{
+import{w as u,j as e,W as d,z as m,r as f,A as p,G as g}from"./NavigationContext-sPPvyzTK.js";import"./primitives-DO2VsBB2.js";import{V as j}from"./index-BtglxW1O.js";import{V as x}from"./index-EkH9-k1O.js";import{V as h}from"./index-C3pXum2I.js";import{V as v}from"./index-DTm3UfQh.js";const b=`{
   "titre": "Offre 3 - déploiement",
   "blocs": [
     {

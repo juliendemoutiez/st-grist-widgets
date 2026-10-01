@@ -1,4 +1,4 @@
-import{w as q,j as n,W as E}from"./NavigationContext-sPPvyzTK.js";import{u as D,a as _,g,b,o as h,l as v,c as T,B as W,C as w}from"./primitives-BIWRhEcW.js";const z=`{
+import{w as q,j as n,W as E}from"./NavigationContext-sPPvyzTK.js";import{u as D,a as _,g,b,o as h,l as v,c as T,B as W,C as w}from"./primitives-DO2VsBB2.js";const z=`{
   "titre": "Effectifs par région et par outil",
   "table": "Deploiements",
   "filtres": [{ "colonne": "offre", "valeur": "OFFRE_3_DIRECT" }],
