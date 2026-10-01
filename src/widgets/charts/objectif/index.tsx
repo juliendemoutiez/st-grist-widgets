@@ -49,18 +49,21 @@ export function VueObjectif({ config: c }: { config: ConfigObjectif }) {
   const cibles = parGroupe(objectif.lignes, c.objectif);
 
   /*
-   * Piloté par les objectifs : une ligne sans cible n'a rien à comparer.
-   * L'inverse — une cible sans réalisé — reste affichée, à zéro, car c'est
-   * une information utile.
+   * Toute région ayant un réalisé ou une cible est affichée. Sans cible, le
+   * réalisé reste lisible seul : les objectifs se saisissent au fil de l'eau,
+   * le graphique ne doit pas rester vide en attendant. Une cible sans réalisé
+   * s'affiche à zéro, car c'est une information utile.
    */
-  const lignes: LigneJauge[] = [...cibles.entries()]
-    .map(([cle, cible]) => ({
+  const cles = new Set([...faits.keys(), ...cibles.keys()]);
+  const lignes: LigneJauge[] = [...cles]
+    .map((cle) => ({
       cle,
       libelle: c.libelles?.[cle] ?? cle,
       realise: faits.get(cle) ?? 0,
-      cible,
+      cible: cibles.get(cle) ?? null,
     }))
-    .sort((a, b) => b.cible - a.cible);
+    // Les régions dotées d'un objectif d'abord, puis par réalisé décroissant.
+    .sort((a, b) => (b.cible ?? -1) - (a.cible ?? -1) || b.realise - a.realise);
 
   return (
       <Bloc
@@ -71,8 +74,8 @@ export function VueObjectif({ config: c }: { config: ConfigObjectif }) {
           lignes: lignes.map((l) => [
             l.libelle,
             l.realise,
-            l.cible,
-            l.cible > 0 ? `${Math.round((l.realise / l.cible) * 100)} %` : '-',
+            l.cible ?? '-',
+            l.cible ? `${Math.round((l.realise / l.cible) * 100)} %` : '-',
           ]),
         }}
       >

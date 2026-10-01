@@ -318,14 +318,15 @@ export interface LigneJauge {
   cle: string;
   libelle: string;
   realise: number;
-  cible: number;
+  /** `null` : pas d'objectif saisi, seul le réalisé est tracé. */
+  cible: number | null;
 }
 
 export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
   const { montrer, cacher, noeud } = useInfobulle();
-  if (!lignes.length) return <p className="viz__vide">Aucun objectif saisi pour ce périmètre.</p>;
+  if (!lignes.length) return <p className="viz__vide">Aucune donnée pour ce périmètre.</p>;
 
-  const max = Math.max(1, ...lignes.map((l) => Math.max(l.realise, l.cible)));
+  const max = Math.max(1, ...lignes.map((l) => Math.max(l.realise, l.cible ?? 0)));
   const largeurTrace = LARGEUR - LARGEUR_LIBELLE - RESERVE_ETIQUETTE_JAUGE;
   const hauteur = lignes.length * PAS + 8;
 
@@ -336,16 +337,20 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
           {lignes.map((ligne, i) => {
             const y = i * PAS;
             const lReal = (ligne.realise / max) * largeurTrace;
-            const lCible = (ligne.cible / max) * largeurTrace;
-            const atteint = ligne.cible > 0 && ligne.realise >= ligne.cible;
-            const pct = ligne.cible > 0 ? Math.round((ligne.realise / ligne.cible) * 100) : null;
+            const aCible = ligne.cible !== null;
+            const cible = ligne.cible ?? 0;
+            const lCible = (cible / max) * largeurTrace;
+            const atteint = cible > 0 && ligne.realise >= cible;
+            const pct = cible > 0 ? Math.round((ligne.realise / cible) * 100) : null;
             return (
               <g key={ligne.cle}>
                 <text className="viz__axe" x={LARGEUR_LIBELLE - 8} y={y + HAUTEUR_BARRE / 2} textAnchor="end" dominantBaseline="central">
                   {ligne.libelle}
                 </text>
                 {/* Piste = objectif ; la barre colorée est le réalisé. */}
-                <rect x={LARGEUR_LIBELLE} y={y + 4} width={Math.max(lCible, 1)} height={HAUTEUR_BARRE - 8} rx={3} fill="var(--objectif)" opacity={0.35} />
+                {aCible && (
+                  <rect x={LARGEUR_LIBELLE} y={y + 4} width={Math.max(lCible, 1)} height={HAUTEUR_BARRE - 8} rx={3} fill="var(--objectif)" opacity={0.35} />
+                )}
                 <rect
                   className="viz__marque"
                   x={LARGEUR_LIBELLE}
@@ -355,7 +360,7 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
                   rx={3}
                   fill={atteint ? 'var(--series-3)' : 'var(--series-1)'}
                 />
-                {ligne.cible > 0 && (
+                {cible > 0 && (
                   <line
                     x1={LARGEUR_LIBELLE + lCible}
                     x2={LARGEUR_LIBELLE + lCible}
@@ -366,7 +371,8 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
                   />
                 )}
                 <text className="viz__valeur" x={LARGEUR_LIBELLE + Math.max(lReal, lCible) + 8} y={y + HAUTEUR_BARRE / 2} dominantBaseline="central">
-                  {nombre(ligne.realise)} / {nombre(ligne.cible)}
+                  {nombre(ligne.realise)}
+                  {aCible ? ` / ${nombre(cible)}` : ''}
                   {pct !== null ? `  (${pct} %)` : ''}
                 </text>
                 <rect
@@ -380,7 +386,7 @@ export function Jauges({ lignes }: { lignes: LigneJauge[] }) {
                       titre: ligne.libelle,
                       lignes: [
                         { libelle: 'Réalisé', valeur: nombre(ligne.realise), couleur: atteint ? 'var(--series-3)' : 'var(--series-1)' },
-                        { libelle: 'Objectif', valeur: nombre(ligne.cible) },
+                        { libelle: 'Objectif', valeur: aCible ? nombre(cible) : 'non saisi' },
                         { libelle: 'Atteinte', valeur: pct !== null ? `${pct} %` : '-' },
                       ],
                     })
